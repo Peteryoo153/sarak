@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'core/theme/app_theme.dart';
 import 'core/database/local_storage.dart';
 import 'features/home/screens/home_screen.dart';
@@ -11,6 +13,9 @@ import 'features/settings/screens/settings_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await LocalStorage.init();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(const ProviderScope(child: SarakApp()));
 }
@@ -43,7 +48,6 @@ class MainShellState extends State<MainShell> {
 
   void switchTab(int index) {
     setState(() => _currentIndex = index);
-    // 달력 탭으로 전환 시 데이터 새로고침
     if (index == 1) {
       _calendarKey.currentState?.loadData();
     }

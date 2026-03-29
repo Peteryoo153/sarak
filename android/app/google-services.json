@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "422313768010",
+    "project_id": "sarak-821b2",
+    "storage_bucket": "sarak-821b2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:422313768010:android:ad3e2746483d75049ea2b3",
+        "android_client_info": {
+          "package_name": "com.chanhoyoo.sarak"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCqf0QB6SvLo4_0PVN97HdT3fDFvkqodF4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
