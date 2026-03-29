@@ -29,6 +29,7 @@ dependencies:
   # 공유 카드 이미지 생성
   screenshot: ^2.3.0
   share_plus: ^9.0.0
+  google_fonts: ^8.0.2
 
 dev_dependencies:
   flutter_test:

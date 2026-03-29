@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/database/bible_database.dart';
+import '../../../core/database/reading_settings.dart';
 
 class ReadingScreen extends StatefulWidget {
   final int bookId;
@@ -28,10 +30,12 @@ class _ReadingScreenState extends State<ReadingScreen> {
   bool _isCompleted = false;
   int _currentChapterIndex = 0;
   final TextEditingController _commentController = TextEditingController();
+  final ReadingSettings _settings = ReadingSettings();
 
   @override
   void initState() {
     super.initState();
+    _settings.load().then((_) => setState(() {}));
     _loadVerses();
   }
 
@@ -71,74 +75,126 @@ class _ReadingScreenState extends State<ReadingScreen> {
     );
   }
 
-  String get _chapterRangeText {
-    if (widget.chapters.length == 1) {
-      return '${widget.bookName} ${widget.chapters.first}장';
+  void _showSettingsSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _SettingsSheet(settings: _settings),
+    ).then((_) => setState(() {}));
+  }
+
+  Color get _bgColor => _settings.isDarkMode
+      ? const Color(0xFF1A1A1A)
+      : AppColors.bg;
+  Color get _textColor => _settings.isDarkMode
+      ? const Color(0xFFE8E2D8)
+      : AppColors.text;
+  Color get _cardColor => _settings.isDarkMode
+      ? const Color(0xFF2A2A2A)
+      : AppColors.bgCard;
+  Color get _borderColor => _settings.isDarkMode
+      ? const Color(0xFF3A3A3A)
+      : AppColors.border;
+
+  TextStyle _getFontStyle() {
+    final base = TextStyle(
+      fontSize: _settings.fontSize,
+      height: 1.8,
+      color: _textColor,
+      fontWeight: FontWeight.w400,
+    );
+    switch (_settings.fontFamily) {
+      case 'NanumMyeongjo':
+        return GoogleFonts.nanumMyeongjo(textStyle: base);
+      case 'NanumGothic':
+        return GoogleFonts.nanumGothic(textStyle: base);
+      case 'serif':
+        return base.copyWith(fontFamily: 'Georgia');
+      case 'sans-serif':
+        return base.copyWith(fontFamily: 'Helvetica');
+      default:
+        return base;
     }
-    return '${widget.bookName} ${widget.chapters.first}-${widget.chapters.last}장';
+  }
+
+  TextStyle _getPreviewFontStyle(ReadingSettings s) {
+    final base = TextStyle(
+      fontSize: s.fontSize,
+      height: 1.8,
+      color: s.isDarkMode ? const Color(0xFFE8E2D8) : AppColors.text,
+      fontWeight: FontWeight.w400,
+    );
+    switch (s.fontFamily) {
+      case 'NanumMyeongjo':
+        return GoogleFonts.nanumMyeongjo(textStyle: base);
+      case 'NanumGothic':
+        return GoogleFonts.nanumGothic(textStyle: base);
+      case 'serif':
+        return base.copyWith(fontFamily: 'Georgia');
+      case 'sans-serif':
+        return base.copyWith(fontFamily: 'Helvetica');
+      default:
+        return base;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: _bgColor,
       appBar: AppBar(
-        backgroundColor: AppColors.bg,
+        backgroundColor: _bgColor,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, size: 18),
+          icon: Icon(Icons.arrow_back_ios, size: 18, color: _textColor),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Day ${widget.dayNumber}',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
-            color: AppColors.text,
+            color: _textColor,
           ),
         ),
         actions: [
           if (widget.chapters.length > 1)
-            Row(
-              children: widget.chapters.asMap().entries.map((e) {
-                final isActive = e.key == _currentChapterIndex;
-                return GestureDetector(
-                  onTap: () {
-                    setState(() => _currentChapterIndex = e.key);
-                    _loadVerses();
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.only(right: 6),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: isActive
-                          ? AppColors.primary
-                          : AppColors.bgElevated,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      '${e.value}장',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: isActive
-                            ? Colors.white
-                            : AppColors.textSecondary,
-                      ),
+            ...widget.chapters.asMap().entries.map((e) {
+              final isActive = e.key == _currentChapterIndex;
+              return GestureDetector(
+                onTap: () {
+                  setState(() => _currentChapterIndex = e.key);
+                  _loadVerses();
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(right: 6),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: isActive ? AppColors.primary : _bgColor,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: _borderColor),
+                  ),
+                  child: Text(
+                    '${e.value}장',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: isActive ? Colors.white : _textColor,
                     ),
                   ),
-                );
-              }).toList(),
-            ),
-          const SizedBox(width: 16),
+                ),
+              );
+            }),
+          IconButton(
+            icon: Icon(Icons.text_fields, color: _textColor),
+            onPressed: _showSettingsSheet,
+          ),
         ],
       ),
       body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(
-                color: AppColors.accent,
-              ),
-            )
+          ? Center(
+              child: CircularProgressIndicator(color: AppColors.accent))
           : Column(
               children: [
                 Expanded(child: _buildVerseList()),
@@ -176,15 +232,15 @@ class _ReadingScreenState extends State<ReadingScreen> {
           ),
           Text(
             '${widget.chapters[_currentChapterIndex]}장',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.w800,
-              color: AppColors.text,
+              color: _textColor,
               letterSpacing: -1,
             ),
           ),
           const SizedBox(height: 8),
-          Divider(color: AppColors.border),
+          Divider(color: _borderColor),
         ],
       ),
     );
@@ -202,8 +258,8 @@ class _ReadingScreenState extends State<ReadingScreen> {
             width: 28,
             child: Text(
               '$verseNum',
-              style: const TextStyle(
-                fontSize: 11,
+              style: TextStyle(
+                fontSize: _settings.fontSize * 0.75,
                 fontWeight: FontWeight.w700,
                 color: AppColors.accent,
                 height: 1.8,
@@ -213,12 +269,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(
-                fontSize: 16,
-                height: 1.8,
-                color: AppColors.text,
-                fontWeight: FontWeight.w400,
-              ),
+              style: _getFontStyle(),
             ),
           ),
         ],
@@ -231,8 +282,8 @@ class _ReadingScreenState extends State<ReadingScreen> {
       padding: EdgeInsets.fromLTRB(
           20, 12, 20, MediaQuery.of(context).padding.bottom + 12),
       decoration: BoxDecoration(
-        color: AppColors.bgCard,
-        border: Border(top: BorderSide(color: AppColors.border)),
+        color: _cardColor,
+        border: Border(top: BorderSide(color: _borderColor)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -247,11 +298,11 @@ class _ReadingScreenState extends State<ReadingScreen> {
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: AppColors.border),
+                borderSide: BorderSide(color: _borderColor),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: AppColors.border),
+                borderSide: BorderSide(color: _borderColor),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
@@ -260,10 +311,12 @@ class _ReadingScreenState extends State<ReadingScreen> {
               contentPadding: const EdgeInsets.symmetric(
                   horizontal: 14, vertical: 10),
               filled: true,
-              fillColor: AppColors.bgElevated,
+              fillColor: _settings.isDarkMode
+                  ? const Color(0xFF2A2A2A)
+                  : AppColors.bgElevated,
             ),
             maxLines: 2,
-            style: const TextStyle(fontSize: 14),
+            style: TextStyle(fontSize: 14, color: _textColor),
           ),
           const SizedBox(height: 10),
           SizedBox(
@@ -271,8 +324,9 @@ class _ReadingScreenState extends State<ReadingScreen> {
             child: ElevatedButton(
               onPressed: _isCompleted ? null : _completeReading,
               style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    _isCompleted ? AppColors.success : AppColors.primary,
+                backgroundColor: _isCompleted
+                    ? AppColors.success
+                    : AppColors.primary,
                 foregroundColor: Colors.white,
                 disabledBackgroundColor: AppColors.success,
                 disabledForegroundColor: Colors.white,
@@ -289,6 +343,232 @@ class _ReadingScreenState extends State<ReadingScreen> {
                   fontWeight: FontWeight.w700,
                 ),
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════
+// 설정 시트
+// ═══════════════════════════════════════
+class _SettingsSheet extends StatefulWidget {
+  final ReadingSettings settings;
+  const _SettingsSheet({required this.settings});
+
+  @override
+  State<_SettingsSheet> createState() => _SettingsSheetState();
+}
+
+class _SettingsSheetState extends State<_SettingsSheet> {
+  TextStyle _getPreviewFontStyle(ReadingSettings s) {
+    final base = TextStyle(
+      fontSize: s.fontSize,
+      height: 1.8,
+      color: s.isDarkMode ? const Color(0xFFE8E2D8) : AppColors.text,
+      fontWeight: FontWeight.w400,
+    );
+    switch (s.fontFamily) {
+      case 'NanumMyeongjo':
+        return GoogleFonts.nanumMyeongjo(textStyle: base);
+      case 'NanumGothic':
+        return GoogleFonts.nanumGothic(textStyle: base);
+      case 'serif':
+        return base.copyWith(fontFamily: 'Georgia');
+      case 'sans-serif':
+        return base.copyWith(fontFamily: 'Helvetica');
+      default:
+        return base;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = widget.settings;
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: EdgeInsets.fromLTRB(
+          24, 20, 24, MediaQuery.of(context).padding.bottom + 24),
+      decoration: BoxDecoration(
+        color: s.isDarkMode ? const Color(0xFF2A2A2A) : AppColors.bgCard,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Container(
+              width: 40, height: 4,
+              margin: const EdgeInsets.only(bottom: 20),
+              decoration: BoxDecoration(
+                color: AppColors.border,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          Text(
+            '읽기 설정',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              color: s.isDarkMode ? Colors.white : AppColors.text,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            '글자 크기',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              IconButton(
+                onPressed: () {
+                  s.setFontSize(s.fontSize - 1);
+                  setState(() {});
+                },
+                icon: const Icon(Icons.remove_circle_outline),
+                color: AppColors.accent,
+              ),
+              Expanded(
+                child: Slider(
+                  value: s.fontSize,
+                  min: 12,
+                  max: 24,
+                  divisions: 12,
+                  activeColor: AppColors.accent,
+                  onChanged: (v) {
+                    s.setFontSize(v);
+                    setState(() {});
+                  },
+                ),
+              ),
+              IconButton(
+                onPressed: () {
+                  s.setFontSize(s.fontSize + 1);
+                  setState(() {});
+                },
+                icon: const Icon(Icons.add_circle_outline),
+                color: AppColors.accent,
+              ),
+              Text(
+                '${s.fontSize.round()}px',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            '폰트',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: s.fontOptions.map((font) {
+              final isSelected = s.fontFamily == font.name;
+              return GestureDetector(
+                onTap: () {
+                  s.setFontFamily(font.name);
+                  setState(() {});
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? AppColors.primary
+                        : s.isDarkMode
+                            ? const Color(0xFF3A3A3A)
+                            : AppColors.bgElevated,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: isSelected
+                          ? AppColors.primary
+                          : AppColors.border,
+                    ),
+                  ),
+                  child: Text(
+                    font.label,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: isSelected
+                          ? Colors.white
+                          : s.isDarkMode
+                              ? Colors.white70
+                              : AppColors.text,
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Text(
+                '다크 모드',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: s.isDarkMode ? Colors.white : AppColors.text,
+                ),
+              ),
+              const Spacer(),
+              Switch(
+                value: s.isDarkMode,
+                activeColor: AppColors.accent,
+                onChanged: (v) {
+                  s.setDarkMode(v);
+                  setState(() {});
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: s.isDarkMode
+                  ? const Color(0xFF1A1A1A)
+                  : AppColors.bgElevated,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '1  ',
+                  style: TextStyle(
+                    fontSize: s.fontSize * 0.75,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.accent,
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    '태초에 하나님이 천지를 창조하시니라',
+                    style: _getPreviewFontStyle(s),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -333,7 +613,6 @@ class _CompletionSheet extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // 드래그 핸들
           Container(
             width: 40, height: 4,
             margin: const EdgeInsets.only(bottom: 20),
@@ -355,7 +634,7 @@ class _CompletionSheet extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            '23일 연속 통독 달성!\n오늘도 말씀과 동행하셨습니다.',
+            '오늘도 말씀과 동행하셨습니다.',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
@@ -364,8 +643,6 @@ class _CompletionSheet extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-
-          // 공유 카드 미리보기
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(20),
@@ -380,34 +657,21 @@ class _CompletionSheet extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: AppColors.accent.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        'Day $dayNumber',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.accentLight,
-                        ),
-                      ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: AppColors.accent.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    'Day $dayNumber',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.accentLight,
                     ),
-                    const Spacer(),
-                    Text(
-                      '🔥 23일 연속',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.accentLight,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Text(
@@ -446,8 +710,6 @@ class _CompletionSheet extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-
-          // 버튼
           Row(
             children: [
               Expanded(
