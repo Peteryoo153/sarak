@@ -38,16 +38,22 @@ class MainShell extends StatefulWidget {
 
 class MainShellState extends State<MainShell> {
   int _currentIndex = 0;
+  final GlobalKey<CalendarScreenState> _calendarKey =
+      GlobalKey<CalendarScreenState>();
 
   void switchTab(int index) {
     setState(() => _currentIndex = index);
+    // 달력 탭으로 전환 시 데이터 새로고침
+    if (index == 1) {
+      _calendarKey.currentState?.loadData();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final screens = [
       HomeScreen(onTabSwitch: switchTab),
-      const CalendarScreen(),
+      CalendarScreen(key: _calendarKey),
       const GroupScreen(),
       const SettingsScreen(),
     ];
@@ -59,7 +65,12 @@ class MainShellState extends State<MainShell> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
+        onTap: (index) {
+          setState(() => _currentIndex = index);
+          if (index == 1) {
+            _calendarKey.currentState?.loadData();
+          }
+        },
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),

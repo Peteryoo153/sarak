@@ -13,7 +13,6 @@ class LocalStorage {
     return _prefs!;
   }
 
-  // ─── 플랜 저장/불러오기 ───────────────────────
   static Future<void> savePlan(Map<String, dynamic> plan) async {
     await _p.setString('current_plan', jsonEncode(plan));
   }
@@ -26,11 +25,14 @@ class LocalStorage {
 
   static Future<void> clearPlan() async {
     await _p.remove('current_plan');
+    await _p.remove('completed_days');
+    await _p.setInt('current_streak', 0);
+    await _p.setInt('best_streak', 0);
   }
 
-  // ─── 완료 기록 저장/불러오기 ──────────────────
-  static Future<void> markDayComplete(int dayNumber, {String comment = ''}) async {
-    final key = 'completed_days';
+  static Future<void> markDayComplete(int dayNumber,
+      {String comment = ''}) async {
+    const key = 'completed_days';
     final raw = _p.getString(key) ?? '{}';
     final Map<String, dynamic> data = jsonDecode(raw);
     data[dayNumber.toString()] = {
@@ -51,7 +53,6 @@ class LocalStorage {
     return data.containsKey(dayNumber.toString());
   }
 
-  // ─── Streak 계산 ──────────────────────────────
   static Future<void> _updateStreak(int dayNumber) async {
     final completed = getCompletedDays();
     int streak = 0;
@@ -68,7 +69,6 @@ class LocalStorage {
   static int getStreak() => _p.getInt('current_streak') ?? 0;
   static int getBestStreak() => _p.getInt('best_streak') ?? 0;
 
-  // ─── 현재 Day 번호 ────────────────────────────
   static int getCurrentDay() {
     final plan = loadPlan();
     if (plan == null) return 1;
@@ -78,12 +78,75 @@ class LocalStorage {
     return diff.clamp(1, (plan['totalDays'] as int?) ?? 365);
   }
 
-  // ─── 전체 진행률 ──────────────────────────────
   static double getProgress() {
     final plan = loadPlan();
     if (plan == null) return 0.0;
     final totalDays = (plan['totalDays'] as int?) ?? 1;
     final completed = getCompletedDays().length;
     return (completed / totalDays).clamp(0.0, 1.0);
+  }
+
+  static Future<void> addBookmark({
+    required int bookId,
+    required String bookName,
+    required int chapter,
+    required int verse,
+    required String text,
+  }) async {
+    const key = 'bookmarks';
+    final raw = _p.getString(key) ?? '[]';
+    final List<dynamic> list = jsonDecode(raw);
+
+    final exists = list.any((b) =>
+        b['bookId'] == bookId &&
+        b['chapter'] == chapter &&
+        b['verse'] == verse);
+
+    if (!exists) {
+      list.add({
+        'bookId': bookId,
+        'bookName': bookName,
+        'chapter': chapter,
+        'verse': verse,
+        'text': text,
+        'savedAt': DateTime.now().toIso8601String(),
+      });
+      await _p.setString(key, jsonEncode(list));
+    }
+  }
+
+  static Future<void> removeBookmark({
+    required int bookId,
+    required int chapter,
+    required int verse,
+  }) async {
+    const key = 'bookmarks';
+    final raw = _p.getString(key) ?? '[]';
+    final List<dynamic> list = jsonDecode(raw);
+    list.removeWhere((b) =>
+        b['bookId'] == bookId &&
+        b['chapter'] == chapter &&
+        b['verse'] == verse);
+    await _p.setString(key, jsonEncode(list));
+  }
+
+  static bool isBookmarked({
+    required int bookId,
+    required int chapter,
+    required int verse,
+  }) {
+    final raw = _p.getString('bookmarks') ?? '[]';
+    final List<dynamic> list = jsonDecode(raw);
+    return list.any((b) =>
+        b['bookId'] == bookId &&
+        b['chapter'] == chapter &&
+        b['verse'] == verse);
+  }
+
+  static List<Map<String, dynamic>> getBookmarks() {
+    final raw = _p.getString('bookmarks') ?? '[]';
+    final List<dynamic> list = jsonDecode(raw);
+    return list.cast<Map<String, dynamic>>()
+      ..sort((a, b) => b['savedAt'].compareTo(a['savedAt']));
   }
 }

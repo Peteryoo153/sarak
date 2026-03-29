@@ -35,6 +35,60 @@ class _PlanSetupScreenState extends State<PlanSetupScreen> {
   }
 
   Future<void> _startPlan() async {
+    // 기존 플랜이 있으면 경고 팝업
+    final existingPlan = LocalStorage.loadPlan();
+    if (existingPlan != null) {
+      final confirm = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text(
+            '플랜을 변경할까요?',
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+              color: AppColors.text,
+            ),
+          ),
+          content: const Text(
+            '새 플랜을 시작하면 기존 진행 기록이 모두 초기화됩니다.\n정말 변경하시겠습니까?',
+            style: TextStyle(
+              fontSize: 14,
+              height: 1.6,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text(
+                '취소',
+                style: TextStyle(color: AppColors.textSecondary),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text('변경하기'),
+            ),
+          ],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+      );
+      if (confirm != true) return;
+
+      // 기존 기록 초기화
+      await LocalStorage.clearPlan();
+    }
+
     setState(() => _isGenerating = true);
     final range = _ranges[_selectedRange];
     final plans = await ScheduleEngine.generatePlan(
@@ -156,7 +210,9 @@ class _PlanSetupScreenState extends State<PlanSetupScreen> {
             child: Row(
               children: [
                 Icon(
-                  isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
+                  isSelected
+                      ? Icons.radio_button_checked
+                      : Icons.radio_button_off,
                   size: 20,
                   color: isSelected ? Colors.white : AppColors.textTertiary,
                 ),
@@ -175,7 +231,9 @@ class _PlanSetupScreenState extends State<PlanSetupScreen> {
                   '${range['chapters']}장',
                   style: TextStyle(
                     fontSize: 13,
-                    color: isSelected ? Colors.white70 : AppColors.textSecondary,
+                    color: isSelected
+                        ? Colors.white70
+                        : AppColors.textSecondary,
                   ),
                 ),
               ],
@@ -195,7 +253,8 @@ class _PlanSetupScreenState extends State<PlanSetupScreen> {
         return GestureDetector(
           onTap: () => setState(() => _selectedMinutes = min),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
               color: isSelected ? AppColors.accent : AppColors.bgCard,
               borderRadius: BorderRadius.circular(10),
@@ -226,7 +285,8 @@ class _PlanSetupScreenState extends State<PlanSetupScreen> {
         return GestureDetector(
           onTap: () => setState(() => _selectedDays = day),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
               color: isSelected ? AppColors.accent : AppColors.bgCard,
               borderRadius: BorderRadius.circular(10),
@@ -260,7 +320,7 @@ class _PlanSetupScreenState extends State<PlanSetupScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             '📊 예상 플랜',
             style: TextStyle(
               fontSize: 14,
@@ -282,13 +342,16 @@ class _PlanSetupScreenState extends State<PlanSetupScreen> {
     );
   }
 
-  Widget _buildEstimateRow(String label, String value, {bool highlight = false}) {
+  Widget _buildEstimateRow(String label, String value,
+      {bool highlight = false}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+          Text(label,
+              style: const TextStyle(
+                  fontSize: 13, color: AppColors.textSecondary)),
           Text(
             value,
             style: TextStyle(
@@ -304,8 +367,9 @@ class _PlanSetupScreenState extends State<PlanSetupScreen> {
 
   Widget _buildStartButton(BuildContext context) {
     return Container(
-      padding: EdgeInsets.fromLTRB(20, 12, 20, MediaQuery.of(context).padding.bottom + 12),
-      decoration: BoxDecoration(
+      padding: EdgeInsets.fromLTRB(
+          20, 12, 20, MediaQuery.of(context).padding.bottom + 12),
+      decoration: const BoxDecoration(
         color: AppColors.bgCard,
         border: Border(top: BorderSide(color: AppColors.border)),
       ),
@@ -318,17 +382,21 @@ class _PlanSetupScreenState extends State<PlanSetupScreen> {
             foregroundColor: Colors.white,
             disabledBackgroundColor: AppColors.primaryLight,
             padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12)),
             elevation: 0,
           ),
           child: _isGenerating
               ? const SizedBox(
-                  width: 20, height: 20,
-                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                      color: Colors.white, strokeWidth: 2),
                 )
               : const Text(
                   '플랜 시작하기',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                  style: TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w700),
                 ),
         ),
       ),

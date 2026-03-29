@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/database/bible_database.dart';
 import '../../../core/database/reading_settings.dart';
+import '../../../core/database/local_storage.dart';
 
 class ReadingScreen extends StatefulWidget {
   final int bookId;
@@ -27,10 +28,10 @@ class ReadingScreen extends StatefulWidget {
 class _ReadingScreenState extends State<ReadingScreen> {
   List<Map<String, dynamic>> _verses = [];
   bool _isLoading = true;
-  bool _isCompleted = false;
   int _currentChapterIndex = 0;
   final TextEditingController _commentController = TextEditingController();
   final ReadingSettings _settings = ReadingSettings();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -42,6 +43,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
   @override
   void dispose() {
     _commentController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -53,23 +55,62 @@ class _ReadingScreenState extends State<ReadingScreen> {
       _verses = verses;
       _isLoading = false;
     });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          0,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
-  void _completeReading() {
-    setState(() => _isCompleted = true);
+  bool get _isFirstChapter => _currentChapterIndex == 0;
+  bool get _isLastChapter =>
+      _currentChapterIndex == widget.chapters.length - 1;
+
+  void _goToPrevChapter() {
+    if (_isFirstChapter) return;
+    setState(() => _currentChapterIndex--);
+    _loadVerses();
+  }
+
+  void _goToNextChapter() {
+    if (_isLastChapter) return;
+    setState(() => _currentChapterIndex++);
+    _loadVerses();
+  }
+
+  void _finishReading() {
     _showCompletionSheet();
+  }
+
+  Future<void> _saveAndComplete() async {
+    await LocalStorage.markDayComplete(
+      widget.dayNumber,
+      comment: _commentController.text,
+    );
   }
 
   void _showCompletionSheet() {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      isDismissible: false,
       backgroundColor: Colors.transparent,
       builder: (context) => _CompletionSheet(
         bookName: widget.bookName,
         chapters: widget.chapters,
         dayNumber: widget.dayNumber,
         comment: _commentController.text,
+        onComplete: () async {
+          await _saveAndComplete();
+          if (mounted) {
+            Navigator.pop(context);
+            Navigator.pop(context);
+          }
+        },
         onClose: () => Navigator.pop(context),
       ),
     );
@@ -84,18 +125,14 @@ class _ReadingScreenState extends State<ReadingScreen> {
     ).then((_) => setState(() {}));
   }
 
-  Color get _bgColor => _settings.isDarkMode
-      ? const Color(0xFF1A1A1A)
-      : AppColors.bg;
-  Color get _textColor => _settings.isDarkMode
-      ? const Color(0xFFE8E2D8)
-      : AppColors.text;
-  Color get _cardColor => _settings.isDarkMode
-      ? const Color(0xFF2A2A2A)
-      : AppColors.bgCard;
-  Color get _borderColor => _settings.isDarkMode
-      ? const Color(0xFF3A3A3A)
-      : AppColors.border;
+  Color get _bgColor =>
+      _settings.isDarkMode ? const Color(0xFF1A1A1A) : AppColors.bg;
+  Color get _textColor =>
+      _settings.isDarkMode ? const Color(0xFFE8E2D8) : AppColors.text;
+  Color get _cardColor =>
+      _settings.isDarkMode ? const Color(0xFF2A2A2A) : AppColors.bgCard;
+  Color get _borderColor =>
+      _settings.isDarkMode ? const Color(0xFF3A3A3A) : AppColors.border;
 
   TextStyle _getFontStyle() {
     final base = TextStyle(
@@ -105,27 +142,6 @@ class _ReadingScreenState extends State<ReadingScreen> {
       fontWeight: FontWeight.w400,
     );
     switch (_settings.fontFamily) {
-      case 'NanumMyeongjo':
-        return GoogleFonts.nanumMyeongjo(textStyle: base);
-      case 'NanumGothic':
-        return GoogleFonts.nanumGothic(textStyle: base);
-      case 'serif':
-        return base.copyWith(fontFamily: 'Georgia');
-      case 'sans-serif':
-        return base.copyWith(fontFamily: 'Helvetica');
-      default:
-        return base;
-    }
-  }
-
-  TextStyle _getPreviewFontStyle(ReadingSettings s) {
-    final base = TextStyle(
-      fontSize: s.fontSize,
-      height: 1.8,
-      color: s.isDarkMode ? const Color(0xFFE8E2D8) : AppColors.text,
-      fontWeight: FontWeight.w400,
-    );
-    switch (s.fontFamily) {
       case 'NanumMyeongjo':
         return GoogleFonts.nanumMyeongjo(textStyle: base);
       case 'NanumGothic':
@@ -206,6 +222,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
 
   Widget _buildVerseList() {
     return ListView.builder(
+      controller: _scrollController,
       padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
       itemCount: _verses.length + 1,
       itemBuilder: (context, index) {
@@ -249,30 +266,84 @@ class _ReadingScreenState extends State<ReadingScreen> {
   Widget _buildVerseRow(Map<String, dynamic> verse) {
     final verseNum = verse['verse'] as int;
     final text = verse['text'] as String;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 28,
-            child: Text(
-              '$verseNum',
-              style: TextStyle(
-                fontSize: _settings.fontSize * 0.75,
-                fontWeight: FontWeight.w700,
-                color: AppColors.accent,
-                height: 1.8,
+    final isBookmarked = LocalStorage.isBookmarked(
+      bookId: widget.bookId,
+      chapter: widget.chapters[_currentChapterIndex],
+      verse: verseNum,
+    );
+
+    return GestureDetector(
+      onLongPress: () async {
+        if (isBookmarked) {
+          await LocalStorage.removeBookmark(
+            bookId: widget.bookId,
+            chapter: widget.chapters[_currentChapterIndex],
+            verse: verseNum,
+          );
+        } else {
+          await LocalStorage.addBookmark(
+            bookId: widget.bookId,
+            bookName: widget.bookName,
+            chapter: widget.chapters[_currentChapterIndex],
+            verse: verseNum,
+            text: text,
+          );
+        }
+        setState(() {});
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                isBookmarked ? '북마크가 해제되었습니다' : '📌 북마크에 저장되었습니다',
+              ),
+              duration: const Duration(seconds: 1),
+              backgroundColor: isBookmarked
+                  ? AppColors.textSecondary
+                  : AppColors.accent,
+            ),
+          );
+        }
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+        margin: const EdgeInsets.only(bottom: 8),
+        decoration: BoxDecoration(
+          color: isBookmarked ? AppColors.accentPale : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+          border: isBookmarked
+              ? Border.all(color: AppColors.accentLight)
+              : null,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: 28,
+              child: Text(
+                '$verseNum',
+                style: TextStyle(
+                  fontSize: _settings.fontSize * 0.75,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.accent,
+                  height: 1.8,
+                ),
               ),
             ),
-          ),
-          Expanded(
-            child: Text(
-              text,
-              style: _getFontStyle(),
+            Expanded(
+              child: Text(text, style: _getFontStyle()),
             ),
-          ),
-        ],
+            if (isBookmarked)
+              Padding(
+                padding: const EdgeInsets.only(left: 6, top: 4),
+                child: Icon(
+                  Icons.bookmark,
+                  size: 14,
+                  color: AppColors.accent,
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -288,62 +359,276 @@ class _ReadingScreenState extends State<ReadingScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          TextField(
-            controller: _commentController,
-            decoration: InputDecoration(
-              hintText: '오늘의 묵상을 남겨보세요 (선택)',
-              hintStyle: const TextStyle(
-                fontSize: 14,
-                color: AppColors.textTertiary,
+          if (_isLastChapter) ...[
+            TextField(
+              controller: _commentController,
+              decoration: InputDecoration(
+                hintText: '오늘의 묵상을 남겨보세요 (선택)',
+                hintStyle: const TextStyle(
+                  fontSize: 14,
+                  color: AppColors.textTertiary,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: _borderColor),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: _borderColor),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: AppColors.accent),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 14, vertical: 10),
+                filled: true,
+                fillColor: _settings.isDarkMode
+                    ? const Color(0xFF2A2A2A)
+                    : AppColors.bgElevated,
               ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: _borderColor),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: _borderColor),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: AppColors.accent),
-              ),
-              contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 14, vertical: 10),
-              filled: true,
-              fillColor: _settings.isDarkMode
-                  ? const Color(0xFF2A2A2A)
-                  : AppColors.bgElevated,
+              maxLines: 2,
+              style: TextStyle(fontSize: 14, color: _textColor),
             ),
-            maxLines: 2,
-            style: TextStyle(fontSize: 14, color: _textColor),
+            const SizedBox(height: 10),
+          ],
+          Row(
+            children: [
+              if (!_isFirstChapter) ...[
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: _goToPrevChapter,
+                    icon: const Icon(Icons.arrow_back_ios, size: 14),
+                    label: const Text('이전 장'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.primary,
+                      side: BorderSide(color: _borderColor),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+              ],
+              Expanded(
+                child: ElevatedButton(
+                  onPressed:
+                      _isLastChapter ? _finishReading : _goToNextChapter,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _isLastChapter
+                        ? AppColors.accent
+                        : AppColors.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        _isLastChapter ? '통독 마무리' : '다음 장',
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(
+                        _isLastChapter
+                            ? Icons.check_circle_outline
+                            : Icons.arrow_forward_ios,
+                        size: 14,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 10),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: _isCompleted ? null : _completeReading,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _isCompleted
-                    ? AppColors.success
-                    : AppColors.primary,
-                foregroundColor: Colors.white,
-                disabledBackgroundColor: AppColors.success,
-                disabledForegroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 0,
-              ),
-              child: Text(
-                _isCompleted ? '✓ 통독 완료!' : '통독 완료',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
+        ],
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════
+// 완료 팝업 시트
+// ═══════════════════════════════════════
+class _CompletionSheet extends StatelessWidget {
+  final String bookName;
+  final List<int> chapters;
+  final int dayNumber;
+  final String comment;
+  final VoidCallback onComplete;
+  final VoidCallback onClose;
+
+  const _CompletionSheet({
+    required this.bookName,
+    required this.chapters,
+    required this.dayNumber,
+    required this.comment,
+    required this.onComplete,
+    required this.onClose,
+  });
+
+  String get _rangeText {
+    if (chapters.length == 1) return '$bookName ${chapters.first}장';
+    return '$bookName ${chapters.first}-${chapters.last}장';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: EdgeInsets.fromLTRB(
+          24, 24, 24, MediaQuery.of(context).padding.bottom + 24),
+      decoration: BoxDecoration(
+        color: AppColors.bgCard,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 40,
+            height: 4,
+            margin: const EdgeInsets.only(bottom: 20),
+            decoration: BoxDecoration(
+              color: AppColors.border,
+              borderRadius: BorderRadius.circular(2),
             ),
+          ),
+          const Text('🎉', style: TextStyle(fontSize: 52)),
+          const SizedBox(height: 12),
+          const Text(
+            '오늘의 통독 완료!',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w800,
+              color: AppColors.text,
+              letterSpacing: -0.5,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '오늘도 말씀과 동행하셨습니다.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14,
+              color: AppColors.textSecondary,
+              height: 1.6,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF2C3E50), Color(0xFF1A2A3A)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: AppColors.accent.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    'Day $dayNumber',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.accentLight,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  _rangeText,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  '생명의 말씀이 사락 넘어갑니다',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white.withOpacity(0.5),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      'SARAK',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white.withOpacity(0.3),
+                        letterSpacing: 3,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: onClose,
+                  icon: const Icon(Icons.share_outlined, size: 16),
+                  label: const Text('공유하기'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.primary,
+                    side: const BorderSide(color: AppColors.border),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: onComplete,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: const Text(
+                    '통독 완료',
+                    style: TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -401,7 +686,8 @@ class _SettingsSheetState extends State<_SettingsSheet> {
         children: [
           Center(
             child: Container(
-              width: 40, height: 4,
+              width: 40,
+              height: 4,
               margin: const EdgeInsets.only(bottom: 20),
               decoration: BoxDecoration(
                 color: AppColors.border,
@@ -570,183 +856,6 @@ class _SettingsSheetState extends State<_SettingsSheet> {
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ═══════════════════════════════════════
-// 완료 팝업 시트
-// ═══════════════════════════════════════
-class _CompletionSheet extends StatelessWidget {
-  final String bookName;
-  final List<int> chapters;
-  final int dayNumber;
-  final String comment;
-  final VoidCallback onClose;
-
-  const _CompletionSheet({
-    required this.bookName,
-    required this.chapters,
-    required this.dayNumber,
-    required this.comment,
-    required this.onClose,
-  });
-
-  String get _rangeText {
-    if (chapters.length == 1) return '$bookName ${chapters.first}장';
-    return '$bookName ${chapters.first}-${chapters.last}장';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(16),
-      padding: EdgeInsets.fromLTRB(
-          24, 24, 24, MediaQuery.of(context).padding.bottom + 24),
-      decoration: BoxDecoration(
-        color: AppColors.bgCard,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 40, height: 4,
-            margin: const EdgeInsets.only(bottom: 20),
-            decoration: BoxDecoration(
-              color: AppColors.border,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const Text('🎉', style: TextStyle(fontSize: 52)),
-          const SizedBox(height: 12),
-          const Text(
-            '오늘의 통독 완료!',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w800,
-              color: AppColors.text,
-              letterSpacing: -0.5,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            '오늘도 말씀과 동행하셨습니다.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              color: AppColors.textSecondary,
-              height: 1.6,
-            ),
-          ),
-          const SizedBox(height: 20),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF2C3E50), Color(0xFF1A2A3A)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: AppColors.accent.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    'Day $dayNumber',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.accentLight,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  _rangeText,
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  '생명의 말씀이 사락 넘어갑니다',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.white.withOpacity(0.5),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      'SARAK',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white.withOpacity(0.3),
-                        letterSpacing: 3,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: onClose,
-                  icon: const Icon(Icons.share_outlined, size: 16),
-                  label: const Text('공유하기'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.primary,
-                    side: const BorderSide(color: AppColors.border),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: onClose,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: const Text(
-                    '확인',
-                    style: TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                ),
-              ),
-            ],
           ),
         ],
       ),
