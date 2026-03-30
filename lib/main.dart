@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
 import 'core/theme/app_theme.dart';
 import 'core/database/local_storage.dart';
+import 'core/providers/auth_provider.dart';
+import 'features/auth/screens/login_screen.dart';
 import 'features/home/screens/home_screen.dart';
 import 'features/calendar/screens/calendar_screen.dart';
 import 'features/group/screens/group_screen.dart';
@@ -20,16 +23,28 @@ void main() async {
   runApp(const ProviderScope(child: SarakApp()));
 }
 
-class SarakApp extends StatelessWidget {
+class SarakApp extends ConsumerWidget {
   const SarakApp({super.key});
 
+  Widget _buildHome(AsyncValue<User?> authState) {
+    if (authState.isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+    final user = authState.valueOrNull;
+    if (user != null) return const MainShell();
+    return const LoginScreen();
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authStateProvider);
     return MaterialApp(
       title: '사락',
       theme: AppTheme.light,
       debugShowCheckedModeBanner: false,
-      home: const MainShell(),
+      home: _buildHome(authState),
     );
   }
 }
