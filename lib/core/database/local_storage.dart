@@ -30,15 +30,16 @@ class LocalStorage {
     await _p.setInt('best_streak', 0);
   }
 
-  static Future<void> markDayComplete(int dayNumber,
-      {String comment = ''}) async {
+  static Future<void> markDayComplete(int dayNumber, {String comment = ''}) async {
     const key = 'completed_days';
     final raw = _p.getString(key) ?? '{}';
     final Map<String, dynamic> data = jsonDecode(raw);
+    
     data[dayNumber.toString()] = {
       'completedAt': DateTime.now().toIso8601String(),
       'comment': comment,
     };
+    
     await _p.setString(key, jsonEncode(data));
     await _updateStreak(dayNumber);
   }
@@ -53,14 +54,19 @@ class LocalStorage {
     return data.containsKey(dayNumber.toString());
   }
 
+  // 👉 수정 포인트 1: 실제 완료된 날짜들을 체크하여 연속 기록(Streak) 계산
   static Future<void> _updateStreak(int dayNumber) async {
     final completed = getCompletedDays();
     int streak = 0;
+    
+    // 현재 완료한 날(dayNumber)부터 역순으로 몇 개가 연속으로 있는지 확인
     int check = dayNumber;
     while (completed.containsKey(check.toString())) {
       streak++;
       check--;
+      if (check < 1) break;
     }
+    
     await _p.setInt('current_streak', streak);
     final best = _p.getInt('best_streak') ?? 0;
     if (streak > best) await _p.setInt('best_streak', streak);
@@ -69,13 +75,23 @@ class LocalStorage {
   static int getStreak() => _p.getInt('current_streak') ?? 0;
   static int getBestStreak() => _p.getInt('best_streak') ?? 0;
 
+  // 👉 수정 포인트 2: 날짜 계산기가 아닌 '내 진도'에 맞춘 오늘의 Day 반환
   static int getCurrentDay() {
     final plan = loadPlan();
     if (plan == null) return 1;
-    final startDate = DateTime.parse(plan['startDate'] as String);
-    final today = DateTime.now();
-    final diff = today.difference(startDate).inDays + 1;
-    return diff.clamp(1, (plan['totalDays'] as int?) ?? 365);
+    
+    final completedData = getCompletedDays();
+    if (completedData.isEmpty) return 1; // 아무것도 안 읽었으면 1일차
+    
+    // 완료된 Day 번호들 중 가장 큰 값을 찾음
+    List<int> completedDays = completedData.keys.map((e) => int.parse(e)).toList();
+    completedDays.sort();
+    
+    int lastCompletedDay = completedDays.last;
+    int totalPlanDays = (plan['totalDays'] as int?) ?? 365;
+
+    // 마지막으로 완료한 날의 다음 날을 '오늘 읽을 날'로 지정
+    return (lastCompletedDay + 1).clamp(1, totalPlanDays);
   }
 
   static double getProgress() {
@@ -86,6 +102,7 @@ class LocalStorage {
     return (completed / totalDays).clamp(0.0, 1.0);
   }
 
+  // --- 북마크 기능 (기존 유지) ---
   static Future<void> addBookmark({
     required int bookId,
     required String bookName,

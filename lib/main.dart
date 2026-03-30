@@ -7,7 +7,6 @@ import 'firebase_options.dart';
 import 'core/theme/app_theme.dart';
 import 'core/database/local_storage.dart';
 import 'core/providers/auth_provider.dart';
-import 'features/auth/screens/login_screen.dart';
 import 'features/home/screens/home_screen.dart';
 import 'features/calendar/screens/calendar_screen.dart';
 import 'features/group/screens/group_screen.dart';
@@ -23,45 +22,75 @@ void main() async {
   runApp(const ProviderScope(child: SarakApp()));
 }
 
-class SarakApp extends ConsumerWidget {
+class SarakApp extends StatelessWidget {
   const SarakApp({super.key});
 
-  Widget _buildHome(AsyncValue<User?> authState) {
-    if (authState.isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
-    final user = authState.valueOrNull;
-    if (user != null) return const MainShell();
-    return const LoginScreen();
-  }
-
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authStateProvider);
+  Widget build(BuildContext context) {
     return MaterialApp(
       title: '사락',
       theme: AppTheme.light,
       debugShowCheckedModeBanner: false,
-      home: _buildHome(authState),
+      home: const MainShell(),
     );
   }
 }
 
-class MainShell extends StatefulWidget {
+class MainShell extends ConsumerStatefulWidget {
   const MainShell({super.key});
 
   @override
-  State<MainShell> createState() => MainShellState();
+  ConsumerState<MainShell> createState() => MainShellState();
 }
 
-class MainShellState extends State<MainShell> {
+class MainShellState extends ConsumerState<MainShell> {
   int _currentIndex = 0;
   final GlobalKey<CalendarScreenState> _calendarKey =
       GlobalKey<CalendarScreenState>();
 
   void switchTab(int index) {
+    setState(() => _currentIndex = index);
+    if (index == 1) {
+      _calendarKey.currentState?.loadData();
+    }
+  }
+
+  Future<void> _onTabTapped(int index) async {
+    if (index == 2) {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text('로그인이 필요해요'),
+            content: const Text('그룹 통독은 Google 계정으로 로그인해야 사용할 수 있어요.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('취소'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('로그인'),
+              ),
+            ],
+          ),
+        );
+        if (confirmed == true) {
+          try {
+            await ref.read(authServiceProvider).signInWithGoogle();
+            if (mounted) setState(() => _currentIndex = 2);
+          } catch (e) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('로그인 실패: $e')),
+              );
+            }
+          }
+        }
+        return;
+      }
+    }
     setState(() => _currentIndex = index);
     if (index == 1) {
       _calendarKey.currentState?.loadData();
@@ -84,12 +113,7 @@ class MainShellState extends State<MainShell> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() => _currentIndex = index);
-          if (index == 1) {
-            _calendarKey.currentState?.loadData();
-          }
-        },
+        onTap: _onTabTapped,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
