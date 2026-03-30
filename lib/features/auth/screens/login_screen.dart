@@ -18,7 +18,6 @@ class LoginScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Spacer(),
-              // 로고
               Container(
                 width: 80,
                 height: 80,
@@ -46,11 +45,10 @@ class LoginScreen extends ConsumerWidget {
                 ),
               ),
               const Spacer(),
-              // Google 로그인
               SizedBox(
                 width: double.infinity,
                 height: 52,
-                child: OutlinedButton.icon(
+                child: FilledButton.icon(
                   onPressed: () async {
                     try {
                       await authService.signInWithGoogle();
@@ -64,34 +62,8 @@ class LoginScreen extends ConsumerWidget {
                   },
                   icon: const Icon(Icons.g_mobiledata, size: 28),
                   label: const Text('Google로 계속하기'),
-                  style: OutlinedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              // Apple 로그인
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: FilledButton.icon(
-                  onPressed: () async {
-                    try {
-                      await authService.signInWithApple();
-                    } catch (e) {
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('로그인 실패: $e')),
-                        );
-                      }
-                    }
-                  },
-                  icon: const Icon(Icons.apple, size: 24),
-                  label: const Text('Apple로 계속하기'),
                   style: FilledButton.styleFrom(
-                    backgroundColor: Colors.black,
+                    backgroundColor: const Color(0xFF2D4A6B),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
