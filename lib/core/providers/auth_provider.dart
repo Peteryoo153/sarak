@@ -11,20 +11,12 @@ final authServiceProvider = Provider((ref) => AuthService());
 
 class AuthService {
   final _auth = FirebaseAuth.instance;
-
-  // 🔴 1. 생성자 대신 instance(싱글톤) 사용
-  final _googleSignIn = GoogleSignIn.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   Future<User?> signInWithGoogle() async {
-    // 🔴 2. v7부터는 사용 전 초기화(initialize) 필수
-    await _googleSignIn.initialize();
-
-    // 🔴 3. signIn() 대신 authenticate() 사용
-    final googleUser = await _googleSignIn.authenticate();
-
-    // 🔴 4. authentication에서 await 제거 (동기 방식으로 변경됨)
-    final googleAuth = googleUser.authentication;
-
+    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+    if (googleUser == null) return null;
+    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
     final credential = GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
