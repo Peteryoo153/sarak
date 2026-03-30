@@ -51,11 +51,10 @@ class AppTheme {
       useMaterial3: true,
       scaffoldBackgroundColor: AppColors.bg,
       fontFamily: 'Pretendard',
-      colorScheme: ColorScheme.light(
+      colorScheme: const ColorScheme.light(
         primary: AppColors.primary,
         secondary: AppColors.accent,
         surface: AppColors.bgCard,
-        background: AppColors.bg,
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.bg,
@@ -120,9 +119,9 @@ class AppTheme {
         color: AppColors.bgCard,
         elevation: 0,
         shape: RoundedRectangleBorder(
-         borderRadius: BorderRadius.circular(14),
-         side: const BorderSide(color: AppColors.border),
-       ),
+          borderRadius: BorderRadius.circular(14),
+          side: const BorderSide(color: AppColors.border),
+        ),
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: Colors.white,

@@ -67,8 +67,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
   }
 
   bool get _isFirstChapter => _currentChapterIndex == 0;
-  bool get _isLastChapter =>
-      _currentChapterIndex == widget.chapters.length - 1;
+  bool get _isLastChapter => _currentChapterIndex == widget.chapters.length - 1;
 
   void _goToPrevChapter() {
     if (_isFirstChapter) return;
@@ -184,8 +183,8 @@ class _ReadingScreenState extends State<ReadingScreen> {
                 },
                 child: Container(
                   margin: const EdgeInsets.only(right: 6),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: isActive ? AppColors.primary : _bgColor,
                     borderRadius: BorderRadius.circular(20),
@@ -209,7 +208,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
         ],
       ),
       body: _isLoading
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(color: AppColors.accent))
           : Column(
               children: [
@@ -297,9 +296,8 @@ class _ReadingScreenState extends State<ReadingScreen> {
                 isBookmarked ? '북마크가 해제되었습니다' : '📌 북마크에 저장되었습니다',
               ),
               duration: const Duration(seconds: 1),
-              backgroundColor: isBookmarked
-                  ? AppColors.textSecondary
-                  : AppColors.accent,
+              backgroundColor:
+                  isBookmarked ? AppColors.textSecondary : AppColors.accent,
             ),
           );
         }
@@ -311,9 +309,8 @@ class _ReadingScreenState extends State<ReadingScreen> {
         decoration: BoxDecoration(
           color: isBookmarked ? AppColors.accentPale : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
-          border: isBookmarked
-              ? Border.all(color: AppColors.accentLight)
-              : null,
+          border:
+              isBookmarked ? Border.all(color: AppColors.accentLight) : null,
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -334,8 +331,8 @@ class _ReadingScreenState extends State<ReadingScreen> {
               child: Text(text, style: _getFontStyle()),
             ),
             if (isBookmarked)
-              Padding(
-                padding: const EdgeInsets.only(left: 6, top: 4),
+              const Padding(
+                padding: EdgeInsets.only(left: 6, top: 4),
                 child: Icon(
                   Icons.bookmark,
                   size: 14,
@@ -380,8 +377,8 @@ class _ReadingScreenState extends State<ReadingScreen> {
                   borderRadius: BorderRadius.circular(10),
                   borderSide: const BorderSide(color: AppColors.accent),
                 ),
-                contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 14, vertical: 10),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 filled: true,
                 fillColor: _settings.isDarkMode
                     ? const Color(0xFF2A2A2A)
@@ -414,12 +411,10 @@ class _ReadingScreenState extends State<ReadingScreen> {
               ],
               Expanded(
                 child: ElevatedButton(
-                  onPressed:
-                      _isLastChapter ? _finishReading : _goToNextChapter,
+                  onPressed: _isLastChapter ? _finishReading : _goToNextChapter,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _isLastChapter
-                        ? AppColors.accent
-                        : AppColors.primary,
+                    backgroundColor:
+                        _isLastChapter ? AppColors.accent : AppColors.primary,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
@@ -515,7 +510,7 @@ class _CompletionSheet extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Text(
+          const Text(
             '오늘도 말씀과 동행하셨습니다.',
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -540,15 +535,15 @@ class _CompletionSheet extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 8, vertical: 3),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
                     color: AppColors.accent.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
                     'Day $dayNumber',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
                       color: AppColors.accentLight,
@@ -704,7 +699,7 @@ class _SettingsSheetState extends State<_SettingsSheet> {
             ),
           ),
           const SizedBox(height: 20),
-          Text(
+          const Text(
             '글자 크기',
             style: TextStyle(
               fontSize: 13,
@@ -746,7 +741,7 @@ class _SettingsSheetState extends State<_SettingsSheet> {
               ),
               Text(
                 '${s.fontSize.round()}px',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textSecondary,
@@ -755,7 +750,7 @@ class _SettingsSheetState extends State<_SettingsSheet> {
             ],
           ),
           const SizedBox(height: 16),
-          Text(
+          const Text(
             '폰트',
             style: TextStyle(
               fontSize: 13,
@@ -775,8 +770,8 @@ class _SettingsSheetState extends State<_SettingsSheet> {
                   setState(() {});
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 14, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(
                     color: isSelected
                         ? AppColors.primary
@@ -785,9 +780,7 @@ class _SettingsSheetState extends State<_SettingsSheet> {
                             : AppColors.bgElevated,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: isSelected
-                          ? AppColors.primary
-                          : AppColors.border,
+                      color: isSelected ? AppColors.primary : AppColors.border,
                     ),
                   ),
                   child: Text(
@@ -820,7 +813,7 @@ class _SettingsSheetState extends State<_SettingsSheet> {
               const Spacer(),
               Switch(
                 value: s.isDarkMode,
-                activeColor: AppColors.accent,
+                activeThumbColor: AppColors.accent,
                 onChanged: (v) {
                   s.setDarkMode(v);
                   setState(() {});
@@ -832,9 +825,8 @@ class _SettingsSheetState extends State<_SettingsSheet> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: s.isDarkMode
-                  ? const Color(0xFF1A1A1A)
-                  : AppColors.bgElevated,
+              color:
+                  s.isDarkMode ? const Color(0xFF1A1A1A) : AppColors.bgElevated,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(

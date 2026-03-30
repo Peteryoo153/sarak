@@ -257,7 +257,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(20),
@@ -296,7 +297,8 @@ class _HomeScreenState extends State<HomeScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: AppColors.accentPale,
                   borderRadius: BorderRadius.circular(20),
@@ -427,7 +429,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               GestureDetector(
                 onTap: () => widget.onTabSwitch?.call(1),
-                child: Text(
+                child: const Text(
                   '전체 보기 →',
                   style: TextStyle(
                     fontSize: 12,
@@ -447,13 +449,12 @@ class _HomeScreenState extends State<HomeScreen> {
               final isToday = day.year == today.year &&
                   day.month == today.month &&
                   day.day == today.day;
-              final isPast = day.isBefore(
-                  DateTime(today.year, today.month, today.day));
+              final isPast =
+                  day.isBefore(DateTime(today.year, today.month, today.day));
 
               int? dayNum;
               if (_plan != null) {
-                final startDate =
-                    DateTime.parse(_plan!['startDate'] as String);
+                final startDate = DateTime.parse(_plan!['startDate'] as String);
                 final diff = day.difference(startDate).inDays + 1;
                 if (diff > 0 && diff <= _totalDays) dayNum = diff;
               }
@@ -558,7 +559,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               GestureDetector(
                 onTap: () => widget.onTabSwitch?.call(2),
-                child: Text(
+                child: const Text(
                   '보기 →',
                   style: TextStyle(
                     fontSize: 12,
@@ -591,8 +592,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           decoration: BoxDecoration(
                             color: color,
                             shape: BoxShape.circle,
-                            border: Border.all(
-                                color: AppColors.bgCard, width: 2),
+                            border:
+                                Border.all(color: AppColors.bgCard, width: 2),
                           ),
                           child: Center(
                             child: Text(
@@ -616,8 +617,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           decoration: BoxDecoration(
                             color: AppColors.bgElevated,
                             shape: BoxShape.circle,
-                            border: Border.all(
-                                color: AppColors.bgCard, width: 2),
+                            border:
+                                Border.all(color: AppColors.bgCard, width: 2),
                           ),
                           child: Center(
                             child: Text(

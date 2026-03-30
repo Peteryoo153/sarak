@@ -121,8 +121,8 @@ class CalendarScreenState extends State<CalendarScreen> {
             children: [
               GestureDetector(
                 onTap: () => setState(() {
-                  _currentMonth = DateTime(
-                      _currentMonth.year, _currentMonth.month - 1);
+                  _currentMonth =
+                      DateTime(_currentMonth.year, _currentMonth.month - 1);
                   _selectedComment = null;
                 }),
                 child: Container(
@@ -149,8 +149,8 @@ class CalendarScreenState extends State<CalendarScreen> {
               ),
               GestureDetector(
                 onTap: () => setState(() {
-                  _currentMonth = DateTime(
-                      _currentMonth.year, _currentMonth.month + 1);
+                  _currentMonth =
+                      DateTime(_currentMonth.year, _currentMonth.month + 1);
                   _selectedComment = null;
                 }),
                 child: Container(
@@ -451,7 +451,7 @@ class CalendarScreenState extends State<CalendarScreen> {
               children: [
                 Text(
                   '${_currentMonth.month}월 $_selectedDay일 묵상 ✍️',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     color: AppColors.accent,
@@ -460,7 +460,7 @@ class CalendarScreenState extends State<CalendarScreen> {
                 const SizedBox(height: 6),
                 Text(
                   _selectedComment ?? '',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 13,
                     color: AppColors.textSecondary,
                     height: 1.5,

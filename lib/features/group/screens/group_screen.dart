@@ -10,13 +10,83 @@ class GroupScreen extends StatefulWidget {
 
 class _GroupScreenState extends State<GroupScreen> {
   final List<Map<String, dynamic>> members = const [
-    {'name': '유찬호', '초성': '찬', 'day': 23, 'status': '읽는 중', 'progress': 0.34, 'colorIndex': 0, 'isMe': true, 'completed': false, 'comment': ''},
-    {'name': '김은혜', '초성': '은', 'day': 23, 'status': '오늘 완료', 'progress': 0.34, 'colorIndex': 1, 'isMe': false, 'completed': true, 'comment': '요셉의 이야기가 너무 감동적이었어요 🙏'},
-    {'name': '박지현', '초성': '지', 'day': 22, 'status': '1일 뒤처짐', 'progress': 0.31, 'colorIndex': 2, 'isMe': false, 'completed': false, 'comment': ''},
-    {'name': '이민수', '초성': '민', 'day': 23, 'status': '오늘 완료', 'progress': 0.34, 'colorIndex': 3, 'isMe': false, 'completed': true, 'comment': '말씀이 살아있습니다'},
-    {'name': '정소영', '초성': '소', 'day': 20, 'status': '3일 뒤처짐', 'progress': 0.28, 'colorIndex': 4, 'isMe': false, 'completed': false, 'comment': ''},
-    {'name': '최현준', '초성': '현', 'day': 23, 'status': '오늘 완료', 'progress': 0.34, 'colorIndex': 5, 'isMe': false, 'completed': true, 'comment': ''},
-    {'name': '한수진', '초성': '수', 'day': 21, 'status': '2일 뒤처짐', 'progress': 0.30, 'colorIndex': 6, 'isMe': false, 'completed': false, 'comment': ''},
+    {
+      'name': '유찬호',
+      '초성': '찬',
+      'day': 23,
+      'status': '읽는 중',
+      'progress': 0.34,
+      'colorIndex': 0,
+      'isMe': true,
+      'completed': false,
+      'comment': ''
+    },
+    {
+      'name': '김은혜',
+      '초성': '은',
+      'day': 23,
+      'status': '오늘 완료',
+      'progress': 0.34,
+      'colorIndex': 1,
+      'isMe': false,
+      'completed': true,
+      'comment': '요셉의 이야기가 너무 감동적이었어요 🙏'
+    },
+    {
+      'name': '박지현',
+      '초성': '지',
+      'day': 22,
+      'status': '1일 뒤처짐',
+      'progress': 0.31,
+      'colorIndex': 2,
+      'isMe': false,
+      'completed': false,
+      'comment': ''
+    },
+    {
+      'name': '이민수',
+      '초성': '민',
+      'day': 23,
+      'status': '오늘 완료',
+      'progress': 0.34,
+      'colorIndex': 3,
+      'isMe': false,
+      'completed': true,
+      'comment': '말씀이 살아있습니다'
+    },
+    {
+      'name': '정소영',
+      '초성': '소',
+      'day': 20,
+      'status': '3일 뒤처짐',
+      'progress': 0.28,
+      'colorIndex': 4,
+      'isMe': false,
+      'completed': false,
+      'comment': ''
+    },
+    {
+      'name': '최현준',
+      '초성': '현',
+      'day': 23,
+      'status': '오늘 완료',
+      'progress': 0.34,
+      'colorIndex': 5,
+      'isMe': false,
+      'completed': true,
+      'comment': ''
+    },
+    {
+      'name': '한수진',
+      '초성': '수',
+      'day': 21,
+      'status': '2일 뒤처짐',
+      'progress': 0.30,
+      'colorIndex': 6,
+      'isMe': false,
+      'completed': false,
+      'comment': ''
+    },
   ];
 
   @override
@@ -45,12 +115,12 @@ class _GroupScreenState extends State<GroupScreen> {
   }
 
   Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
+    return const Padding(
+      padding: EdgeInsets.fromLTRB(24, 20, 24, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             '그룹 통독',
             style: TextStyle(
               fontSize: 26,
@@ -59,7 +129,7 @@ class _GroupScreenState extends State<GroupScreen> {
               letterSpacing: -0.5,
             ),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Text(
             '함께 읽으면 더 멀리 갑니다',
             style: TextStyle(
@@ -100,7 +170,8 @@ class _GroupScreenState extends State<GroupScreen> {
               ),
               const Spacer(),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(20),
@@ -139,7 +210,7 @@ class _GroupScreenState extends State<GroupScreen> {
               const Spacer(),
               Text(
                 '$percent%',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
                   color: AppColors.accentLight,
@@ -153,7 +224,7 @@ class _GroupScreenState extends State<GroupScreen> {
             child: LinearProgressIndicator(
               value: completed / total,
               backgroundColor: Colors.white.withOpacity(0.15),
-              valueColor: AlwaysStoppedAnimation<Color>(AppColors.accent),
+              valueColor: const AlwaysStoppedAnimation<Color>(AppColors.accent),
               minHeight: 6,
             ),
           ),
@@ -170,9 +241,8 @@ class _GroupScreenState extends State<GroupScreen> {
                 decoration: BoxDecoration(
                   color: isDone ? color : color.withOpacity(0.3),
                   shape: BoxShape.circle,
-                  border: isDone
-                      ? Border.all(color: Colors.white, width: 2)
-                      : null,
+                  border:
+                      isDone ? Border.all(color: Colors.white, width: 2) : null,
                 ),
                 child: Center(
                   child: Text(
@@ -207,7 +277,7 @@ class _GroupScreenState extends State<GroupScreen> {
             children: [
               _buildMemberRow(entry.value),
               if (!isLast)
-                Divider(height: 1, indent: 60, color: AppColors.border),
+                const Divider(height: 1, indent: 60, color: AppColors.border),
             ],
           );
         }).toList(),
@@ -300,7 +370,7 @@ class _GroupScreenState extends State<GroupScreen> {
                               color: AppColors.successLight,
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child: Text(
+                            child: const Text(
                               '나',
                               style: TextStyle(
                                 fontSize: 9,
@@ -320,9 +390,8 @@ class _GroupScreenState extends State<GroupScreen> {
                         color: isCompleted
                             ? AppColors.success
                             : AppColors.textSecondary,
-                        fontWeight: isCompleted
-                            ? FontWeight.w600
-                            : FontWeight.w400,
+                        fontWeight:
+                            isCompleted ? FontWeight.w600 : FontWeight.w400,
                       ),
                     ),
                   ],
@@ -336,7 +405,7 @@ class _GroupScreenState extends State<GroupScreen> {
                   children: [
                     Text(
                       '${(progress * 100).round()}%',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textSecondary,
@@ -369,7 +438,7 @@ class _GroupScreenState extends State<GroupScreen> {
               ),
               child: Text(
                 comment,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 12,
                   color: AppColors.textSecondary,
                   height: 1.5,
@@ -400,7 +469,7 @@ class _GroupScreenState extends State<GroupScreen> {
           ),
           style: OutlinedButton.styleFrom(
             foregroundColor: AppColors.primary,
-            side: BorderSide(color: AppColors.border),
+            side: const BorderSide(color: AppColors.border),
             padding: const EdgeInsets.symmetric(vertical: 14),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),

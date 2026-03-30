@@ -194,25 +194,25 @@ class SettingsScreen extends StatelessWidget {
   }
 
   Widget _buildFooter() {
-    return Center(
+    return const Center(
       child: Column(
         children: [
           Text(
             '${AppConstants.appName} v${AppConstants.appVersion}',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 11,
               color: AppColors.textTertiary,
             ),
           ),
-          const SizedBox(height: 4),
-          const Text(
+          SizedBox(height: 4),
+          Text(
             '성경공방 · 등대교육공동체',
             style: TextStyle(
               fontSize: 10,
               color: AppColors.textTertiary,
             ),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
         ],
       ),
     );
@@ -264,13 +264,13 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
         ),
       ),
       body: _bookmarks.isEmpty
-          ? Center(
+          ? const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text('📌', style: TextStyle(fontSize: 48)),
-                  const SizedBox(height: 16),
-                  const Text(
+                  Text('📌', style: TextStyle(fontSize: 48)),
+                  SizedBox(height: 16),
+                  Text(
                     '저장된 북마크가 없습니다',
                     style: TextStyle(
                       fontSize: 16,
@@ -278,7 +278,7 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
                       color: AppColors.text,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   Text(
                     '성경 본문에서 절을 길게 누르면\n북마크에 저장됩니다',
                     textAlign: TextAlign.center,
@@ -318,7 +318,7 @@ class _BookmarkScreenState extends State<BookmarkScreen> {
                             ),
                             child: Text(
                               '${b['bookName']} ${b['chapter']}:${b['verse']}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.accent,
