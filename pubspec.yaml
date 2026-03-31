@@ -10,47 +10,39 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # 로컬 DB (성경 텍스트 + 오프라인)
   sqflite: ^2.3.2
   path: ^1.9.0
-
-  # 상태 관리
   flutter_riverpod: ^2.5.1
-
-  # 로컬 저장소 (읽기 기록)
   shared_preferences: ^2.2.3
-
-  # 날짜 처리
   intl: ^0.19.0
-
-  # 아이콘
   cupertino_icons: ^1.0.8
-
-  # 공유 카드 이미지 생성
   screenshot: ^2.3.0
   share_plus: ^12.0.1
   google_fonts: ^8.0.2
 
-  # Firebase
   firebase_core: ^4.6.0
   firebase_auth: ^6.3.0
   cloud_firestore: ^6.2.0
   google_sign_in: ^6.2.1
   sign_in_with_apple: ^7.0.1
 
+  # ✅ 핵심 (최신 기준 유지)
+  flutter_local_notifications: ^21.0.0
+  timezone: ^0.11.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.13.1 # 🌟 1. 아이콘 만드는 기계 추가!
 
 flutter:
   uses-material-design: true
   assets:
     - assets/db/
 
-flutter_launcher_icons:
-  android: true
+# 🌟 2. 아이콘 기계 작동 설정 추가!
+flutter_icons:
+  android: "launcher_icon"
   ios: true
-  image_path: "assets/app_icon.png"
-  min_sdk_android: 21
-  remove_alpha_ios: true
+  image_path: "assets/icon.png"

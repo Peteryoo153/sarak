@@ -44,7 +44,7 @@ class SettingsScreen extends ConsumerWidget {
                   // 👉 [수정] const를 제거했습니다.
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => NotificationSettingsScreen()),
+                    MaterialPageRoute(builder: (_) => const NotificationSettingsScreen()),
                   );
                 }),
                 _buildSettingsItem(context, '📜', '역본 설정', '개역개정', true, () {}),
