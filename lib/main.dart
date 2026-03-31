@@ -1,3 +1,4 @@
+import 'splash_page.dart'; // 🌟 인트로 페이지 불러오기
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,13 +29,19 @@ class SarakApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '사락',
+      title: '사락사락 Bible', // 🌟 앱 이름 반영
       theme: AppTheme.light,
       debugShowCheckedModeBanner: false,
-      home: const MainShell(),
+      // 🌟 이제 앱을 켜면 MainShell이 아니라 SplashPage가 먼저 뜹니다!
+      home: const SplashPage(), 
     );
   }
 }
+
+// -------------------------------------------------------------------------
+// 아래는 메인 화면(껍데기) 코드입니다. 
+// SplashPage에서 3초 뒤에 이 MainShell로 넘어오게 됩니다.
+// -------------------------------------------------------------------------
 
 class MainShell extends ConsumerStatefulWidget {
   const MainShell({super.key});

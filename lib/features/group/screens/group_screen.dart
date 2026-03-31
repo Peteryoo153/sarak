@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/providers/auth_provider.dart';
-import '../../../core/database/firestore_service.dart'; // 👈 경로 확인 완료
+// 👈 경로 확인 완료
 import '../../../core/models/member_progress.dart';
 import '../../../core/models/sarak_group.dart';
 

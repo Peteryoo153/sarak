@@ -1,17 +1,30 @@
-// settings_screen.dart 맨 윗줄
 import 'notification_settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart'; // 🌟 링크 연결 부품
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/database/local_storage.dart';
 import '../../../core/providers/auth_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../../core/database/firestore_service.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
+
+  // 🔗 링크를 안전하게 열어주는 마법의 함수입니다.
+  Future<void> _launchURL(BuildContext context, String urlString) async {
+    final Uri url = Uri.parse(urlString);
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('링크를 열 수 없습니다.')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -30,18 +43,11 @@ class SettingsScreen extends ConsumerWidget {
               if (user != null) _buildSyncButton(context, ref),
               if (user == null) const SizedBox(height: 8),
               
-              // 1. 핵심 메뉴 그룹
               _buildSettingsGroup(context, [
                 _buildSettingsItem(context, '🏆', '나의 통독 기록', '', true, () {
-                  // 👉 [수정] const를 제거했습니다.
                   Navigator.push(context, MaterialPageRoute(builder: (_) => const ReadingHistoryScreen()));
                 }),
-                _buildSettingsItem(context, '📌', '북마크', '', true, () {
-                  // 👉 [수정] const를 제거했습니다.
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const BookmarkScreen()));
-                }),
                 _buildSettingsItem(context, '🔔', '알림 설정', '', true, () {
-                  // 👉 [수정] const를 제거했습니다.
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const NotificationSettingsScreen()),
@@ -51,9 +57,7 @@ class SettingsScreen extends ConsumerWidget {
               ]),
               
               const SizedBox(height: 20),
-
               _buildInfoSection(context),
-
               const SizedBox(height: 24),
               _buildFooter(),
             ],
@@ -177,11 +181,21 @@ class SettingsScreen extends ConsumerWidget {
             padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Text('사역후원 및 제안', style: TextStyle(fontSize: 13, color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
           ),
-          _buildDetailItem(context, Icons.favorite_outline, '사역후원', 'icon_new', isPink: true, () {}),
+          
+          // 🌟 1. 사역후원 -> 유튜브 멤버십 가입 링크
+          _buildDetailItem(context, Icons.favorite_outline, '사역후원', 'icon_new', isPink: true, () {
+            _launchURL(context, 'https://www.youtube.com/@biblecraft/join');
+          }),
+          
           const Divider(height: 1, indent: 56, color: AppColors.border),
           _buildDetailItem(context, Icons.mail_outline, '앱 제안 및 문의', 'biblestorys@naver.com', isBlue: true, () {}),
           const Divider(height: 1, indent: 56, color: AppColors.border),
-          _buildDetailItem(context, Icons.person_outline, '제작', '@revchanho 유찬호 목사', isAuthor: true, () {}),
+          
+          // 🌟 2. 제작 -> 목사님 링크트리 연결
+          _buildDetailItem(context, Icons.person_outline, '제작', '@revchanho 유찬호 목사', isAuthor: true, () {
+            _launchURL(context, 'https://linktr.ee/biblestorys');
+          }),
+          
           const Divider(height: 1, indent: 56, color: AppColors.border),
           _buildDetailItem(context, Icons.info_outline, '버전 정보', '1.0.1 (3)', isVersion: true, null),
         ],
@@ -253,7 +267,6 @@ class SettingsScreen extends ConsumerWidget {
   }
 }
 
-// --- 완주 기록 및 북마크 화면은 그대로 유지하시면 됩니다 ---
 class ReadingHistoryScreen extends ConsumerWidget {
   const ReadingHistoryScreen({super.key});
   @override
@@ -297,44 +310,6 @@ class ReadingHistoryScreen extends ConsumerWidget {
           );
         },
       ),
-    );
-  }
-}
-
-class BookmarkScreen extends StatefulWidget {
-  const BookmarkScreen({super.key});
-  @override
-  State<BookmarkScreen> createState() => _BookmarkScreenState();
-}
-class _BookmarkScreenState extends State<BookmarkScreen> {
-  List<Map<String, dynamic>> _bookmarks = [];
-  @override
-  void initState() { super.initState(); _loadBookmarks(); }
-  void _loadBookmarks() => setState(() => _bookmarks = LocalStorage.getBookmarks());
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.bg,
-      appBar: AppBar(backgroundColor: AppColors.bg, leading: IconButton(icon: const Icon(Icons.arrow_back_ios, size: 18), onPressed: () => Navigator.pop(context)), title: const Text('북마크', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: AppColors.text))),
-      body: _bookmarks.isEmpty 
-        ? const Center(child: Text('저장된 북마크가 없습니다.')) 
-        : ListView.builder(
-            padding: const EdgeInsets.all(20),
-            itemCount: _bookmarks.length,
-            itemBuilder: (context, index) {
-              final b = _bookmarks[index];
-              return Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(color: AppColors.bgCard, borderRadius: BorderRadius.circular(14), border: Border.all(color: AppColors.border)),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('${b['bookName']} ${b['chapter']}:${b['verse']}', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.accent)),
-                  const SizedBox(height: 10),
-                  Text(b['text'] as String, style: const TextStyle(fontSize: 15, height: 1.7, color: AppColors.text)),
-                ]),
-              );
-            },
-          ),
     );
   }
 }

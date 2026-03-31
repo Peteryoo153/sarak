@@ -19,6 +19,9 @@ dependencies:
   screenshot: ^2.3.0
   share_plus: ^12.0.1
   google_fonts: ^8.0.2
+  
+  # 🌟 인터넷 창을 열어주는 마법 부품 추가!
+  url_launcher: ^6.2.6
 
   firebase_core: ^4.6.0
   firebase_auth: ^6.3.0
@@ -26,7 +29,7 @@ dependencies:
   google_sign_in: ^6.2.1
   sign_in_with_apple: ^7.0.1
 
-  # ✅ 핵심 (최신 기준 유지)
+  # ✅ 알림 패키지 (최신 버전 유지)
   flutter_local_notifications: ^21.0.0
   timezone: ^0.11.0
 
@@ -34,15 +37,25 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
-  flutter_launcher_icons: ^0.13.1 # 🌟 1. 아이콘 만드는 기계 추가!
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.4.0 # 🌟 빈 화면을 만들기 위해 다시 불렀습니다!
 
 flutter:
   uses-material-design: true
   assets:
     - assets/db/
+    - assets/icon.png
+    - assets/intro.png  # 🖼️ 목사님의 예쁜 인트로 이미지!
 
-# 🌟 2. 아이콘 기계 작동 설정 추가!
-flutter_icons:
+# 🌟 앱 아이콘 설정 (아이콘 기계)
+flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
   image_path: "assets/icon.png"
+
+# 🌟 고집쟁이 로고 덮어쓰기 (그림 없이 보라색 배경만 칠합니다!)
+flutter_native_splash:
+  color: "#4B2C71"
+  android: true
+  ios: true
+  fullscreen: true

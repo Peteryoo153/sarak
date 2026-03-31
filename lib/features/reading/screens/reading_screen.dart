@@ -25,7 +25,8 @@ class ReadingScreen extends StatefulWidget {
   State<ReadingScreen> createState() => _ReadingScreenState();
 }
 
-class _ReadingScreenState extends State<ReadingScreen> {
+// 🌟 마법 1: 화면이 켜지고 꺼지는 걸 감지하는 센서(WidgetsBindingObserver)를 달았습니다!
+class _ReadingScreenState extends State<ReadingScreen> with WidgetsBindingObserver {
   List<Map<String, dynamic>> _verses = [];
   bool _isLoading = true;
   int _currentChapterIndex = 0;
@@ -36,15 +37,25 @@ class _ReadingScreenState extends State<ReadingScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this); // 🌟 센서 작동 시작!
     _settings.load().then((_) => setState(() {}));
     _loadVerses();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this); // 🌟 화면이 꺼질 때 센서도 같이 끕니다.
     _commentController.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  // 🌟 센서가 화면을 다시 볼 때마다 알아서 새로고침(setState)을 해줍니다!
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      setState(() {});
+    }
   }
 
   Future<void> _loadVerses() async {
@@ -220,15 +231,22 @@ class _ReadingScreenState extends State<ReadingScreen> {
   }
 
   Widget _buildVerseList() {
-    return ListView.builder(
-      controller: _scrollController,
-      padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
-      itemCount: _verses.length + 1,
-      itemBuilder: (context, index) {
-        if (index == 0) return _buildChapterHeader();
-        final verse = _verses[index - 1];
-        return _buildVerseRow(verse);
+    // 🌟 마법 2: 화면을 아래로 쭉 당기면 새로고침이 되는 기능을 추가했습니다!
+    return RefreshIndicator(
+      color: AppColors.accent,
+      onRefresh: () async {
+        setState(() {}); // 창고에서 최신 북마크 상태를 다시 가져옵니다.
       },
+      child: ListView.builder(
+        controller: _scrollController,
+        padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
+        itemCount: _verses.length + 1,
+        itemBuilder: (context, index) {
+          if (index == 0) return _buildChapterHeader();
+          final verse = _verses[index - 1];
+          return _buildVerseRow(verse);
+        },
+      ),
     );
   }
 
@@ -265,6 +283,8 @@ class _ReadingScreenState extends State<ReadingScreen> {
   Widget _buildVerseRow(Map<String, dynamic> verse) {
     final verseNum = verse['verse'] as int;
     final text = verse['text'] as String;
+    
+    // 🌟 이 부분이 화면이 그려질 때마다 창고(LocalStorage)를 확인하는 코드입니다.
     final isBookmarked = LocalStorage.isBookmarked(
       bookId: widget.bookId,
       chapter: widget.chapters[_currentChapterIndex],
@@ -288,7 +308,7 @@ class _ReadingScreenState extends State<ReadingScreen> {
             text: text,
           );
         }
-        setState(() {});
+        setState(() {}); // 누르면 바로 새로고침!
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
