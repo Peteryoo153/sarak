@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:share_plus/share_plus.dart'; // 🌟 공유하기 기능 추가!
 import '../../../core/theme/app_theme.dart';
 import '../../../core/database/bible_database.dart';
 import '../../../core/database/reading_settings.dart';
@@ -496,6 +497,20 @@ class _CompletionSheet extends StatelessWidget {
     return '$bookName ${chapters.first}-${chapters.last}장';
   }
 
+  // 🌟 공유하기 함수를 추가했습니다.
+  void _shareReadingResult() {
+    final String shareMessage = '''
+[사락(SARAK) - 오늘의 통독 완료]
+📖 오늘의 말씀: $_rangeText
+✨ Day $dayNumber 완료!
+
+"생명의 말씀이 사락 넘어갑니다."
+오늘도 말씀과 동행하며 승리하는 하루 되세요! 🙏
+''';
+    
+    Share.share(shareMessage);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -611,7 +626,7 @@ class _CompletionSheet extends StatelessWidget {
             children: [
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: onClose,
+                  onPressed: _shareReadingResult, // 🌟 공유 버튼이 눌리면 함수가 실행되도록 연결했습니다.
                   icon: const Icon(Icons.share_outlined, size: 16),
                   label: const Text('공유하기'),
                   style: OutlinedButton.styleFrom(

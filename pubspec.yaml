@@ -1,7 +1,7 @@
 name: sarak
 description: 사락 — 생명의 말씀이 사락 넘어갑니다
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.0.0+3
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -17,7 +17,7 @@ dependencies:
   intl: ^0.19.0
   cupertino_icons: ^1.0.8
   screenshot: ^2.3.0
-  share_plus: ^12.0.1
+  share_plus: ^12.0.2
   google_fonts: ^8.0.2
   
   # 🌟 인터넷 창을 열어주는 마법 부품 추가!

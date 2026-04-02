@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/providers/auth_provider.dart';
-// 👈 경로 확인 완료
 import '../../../core/models/member_progress.dart';
 import '../../../core/models/sarak_group.dart';
 
@@ -83,7 +82,7 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
     );
   }
 
-  // --- 로그인 프롬프트 (기존 디자인 유지) ---
+  // --- 로그인 프롬프트 ---
   Widget _buildLoginPrompt() {
     return Center(
       child: Padding(
@@ -117,7 +116,7 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
     );
   }
 
-  // --- 그룹 없음 화면 (기존 디자인 유지) ---
+  // --- 그룹 없음 화면 ---
   Widget _buildNoGroupScreen() {
     return SingleChildScrollView(
       child: Padding(
@@ -173,7 +172,7 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
     );
   }
 
-  // --- 🌟 핵심: 그룹 뷰 (실시간 데이터 연동) ---
+  // --- 🌟 핵심: 그룹 뷰 ---
   Widget _buildGroupView(SarakGroup group) {
     final progressAsync = ref.watch(groupProgressProvider(group.id));
     final currentUid = ref.read(authStateProvider).valueOrNull?.uid;
@@ -221,7 +220,6 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
     );
   }
 
-  // --- 목사님의 기존 카드 디자인 UI 함수들 (그대로 유지) ---
   Widget _buildHeader() {
     return const Padding(
       padding: EdgeInsets.fromLTRB(24, 20, 24, 16),
@@ -337,7 +335,6 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
     );
   }
 
-  // --- 핵심 로직 함수들 (안전하게 통합) ---
   Future<void> _toggleMyProgress(
       MemberProgress member, SarakGroup group) async {
     final firestore = ref.read(firestoreServiceProvider);
@@ -397,19 +394,80 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
     _joinCodeController.clear();
   }
 
+  // --- 🌟 초대코드 복사 및 스낵바 알림 ---
   Widget _buildInviteButton(BuildContext context, String inviteCode) {
     return Padding(
-        padding: const EdgeInsets.all(20),
-        child: OutlinedButton(
-            onPressed: () => Clipboard.setData(ClipboardData(text: inviteCode)),
-            child: Text('초대코드 복사: $inviteCode')));
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        child: OutlinedButton.icon(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: inviteCode));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('초대코드가 복사되었습니다!'),
+                  backgroundColor: AppColors.accent,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+              );
+            },
+            icon: const Icon(Icons.copy, size: 18),
+            label: Text('초대코드 복사: $inviteCode')));
   }
 
+  // --- 🌟 그룹 나가기 버튼 ---
   Widget _buildLeaveGroupButton(
       BuildContext context, String groupId, String uid) {
     return Center(
-        child: TextButton(
-            onPressed: () {},
-            child: const Text('그룹 나가기', style: TextStyle(color: Colors.grey))));
+      child: TextButton(
+        onPressed: () => _confirmLeaveGroup(context, groupId, uid),
+        child: const Text(
+          '그룹 나가기',
+          style: TextStyle(
+            color: Colors.grey,
+            decoration: TextDecoration.underline,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // --- 🌟 그룹 나가기 로직 ---
+  Future<void> _confirmLeaveGroup(
+      BuildContext context, String groupId, String uid) async {
+    final bool? leave = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('그룹 나가기'),
+        content: const Text('정말 이 그룹에서 나가시겠습니까?\n내 활동 기록이 삭제됩니다.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('취소'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('나가기', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (leave == true) {
+      try {
+        await ref.read(firestoreServiceProvider).leaveGroup(groupId);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('그룹에서 성공적으로 나갔습니다.')),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('오류가 발생했습니다: $e')),
+          );
+        }
+      }
+    }
   }
 }

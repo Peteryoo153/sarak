@@ -108,7 +108,7 @@ class CalendarScreenState extends State<CalendarScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            '통독 달력',
+            '말씀통독 달력',
             style: TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.w800,

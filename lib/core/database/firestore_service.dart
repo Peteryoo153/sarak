@@ -195,7 +195,7 @@ class FirestoreService {
             .toList());
   }
 
-  /// 3. 멤버 내보내기 또는 내가 그룹에서 나가기
+  /// 3. 멤버 내보내기 또는 내가 그룹에서 나가기 (기존 함수)
   Future<void> removeMember(String groupId, String memberUid) async {
     // 1. 그룹 멤버 명단에서 이름 지우기
     await _db.collection('groups').doc(groupId).update({
@@ -209,6 +209,12 @@ class FirestoreService {
         .collection('progress')
         .doc(memberUid)
         .delete();
+  }
+
+  /// 🌟 3-1. 내가 스스로 그룹에서 나가기 (UI에서 호출하는 함수)
+  Future<void> leaveGroup(String groupId) async {
+    if (currentUid == null) return; // 로그인 안 되어 있으면 무시
+    await removeMember(groupId, currentUid!); // 내 아이디를 넣어서 삭제 실행
   }
 
   // ─── 통독 완주 기록 (🏆 칭호 및 훈장용) ───
