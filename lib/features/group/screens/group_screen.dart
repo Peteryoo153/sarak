@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:io' show Platform; // 🌟 애플 기기인지 확인하는 부품 추가
 import '../../../core/theme/app_theme.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/models/member_progress.dart';
@@ -82,7 +83,7 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
     );
   }
 
-  // --- 로그인 프롬프트 ---
+  // --- 🌟 수정된 부분: 로그인 프롬프트 (애플 버튼 추가) ---
   Widget _buildLoginPrompt() {
     return Center(
       child: Padding(
@@ -96,6 +97,8 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
             const Text('그룹 통독은 로그인이 필요해요',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
             const SizedBox(height: 32),
+            
+            // 🔴 구글 로그인 버튼
             SizedBox(
               width: double.infinity,
               height: 52,
@@ -110,6 +113,26 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
                         borderRadius: BorderRadius.circular(12))),
               ),
             ),
+            
+            const SizedBox(height: 12), // 버튼 사이 간격
+
+            // 🍏 애플 로그인 버튼 (아이폰일 때만 보여줌)
+            if (Platform.isIOS)
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: FilledButton.icon(
+                  onPressed: () =>
+                      ref.read(authServiceProvider).signInWithApple(),
+                  icon: const Icon(Icons.apple, size: 24),
+                  label: const Text('Apple로 로그인'),
+                  style: FilledButton.styleFrom(
+                      backgroundColor: Colors.black, // 애플은 블랙
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12))),
+                ),
+              ),
           ],
         ),
       ),

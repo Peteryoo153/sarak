@@ -2,16 +2,16 @@ import 'notification_settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart'; // 🌟 링크 연결 부품
+import 'package:url_launcher/url_launcher.dart'; 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/providers/auth_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:io' show Platform;
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
-  // 🔗 링크를 안전하게 열어주는 마법의 함수입니다.
   Future<void> _launchURL(BuildContext context, String urlString) async {
     final Uri url = Uri.parse(urlString);
     if (await canLaunchUrl(url)) {
@@ -23,6 +23,97 @@ class SettingsScreen extends ConsumerWidget {
         );
       }
     }
+  }
+
+  // 🌟 다시 살려낸 부분: 아래에서 스르륵 올라오는 예쁜 로그인 팝업창입니다!
+  void _showLoginBottomSheet(BuildContext context, WidgetRef ref) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.bgCard,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                '로그인',
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.text),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                '데이터를 안전하게 동기화하세요.',
+                style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
+              ),
+              const SizedBox(height: 30),
+
+              // 🔴 구글 로그인 버튼
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                  elevation: 1,
+                  minimumSize: const Size(double.infinity, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    side: BorderSide(color: Colors.grey.shade300),
+                  ),
+                ),
+                onPressed: () async {
+                  Navigator.pop(context); // 창 닫기
+                  await ref.read(authServiceProvider).signInWithGoogle();
+                },
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('G', style: TextStyle(fontWeight: FontWeight.w900, color: Colors.red, fontSize: 18)),
+                    SizedBox(width: 12),
+                    Text('Google로 로그인',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w600)),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // 🍏 애플 로그인 버튼 (아이폰일 때만 보여줌)
+              if (Platform.isIOS)
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    minimumSize: const Size(double.infinity, 50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onPressed: () async {
+                    Navigator.pop(context); // 창 닫기
+                    await ref.read(authServiceProvider).signInWithApple();
+                  },
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.apple, size: 24), // 애플 기본 아이콘
+                      SizedBox(width: 12),
+                      Text('Apple로 로그인',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w600)),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -89,8 +180,9 @@ class SettingsScreen extends ConsumerWidget {
                 children: [
                   const Text('로그인이 필요합니다', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.text)),
                   const SizedBox(height: 4),
+                  // 🌟 여기를 누르면 팝업창 함수를 부릅니다!
                   GestureDetector(
-                    onTap: () => ref.read(authServiceProvider).signInWithGoogle(),
+                    onTap: () => _showLoginBottomSheet(context, ref),
                     child: const Text('여기를 눌러 로그인하세요', style: TextStyle(fontSize: 13, color: AppColors.primary, fontWeight: FontWeight.w600)),
                   ),
                 ],
@@ -181,7 +273,6 @@ class SettingsScreen extends ConsumerWidget {
             child: Text('사역후원 및 제안', style: TextStyle(fontSize: 13, color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
           ),
           
-          // 🌟 1. 사역후원 -> 유튜브 멤버십 가입 링크
           _buildDetailItem(context, Icons.favorite_outline, '사역후원', 'icon_new', isPink: true, () {
             _launchURL(context, 'https://www.youtube.com/@biblecraft/join');
           }),
@@ -190,7 +281,6 @@ class SettingsScreen extends ConsumerWidget {
           _buildDetailItem(context, Icons.mail_outline, '앱 제안 및 문의', 'biblestorys@naver.com', isBlue: true, () {}),
           const Divider(height: 1, indent: 56, color: AppColors.border),
           
-          // 🌟 2. 제작 -> 목사님 링크트리 연결
           _buildDetailItem(context, Icons.person_outline, '제작', '@revchanho 유찬호 목사', isAuthor: true, () {
             _launchURL(context, 'https://linktr.ee/biblestorys');
           }),

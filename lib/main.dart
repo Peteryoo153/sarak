@@ -62,42 +62,9 @@ class MainShellState extends ConsumerState<MainShell> {
     }
   }
 
+  // 🌟 변경된 부분: 팝업창이나 다른 로그인 페이지로 가는 코드를 지웠습니다.
+  // 🌟 이제 그룹 탭을 누르면 바로 그룹 화면으로 자연스럽게 넘어갑니다.
   Future<void> _onTabTapped(int index) async {
-    if (index == 2) {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        final confirmed = await showDialog<bool>(
-          context: context,
-          builder: (_) => AlertDialog(
-            title: const Text('로그인이 필요해요'),
-            content: const Text('그룹 통독은 Google 계정으로 로그인해야 사용할 수 있어요.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('취소'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('로그인'),
-              ),
-            ],
-          ),
-        );
-        if (confirmed == true) {
-          try {
-            await ref.read(authServiceProvider).signInWithGoogle();
-            if (mounted) setState(() => _currentIndex = 2);
-          } catch (e) {
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('로그인 실패: $e')),
-              );
-            }
-          }
-        }
-        return;
-      }
-    }
     setState(() => _currentIndex = index);
     if (index == 1) {
       _calendarKey.currentState?.loadData();
