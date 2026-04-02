@@ -1,7 +1,7 @@
 name: sarak
 description: 사락 — 생명의 말씀이 사락 넘어갑니다
 publish_to: 'none'
-version: 1.0.0+3
+version: 1.0.0+4
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
