@@ -27,6 +27,7 @@ class SettingsScreen extends ConsumerWidget {
 
   // 🌟 다시 살려낸 부분: 아래에서 스르륵 올라오는 예쁜 로그인 팝업창입니다!
   void _showLoginBottomSheet(BuildContext context, WidgetRef ref) {
+    final outerMessenger = ScaffoldMessenger.of(context);
     showModalBottomSheet(
       context: context,
       backgroundColor: AppColors.bgCard,
@@ -67,7 +68,13 @@ class SettingsScreen extends ConsumerWidget {
                 ),
                 onPressed: () async {
                   Navigator.pop(context); // 창 닫기
-                  await ref.read(authServiceProvider).signInWithGoogle();
+                  try {
+                    await ref.read(authServiceProvider).signInWithGoogle();
+                  } catch (e) {
+                    outerMessenger.showSnackBar(
+                      SnackBar(content: Text('$e'.replaceFirst('Exception: ', ''))),
+                    );
+                  }
                 },
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -96,7 +103,13 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                   onPressed: () async {
                     Navigator.pop(context); // 창 닫기
-                    await ref.read(authServiceProvider).signInWithApple();
+                    try {
+                      await ref.read(authServiceProvider).signInWithApple();
+                    } catch (e) {
+                      outerMessenger.showSnackBar(
+                        SnackBar(content: Text('$e'.replaceFirst('Exception: ', ''))),
+                      );
+                    }
                   },
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -145,9 +158,13 @@ class SettingsScreen extends ConsumerWidget {
                 }),
                 _buildSettingsItem(context, '📜', '역본 설정', '개역개정', true, () {}),
               ]),
-              
+
               const SizedBox(height: 20),
               _buildInfoSection(context),
+              if (user != null) ...[
+                const SizedBox(height: 20),
+                _buildAccountDeletionSection(context, ref),
+              ],
               const SizedBox(height: 24),
               _buildFooter(),
             ],
@@ -340,6 +357,74 @@ class SettingsScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildAccountDeletionSection(BuildContext context, WidgetRef ref) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        color: AppColors.bgCard,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: ListTile(
+        onTap: () => _confirmDeleteAccount(context, ref),
+        leading: const Icon(Icons.person_remove_outlined,
+            size: 22, color: Colors.redAccent),
+        title: const Text('계정 삭제',
+            style: TextStyle(fontSize: 15, color: Colors.redAccent, fontWeight: FontWeight.w600)),
+        trailing: const Icon(Icons.chevron_right, size: 18, color: AppColors.textTertiary),
+      ),
+    );
+  }
+
+  Future<void> _confirmDeleteAccount(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.bgCard,
+        title: const Text('계정 삭제', style: TextStyle(color: AppColors.text, fontWeight: FontWeight.bold)),
+        content: const Text(
+          '정말 삭제하시겠습니까? 모든 데이터가 삭제됩니다.',
+          style: TextStyle(color: AppColors.text, height: 1.4),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('취소', style: TextStyle(color: AppColors.textSecondary)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('삭제', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w700)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !context.mounted) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      await ref.read(authServiceProvider).deleteAccount();
+      if (navigator.canPop()) navigator.pop(); // 진행 다이얼로그 닫기
+      navigator.popUntil((r) => r.isFirst);
+      messenger.showSnackBar(
+        const SnackBar(content: Text('계정이 삭제되었습니다.')),
+      );
+    } catch (e) {
+      if (navigator.canPop()) navigator.pop();
+      messenger.showSnackBar(
+        SnackBar(content: Text('$e'.replaceFirst('Exception: ', ''))),
+      );
+    }
   }
 
   Widget _buildFooter() {

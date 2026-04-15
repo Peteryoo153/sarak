@@ -366,7 +366,7 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
     if (willBeCompleted && member.progress >= 1.0) {
       await firestore.saveCompletionRecord(
         planName: group.name,
-        startDate: group.startDate ?? group.createdAt ?? DateTime.now(),
+        startDate: group.startDate ?? group.createdAt,
         range: group.planType,
       );
     }
@@ -457,6 +457,7 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
   // --- 🌟 그룹 나가기 로직 ---
   Future<void> _confirmLeaveGroup(
       BuildContext context, String groupId, String uid) async {
+    final messenger = ScaffoldMessenger.of(context);
     final bool? leave = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -478,18 +479,13 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
     if (leave == true) {
       try {
         await ref.read(firestoreServiceProvider).leaveGroup(groupId);
-
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('그룹에서 성공적으로 나갔습니다.')),
-          );
-        }
+        messenger.showSnackBar(
+          const SnackBar(content: Text('그룹에서 성공적으로 나갔습니다.')),
+        );
       } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('오류가 발생했습니다: $e')),
-          );
-        }
+        messenger.showSnackBar(
+          SnackBar(content: Text('오류가 발생했습니다: $e')),
+        );
       }
     }
   }

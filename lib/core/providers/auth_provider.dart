@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -69,9 +70,10 @@ class AuthService {
         await _firestore.createUserIfNeeded(result.user!);
       }
       return result.user;
-    } catch (e) {
-      print("Google Sign-In 에러: $e");
-      return null;
+    } on FirebaseAuthException catch (e) {
+      throw Exception(e.message ?? '구글 로그인에 실패했습니다.');
+    } catch (_) {
+      throw Exception('구글 로그인 중 문제가 발생했습니다.');
     }
   }
 
@@ -93,12 +95,25 @@ class AuthService {
       final result = await _auth.signInWithCredential(oauthCredential);
 
       if (result.user != null) {
-        await _firestore.createUserIfNeeded(result.user!);
+        // Apple은 최초 1회만 이름을 돌려주므로, 이때만 displayName에 채워둔다.
+        final fullName = [credential.givenName, credential.familyName]
+            .whereType<String>()
+            .where((s) => s.isNotEmpty)
+            .join(' ');
+        if (fullName.isNotEmpty && (result.user!.displayName ?? '').isEmpty) {
+          await result.user!.updateDisplayName(fullName);
+          await result.user!.reload();
+        }
+        await _firestore.createUserIfNeeded(_auth.currentUser ?? result.user!);
       }
-      return result.user;
-    } catch (e) {
-      print("Apple Sign-In 에러: $e");
-      return null;
+      return _auth.currentUser ?? result.user;
+    } on SignInWithAppleAuthorizationException catch (e) {
+      if (e.code == AuthorizationErrorCode.canceled) return null;
+      throw Exception(e.message);
+    } on FirebaseAuthException catch (e) {
+      throw Exception(e.message ?? '애플 로그인에 실패했습니다.');
+    } catch (_) {
+      throw Exception('애플 로그인 중 문제가 발생했습니다.');
     }
   }
 
@@ -106,5 +121,90 @@ class AuthService {
   Future<void> signOut() async {
     await _googleSignIn.signOut();
     await _auth.signOut();
+  }
+
+  // 계정 삭제 (Apple App Store 가이드라인 5.1.1(v) 준수)
+  Future<void> deleteAccount() async {
+    final user = _auth.currentUser;
+    if (user == null) throw Exception('로그인 상태가 아닙니다.');
+
+    try {
+      await _deleteUserData(user.uid);
+      await user.delete();
+      await _googleSignIn.signOut();
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'requires-recent-login') {
+        // 최근 로그인이 필요하면 재인증 후 재시도
+        await _reauthenticate(user);
+        await _deleteUserData(user.uid);
+        await _auth.currentUser?.delete();
+        await _googleSignIn.signOut();
+      } else {
+        throw Exception(e.message ?? '계정 삭제에 실패했습니다.');
+      }
+    } catch (_) {
+      throw Exception('계정 삭제 중 문제가 발생했습니다.');
+    }
+  }
+
+  Future<void> _reauthenticate(User user) async {
+    final providerId = user.providerData.isNotEmpty
+        ? user.providerData.first.providerId
+        : '';
+
+    if (providerId == 'google.com') {
+      GoogleSignInAccount? googleUser = await _googleSignIn.signInSilently();
+      googleUser ??= await _googleSignIn.signIn();
+      if (googleUser == null) throw Exception('재인증이 취소되었습니다.');
+      final googleAuth = await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      await user.reauthenticateWithCredential(credential);
+    } else if (providerId == 'apple.com') {
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+      final oauthCredential = OAuthProvider('apple.com').credential(
+        idToken: appleCredential.identityToken,
+        accessToken: appleCredential.authorizationCode,
+      );
+      await user.reauthenticateWithCredential(oauthCredential);
+    } else {
+      throw Exception('지원하지 않는 로그인 제공자입니다.');
+    }
+  }
+
+  Future<void> _deleteUserData(String uid) async {
+    final db = FirebaseFirestore.instance;
+
+    // 1. 내가 속한 모든 그룹에서 나가기 (members 배열에서 제거 + progress 문서 삭제)
+    final myGroups = await db
+        .collection('groups')
+        .where('members', arrayContains: uid)
+        .get();
+    for (final groupDoc in myGroups.docs) {
+      await groupDoc.reference.update({
+        'members': FieldValue.arrayRemove([uid]),
+      });
+      await groupDoc.reference.collection('progress').doc(uid).delete();
+    }
+
+    // 2. 통독 완주 기록 서브컬렉션 삭제
+    final completed = await db
+        .collection('users')
+        .doc(uid)
+        .collection('completed_plans')
+        .get();
+    for (final doc in completed.docs) {
+      await doc.reference.delete();
+    }
+
+    // 3. 유저 문서 삭제
+    await db.collection('users').doc(uid).delete();
   }
 }

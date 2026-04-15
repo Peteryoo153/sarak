@@ -175,13 +175,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               onPressed: () => Navigator.pop(ctx), child: const Text('아니오')),
           TextButton(
             onPressed: () async {
+              final messenger = ScaffoldMessenger.of(context);
+              final navigator = Navigator.of(ctx);
               await LocalStorage.clearPlan();
-              if (mounted) {
-                Navigator.pop(ctx);
-                _loadData();
-                ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('플랜이 취소되었습니다.')));
-              }
+              if (!mounted) return;
+              navigator.pop();
+              _loadData();
+              messenger.showSnackBar(
+                  const SnackBar(content: Text('플랜이 취소되었습니다.')));
             },
             child:
                 const Text('취소하기', style: TextStyle(color: Colors.redAccent)),
@@ -317,7 +318,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20)),
             child: Text(
               _hasPlan

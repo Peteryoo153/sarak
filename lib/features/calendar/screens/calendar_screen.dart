@@ -242,7 +242,7 @@ class CalendarScreenState extends State<CalendarScreen> {
         border: Border.all(color: AppColors.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -371,7 +371,7 @@ class CalendarScreenState extends State<CalendarScreen> {
                           height: 4,
                           decoration: BoxDecoration(
                             color: isCompleted
-                                ? Colors.white.withOpacity(0.8)
+                                ? Colors.white.withValues(alpha: 0.8)
                                 : AppColors.accent,
                             shape: BoxShape.circle,
                           ),

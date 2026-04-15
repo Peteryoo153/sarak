@@ -5,6 +5,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/database/bible_database.dart';
 import '../../../core/database/reading_settings.dart';
 import '../../../core/database/local_storage.dart';
+import '../../../core/database/firestore_service.dart';
 
 class ReadingScreen extends StatefulWidget {
   final int bookId;
@@ -102,6 +103,19 @@ class _ReadingScreenState extends State<ReadingScreen> with WidgetsBindingObserv
       widget.dayNumber,
       comment: _commentController.text,
     );
+    // 로그인 상태면 Firestore에도 진도 동기화 (그룹원이 실시간으로 보게)
+    final firestore = FirestoreService();
+    if (firestore.currentUid != null) {
+      try {
+        await firestore.markTodayComplete(
+          comment: _commentController.text.isEmpty
+              ? null
+              : _commentController.text,
+        );
+      } catch (_) {
+        // 네트워크 실패는 무시 (로컬 저장은 이미 성공)
+      }
+    }
   }
 
   void _showCompletionSheet() {
@@ -116,11 +130,11 @@ class _ReadingScreenState extends State<ReadingScreen> with WidgetsBindingObserv
         dayNumber: widget.dayNumber,
         comment: _commentController.text,
         onComplete: () async {
+          final navigator = Navigator.of(context);
           await _saveAndComplete();
-          if (mounted) {
-            Navigator.pop(context);
-            Navigator.pop(context);
-          }
+          if (!mounted) return;
+          navigator.pop();
+          navigator.pop();
         },
         onClose: () => Navigator.pop(context),
       ),
@@ -508,7 +522,7 @@ class _CompletionSheet extends StatelessWidget {
 오늘도 말씀과 동행하며 승리하는 하루 되세요! 🙏
 ''';
     
-    Share.share(shareMessage);
+    SharePlus.instance.share(ShareParams(text: shareMessage));
   }
 
   @override
@@ -573,7 +587,7 @@ class _CompletionSheet extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: AppColors.accent.withOpacity(0.2),
+                    color: AppColors.accent.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -600,7 +614,7 @@ class _CompletionSheet extends StatelessWidget {
                   '생명의 말씀이 사락 넘어갑니다',
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.white.withOpacity(0.5),
+                    color: Colors.white.withValues(alpha: 0.5),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -612,7 +626,7 @@ class _CompletionSheet extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w800,
-                        color: Colors.white.withOpacity(0.3),
+                        color: Colors.white.withValues(alpha: 0.3),
                         letterSpacing: 3,
                       ),
                     ),

@@ -1,0 +1,63 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isSelf(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // 사용자 프로필
+    match /users/{uid} {
+      allow read: if isSignedIn();
+      allow create, update: if isSelf(uid);
+      allow delete: if false;
+
+      // 통독 완주 기록 (본인만)
+      match /completed_plans/{planId} {
+        allow read, write: if isSelf(uid);
+      }
+    }
+
+    // 그룹
+    match /groups/{groupId} {
+      // 그룹 멤버만 문서 조회 가능
+      allow read: if isSignedIn()
+        && request.auth.uid in resource.data.members;
+
+      // 로그인 한 사용자는 자기 uid를 members에 포함시켜 생성 가능
+      allow create: if isSignedIn()
+        && request.auth.uid == request.resource.data.createdBy
+        && request.auth.uid in request.resource.data.members;
+
+      // 멤버 목록 변경: 본인 uid만 추가/제거 가능 (그룹 참여 / 나가기)
+      // 그 외 필드는 생성자만 변경 가능
+      allow update: if isSignedIn() && (
+        // 본인이 members에서 자기 uid만 추가하거나 제거하는 경우
+        (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members'])
+          && (
+            request.resource.data.members.hasAll(resource.data.members.removeAll([request.auth.uid]))
+            || resource.data.members.hasAll(request.resource.data.members)
+          )
+        )
+        // 그룹 생성자가 다른 필드를 수정하는 경우
+        || request.auth.uid == resource.data.createdBy
+      );
+
+      allow delete: if isSignedIn()
+        && request.auth.uid == resource.data.createdBy;
+
+      // 그룹 진행 출석부: 그룹 멤버면 조회, 본인 문서만 쓰기
+      match /progress/{memberUid} {
+        allow read: if isSignedIn()
+          && request.auth.uid in get(/databases/$(database)/documents/groups/$(groupId)).data.members;
+        allow write: if isSelf(memberUid);
+      }
+    }
+  }
+}
