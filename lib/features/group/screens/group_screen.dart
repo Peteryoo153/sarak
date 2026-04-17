@@ -25,6 +25,9 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
   final _joinCodeController = TextEditingController();
   final _groupNameController = TextEditingController();
 
+  // 현재 화면에 표시 중인 그룹 id. null이면 groups.first로 폴백
+  String? _selectedGroupId;
+
   @override
   void dispose() {
     _joinCodeController.dispose();
@@ -76,7 +79,20 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
           error: (e, _) => Center(child: Text('오류: $e')),
           data: (groups) {
             if (groups.isEmpty) return _buildNoGroupScreen();
-            return _buildGroupView(groups.first);
+            // 선택된 id가 현재 목록에 있으면 사용, 아니면 첫 그룹으로 폴백
+            // (나가기/삭제 등으로 기존 선택이 사라져도 안전)
+            final displayed = groups.firstWhere(
+              (g) => g.id == _selectedGroupId,
+              orElse: () => groups.first,
+            );
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(),
+                _buildGroupTabs(groups, displayed.id),
+                Expanded(child: _buildGroupView(displayed)),
+              ],
+            );
           },
         ),
       ),
@@ -225,7 +241,6 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(),
               _buildTodayStatusCard(
                   group, sortedMembers, completedCount, totalCount),
               const SizedBox(height: 12),
@@ -258,6 +273,124 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
     );
   }
 
+  // 여러 그룹 간 전환용 가로 스크롤 탭. 마지막에 "추가" 칩으로 신규 그룹 생성/참여
+  Widget _buildGroupTabs(List<SarakGroup> groups, String selectedId) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+        child: Row(
+          children: [
+            ...groups.map((g) {
+              final selected = g.id == selectedId;
+              return Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: ChoiceChip(
+                  label: Text(g.name),
+                  selected: selected,
+                  onSelected: (_) {
+                    if (!selected) {
+                      setState(() => _selectedGroupId = g.id);
+                    }
+                  },
+                  selectedColor: AppColors.accent,
+                  backgroundColor: AppColors.bgCard,
+                  labelStyle: TextStyle(
+                    color: selected ? Colors.white : AppColors.text,
+                    fontWeight:
+                        selected ? FontWeight.w700 : FontWeight.w500,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    side: BorderSide(
+                      color: selected ? AppColors.accent : AppColors.border,
+                    ),
+                  ),
+                ),
+              );
+            }),
+            ActionChip(
+              avatar: const Icon(Icons.add, size: 18),
+              label: const Text('추가'),
+              onPressed: _showAddGroupSheet,
+              backgroundColor: AppColors.bgCard,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: const BorderSide(color: AppColors.border),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // "추가" 칩을 눌렀을 때 그룹 만들기/참여 중 선택하게 해주는 바텀시트
+  void _showAddGroupSheet() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.group_add_outlined),
+                title: const Text('새 그룹 만들기'),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _showCreateGroupDialog();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.login),
+                title: const Text('초대코드로 참여'),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _showJoinGroupDialog();
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 초대코드 입력 다이얼로그 (이미 그룹에 속한 상태에서 다른 그룹에 추가 참여)
+  void _showJoinGroupDialog() {
+    _joinCodeController.clear();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('초대코드로 참여'),
+        content: TextField(
+          controller: _joinCodeController,
+          textCapitalization: TextCapitalization.characters,
+          decoration: const InputDecoration(hintText: '초대코드 입력'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('취소'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              await _joinGroup();
+            },
+            child: const Text('참여'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildTodayStatusCard(SarakGroup group, List<MemberProgress> members,
       int completed, int total) {
     final percent = total > 0 ? (completed / total * 100).round() : 0;
@@ -271,12 +404,15 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
       ),
       child: Column(children: [
         Row(children: [
-          Text('🏫 ${group.name}',
-              style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white)),
-          const Spacer(),
+          Expanded(
+            child: Text('🏫 ${group.name}',
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white)),
+          ),
+          const SizedBox(width: 8),
           Text('$total명',
               style: const TextStyle(fontSize: 11, color: Colors.white70)),
         ]),
@@ -401,20 +537,34 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
                       final name = _groupNameController.text.trim();
                       if (name.isEmpty) return;
                       Navigator.pop(ctx);
-                      await ref
+                      final created = await ref
                           .read(firestoreServiceProvider)
                           .createGroup(name);
+                      // 방금 만든 그룹을 자동 선택해서 UI가 바로 그쪽을 보여주게 함
+                      if (mounted) {
+                        setState(() => _selectedGroupId = created.id);
+                      }
                     },
                     child: const Text('만들기')),
               ],
             ));
   }
 
-  void _joinGroup() async {
+  Future<void> _joinGroup() async {
     final code = _joinCodeController.text.trim();
     if (code.isEmpty) return;
-    await ref.read(firestoreServiceProvider).joinGroup(code);
+    final messenger = ScaffoldMessenger.of(context);
+    final joined = await ref.read(firestoreServiceProvider).joinGroup(code);
     _joinCodeController.clear();
+    if (!mounted) return;
+    if (joined == null) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text('잘못된 초대코드입니다.')),
+      );
+      return;
+    }
+    // 방금 참여한 그룹을 자동 선택
+    setState(() => _selectedGroupId = joined.id);
   }
 
   // --- 🌟 초대코드 복사 및 스낵바 알림 ---
@@ -479,6 +629,10 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
     if (leave == true) {
       try {
         await ref.read(firestoreServiceProvider).leaveGroup(groupId);
+        // 선택이 나간 그룹이면 초기화 → 빌드 시 남은 그룹 중 첫 번째로 폴백
+        if (mounted && _selectedGroupId == groupId) {
+          setState(() => _selectedGroupId = null);
+        }
         messenger.showSnackBar(
           const SnackBar(content: Text('그룹에서 성공적으로 나갔습니다.')),
         );

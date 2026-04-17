@@ -12,8 +12,10 @@ final authServiceProvider = Provider((ref) => AuthService());
 final firestoreServiceProvider = Provider((ref) => FirestoreService());
 
 // ─── 1. Firebase Auth 실시간 상태 (앱을 켜자마자 확인) ───
+// idTokenChanges()를 사용해야 ID 토큰이 Firestore에 전파된 뒤 스트림이 발화됨
+// (authStateChanges는 토큰 전파 전에 발화되어 permission-denied를 유발)
 final authStateProvider = StreamProvider<User?>((ref) {
-  return FirebaseAuth.instance.authStateChanges();
+  return FirebaseAuth.instance.idTokenChanges();
 });
 
 // ─── 2. 내 상세 프로필 (Firestore 데이터) ───

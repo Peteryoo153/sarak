@@ -103,19 +103,20 @@ class FirestoreService {
   }
 
   /// 초대코드로 그룹 참가 (참가할 때도 출석부에 이름을 등록합니다!)
-  Future<bool> joinGroup(String inviteCode) async {
-    if (currentUid == null) return false;
-    
+  /// 성공 시 참여한 그룹을, 코드가 잘못되었거나 로그인되지 않았으면 null을 반환
+  Future<SarakGroup?> joinGroup(String inviteCode) async {
+    if (currentUid == null) return null;
+
     final query = await _db
         .collection('groups')
         .where('inviteCode', isEqualTo: inviteCode)
         .limit(1)
         .get();
-        
-    if (query.docs.isEmpty) return false;
-    
+
+    if (query.docs.isEmpty) return null;
+
     final groupDoc = query.docs.first;
-    
+
     // 1. 그룹 멤버 명단에 내 UID 추가
     await groupDoc.reference.update({
       'members': FieldValue.arrayUnion([currentUid]),
@@ -136,7 +137,8 @@ class FirestoreService {
     );
     await updateMemberProgress(groupId: groupDoc.id, progress: initialProgress);
 
-    return true;
+    final refreshed = await groupDoc.reference.get();
+    return SarakGroup.fromFirestore(refreshed);
   }
 
   /// 내가 속한 그룹 목록 스트림
