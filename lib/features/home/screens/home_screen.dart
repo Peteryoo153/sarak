@@ -13,10 +13,10 @@ class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key, this.onTabSwitch});
 
   @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class HomeScreenState extends ConsumerState<HomeScreen> {
   Map<String, dynamic>? _plan;
   int _streak = 0;
   double _progress = 0.0;
@@ -28,6 +28,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.initState();
     _loadData();
   }
+
+  /// 활성 플랜/진행 상태를 LocalStorage에서 다시 읽어와 화면 갱신.
+  /// 외부에서도 호출할 수 있게 public으로 노출.
+  void loadData() => _loadData();
 
   void _loadData() {
     if (!mounted) return;
@@ -212,6 +216,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildGreeting(),
+                _buildPlanSourceBadge(),
                 const SizedBox(height: 16),
                 _buildStreakCard(),
                 const SizedBox(height: 16),
@@ -238,6 +243,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  /// 홈 상단에 현재 활성 플랜의 출처(개인 / 그룹명) 뱃지를 보여줌
+  Widget _buildPlanSourceBadge() {
+    if (_plan == null) return const SizedBox.shrink();
+    final source = LocalStorage.getActiveSource();
+    final isGroup = source.startsWith('group:');
+    if (!isGroup) return const SizedBox.shrink();
+
+    final groupName = (_plan!['groupName'] as String?) ?? '그룹 플랜';
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: AppColors.accentPale,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: AppColors.accentLight),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.group, size: 14, color: AppColors.accent),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                '🏫 $groupName 플랜으로 함께 읽는 중',
+                style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.accent),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
         ),
       ),
     );

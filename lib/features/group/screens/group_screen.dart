@@ -6,10 +6,16 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/models/member_progress.dart';
 import '../../../core/models/sarak_group.dart';
+import '../../../core/database/local_storage.dart';
+import 'group_create_screen.dart';
 
-// 🌟 실시간 그룹 진도 감시자
+// 🌟 실시간 그룹 진도 감시자.
+// authStateProvider가 준비된 뒤에만 Firestore listener를 붙이도록 해서
+// 로그인 직후 credential 전파가 덜 된 상태에서 permission-denied를 맞는 레이스를 피함.
 final groupProgressProvider =
     StreamProvider.family<List<MemberProgress>, String>((ref, groupId) {
+  final authState = ref.watch(authStateProvider);
+  if (authState.valueOrNull == null) return Stream.value(const <MemberProgress>[]);
   final firestore = ref.watch(firestoreServiceProvider);
   return firestore.streamGroupProgress(groupId);
 });
@@ -23,7 +29,6 @@ class GroupScreen extends ConsumerStatefulWidget {
 
 class _GroupScreenState extends ConsumerState<GroupScreen> {
   final _joinCodeController = TextEditingController();
-  final _groupNameController = TextEditingController();
 
   // 현재 화면에 표시 중인 그룹 id. null이면 groups.first로 폴백
   String? _selectedGroupId;
@@ -31,7 +36,6 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
   @override
   void dispose() {
     _joinCodeController.dispose();
-    _groupNameController.dispose();
     super.dispose();
   }
 
@@ -173,7 +177,7 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
               width: double.infinity,
               height: 52,
               child: FilledButton.icon(
-                onPressed: _showCreateGroupDialog,
+                onPressed: _openCreateGroup,
                 icon: const Icon(Icons.add),
                 label: const Text('새 그룹 만들기'),
                 style: FilledButton.styleFrom(
@@ -217,6 +221,9 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
     final currentUid = ref.read(authStateProvider).valueOrNull?.uid;
     final isCreator = group.createdBy == currentUid;
 
+    // 내가 이 그룹 플랜을 쓰는 중이라면 방장이 바꾼 스케줄을 로컬에도 자동 반영
+    _maybeSyncActivePlan(group);
+
     return progressAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Center(child: Text('로딩 오류: $e')),
@@ -244,6 +251,8 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
               _buildTodayStatusCard(
                   group, sortedMembers, completedCount, totalCount),
               const SizedBox(height: 12),
+              _buildPlanSection(group, isCreator),
+              const SizedBox(height: 12),
               _buildMemberList(sortedMembers, currentUid, groupMaxDay, group.id,
                   isCreator, group),
               if (isCreator) _buildInviteButton(context, group.inviteCode),
@@ -256,6 +265,182 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
         );
       },
     );
+  }
+
+  /// 그룹 플랜 섹션: 플랜 정보 표시 + "이 플랜으로 함께 읽기" 전환 버튼
+  /// 생성자에게는 플랜이 없으면 "플랜 설정하기", 있으면 "플랜 수정" 메뉴도 노출
+  Widget _buildPlanSection(SarakGroup group, bool isCreator) {
+    final source = LocalStorage.groupSource(group.id);
+    final isActive = LocalStorage.getActiveSource() == source;
+    final hasSchedule = group.hasSchedule;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.bgCard,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.menu_book_outlined,
+                  size: 18, color: AppColors.accent),
+              const SizedBox(width: 6),
+              const Text('그룹 플랜',
+                  style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.text)),
+              const Spacer(),
+              if (hasSchedule && isCreator)
+                TextButton(
+                  onPressed: () => _openEditGroupPlan(group),
+                  style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      minimumSize: const Size(0, 32)),
+                  child: const Text('수정',
+                      style: TextStyle(
+                          fontSize: 12, color: AppColors.textSecondary)),
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          if (!hasSchedule) ...[
+            const Text(
+              '아직 이 그룹의 플랜이 설정되지 않았습니다.',
+              style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: 10),
+            if (isCreator)
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: () => _openEditGroupPlan(group),
+                  icon: const Icon(Icons.tune, size: 18),
+                  label: const Text('플랜 설정하기'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                ),
+              )
+            else
+              const Text(
+                '그룹을 만든 사람이 플랜을 설정할 때까지 기다려 주세요.',
+                style: TextStyle(fontSize: 12, color: AppColors.textTertiary),
+              ),
+          ] else ...[
+            Text(
+              '${group.rangeName.isNotEmpty ? group.rangeName : group.planType} · ${group.minutesPerDay}분/일 · 총 ${group.totalDays}일',
+              style:
+                  const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: 10),
+            if (isActive)
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: AppColors.accentPale,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.accentLight),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.check_circle,
+                        size: 14, color: AppColors.accent),
+                    SizedBox(width: 6),
+                    Text('현재 이 플랜으로 읽는 중',
+                        style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.accent)),
+                  ],
+                ),
+              )
+            else
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: () => _activateGroupPlan(group),
+                  icon: const Icon(Icons.play_arrow, size: 18),
+                  label: const Text('이 플랜으로 함께 읽기'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.accent,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                ),
+              ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  /// 최신 그룹 스케줄과 로컬 캐시를 비교하여 달라졌으면 자동 재저장.
+  /// 활성 소스가 이 그룹이 아닌 경우에는 아무것도 하지 않음.
+  void _maybeSyncActivePlan(SarakGroup group) {
+    if (!group.hasSchedule) return;
+    final source = LocalStorage.groupSource(group.id);
+    if (LocalStorage.getActiveSource() != source) return;
+
+    final local = LocalStorage.loadPlanFor(source);
+    final needsResync = local == null ||
+        local['totalDays'] != group.totalDays ||
+        local['minutesPerDay'] != group.minutesPerDay ||
+        local['startBookId'] != group.startBookId ||
+        local['endBookId'] != group.endBookId ||
+        (local['schedule'] as List?)?.length != group.schedule.length;
+    if (!needsResync) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _activateGroupPlan(group, silent: true);
+    });
+  }
+
+  /// 그룹 플랜을 내 로컬 활성 플랜으로 전환.
+  /// [silent]가 true면 스낵바를 띄우지 않음 (백그라운드 자동 동기화 등)
+  Future<void> _activateGroupPlan(SarakGroup group,
+      {bool silent = false}) async {
+    if (!group.hasSchedule) return;
+
+    // 기존 개인 진행 기록은 유지(활성 소스만 변경)되며,
+    // 이 그룹 소스의 완료 기록은 별도로 누적됩니다.
+    final planData = {
+      'rangeName': group.rangeName.isNotEmpty ? group.rangeName : group.planType,
+      'startBookId': group.startBookId,
+      'endBookId': group.endBookId,
+      'totalDays': group.totalDays,
+      'minutesPerDay': group.minutesPerDay,
+      'startDate': (group.startDate ?? DateTime.now()).toIso8601String(),
+      'schedule': group.schedule,
+      'source': LocalStorage.groupSource(group.id),
+      'groupId': group.id,
+      'groupName': group.name,
+    };
+
+    final source = LocalStorage.groupSource(group.id);
+    await LocalStorage.setActiveSource(source);
+    await LocalStorage.savePlanFor(source, planData);
+
+    if (!mounted) return;
+    setState(() {}); // 뱃지 재렌더
+    if (!silent) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('"${group.name}" 플랜으로 함께 읽기 시작!'),
+          backgroundColor: AppColors.accent,
+        ),
+      );
+    }
   }
 
   Widget _buildHeader() {
@@ -344,7 +529,7 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
                 title: const Text('새 그룹 만들기'),
                 onTap: () {
                   Navigator.pop(ctx);
-                  _showCreateGroupDialog();
+                  _openCreateGroup();
                 },
               ),
               ListTile(
@@ -468,6 +653,7 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
   Widget _buildMemberRow(MemberProgress member, int index, bool isMe,
       int groupMaxDay, String groupId, bool isCreator, SarakGroup group) {
     final color = _memberColor(index);
+    final hasComment = (member.todayComment ?? '').trim().isNotEmpty;
     return ListTile(
       leading: CircleAvatar(
           backgroundColor: color,
@@ -476,8 +662,35 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
       title: Text(member.name,
           style: TextStyle(
               fontWeight: isMe ? FontWeight.bold : FontWeight.normal)),
-      subtitle: Text(
-          'Day ${member.currentDay} · ${_statusText(member, groupMaxDay)}'),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+              'Day ${member.currentDay} · ${_statusText(member, groupMaxDay)}'),
+          if (hasComment) ...[
+            const SizedBox(height: 4),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('💬 ', style: TextStyle(fontSize: 12)),
+                Expanded(
+                  child: Text(
+                    member.todayComment!.trim(),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                      fontStyle: FontStyle.italic,
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+      isThreeLine: hasComment,
       trailing: isMe
           ? IconButton(
               icon: Icon(
@@ -497,7 +710,7 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
   Future<void> _toggleMyProgress(
       MemberProgress member, SarakGroup group) async {
     final firestore = ref.read(firestoreServiceProvider);
-    bool willBeCompleted = !member.todayCompleted;
+    final willBeCompleted = !member.todayCompleted;
 
     if (willBeCompleted && member.progress >= 1.0) {
       await firestore.saveCompletionRecord(
@@ -512,6 +725,8 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
       name: member.name,
       currentDay: member.currentDay,
       todayCompleted: willBeCompleted,
+      // 완료 취소 시엔 한마디도 같이 비움
+      todayComment: willBeCompleted ? member.todayComment : null,
       progress: member.progress,
       streak: member.streak,
       lastReadAt: DateTime.now(),
@@ -519,35 +734,31 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
     await firestore.updateMemberProgress(groupId: group.id, progress: updated);
   }
 
-  void _showCreateGroupDialog() {
-    _groupNameController.clear();
-    showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-              title: const Text('새 그룹 만들기'),
-              content: TextField(
-                  controller: _groupNameController,
-                  decoration: const InputDecoration(hintText: '그룹 이름')),
-              actions: [
-                TextButton(
-                    onPressed: () => Navigator.pop(ctx),
-                    child: const Text('취소')),
-                FilledButton(
-                    onPressed: () async {
-                      final name = _groupNameController.text.trim();
-                      if (name.isEmpty) return;
-                      Navigator.pop(ctx);
-                      final created = await ref
-                          .read(firestoreServiceProvider)
-                          .createGroup(name);
-                      // 방금 만든 그룹을 자동 선택해서 UI가 바로 그쪽을 보여주게 함
-                      if (mounted) {
-                        setState(() => _selectedGroupId = created.id);
-                      }
-                    },
-                    child: const Text('만들기')),
-              ],
-            ));
+  Future<void> _openCreateGroup() async {
+    final created = await Navigator.push<SarakGroup?>(
+      context,
+      MaterialPageRoute(builder: (_) => const GroupCreateScreen()),
+    );
+    if (!mounted || created == null) return;
+    setState(() => _selectedGroupId = created.id);
+    // 만든 사람도 자동으로 이 그룹 플랜을 활성 플랜으로 사용
+    if (created.hasSchedule) {
+      await _activateGroupPlan(created, silent: true);
+    }
+  }
+
+  Future<void> _openEditGroupPlan(SarakGroup group) async {
+    await Navigator.push<SarakGroup?>(
+      context,
+      MaterialPageRoute(
+          builder: (_) => GroupCreateScreen(existingGroup: group)),
+    );
+    if (!mounted) return;
+    // 내가 해당 그룹 플랜을 활성 중이라면 로컬 캐시도 새 스케줄로 갱신
+    final source = LocalStorage.groupSource(group.id);
+    if (LocalStorage.getActiveSource() == source) {
+      // watchGroup 스트림이 최신 SarakGroup을 전달하면 아래에서 캐시 갱신됨
+    }
   }
 
   Future<void> _joinGroup() async {
@@ -563,8 +774,14 @@ class _GroupScreenState extends ConsumerState<GroupScreen> {
       );
       return;
     }
-    // 방금 참여한 그룹을 자동 선택
+    // 방금 참여한 그룹을 자동 선택 + 해당 그룹 플랜으로 자동 전환
     setState(() => _selectedGroupId = joined.id);
+    if (joined.hasSchedule) {
+      await _activateGroupPlan(joined, silent: false);
+    } else {
+      messenger.showSnackBar(SnackBar(
+          content: Text('"${joined.name}" 그룹에 참여했습니다. 방장이 플랜을 설정하면 자동으로 적용됩니다.')));
+    }
   }
 
   // --- 🌟 초대코드 복사 및 스낵바 알림 ---

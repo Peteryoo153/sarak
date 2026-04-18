@@ -67,9 +67,14 @@ class FirestoreService {
     String planType = '90일 통독',
     int totalDays = 90,
     DateTime? startDate,
+    String rangeName = '',
+    int startBookId = 1,
+    int endBookId = 66,
+    int minutesPerDay = 15,
+    List<Map<String, dynamic>> schedule = const [],
   }) async {
     if (currentUid == null) throw Exception('로그인 필요');
-    
+
     // 1. 그룹 먼저 만들기
     final inviteCode = _generateInviteCode();
     final docRef = await _db.collection('groups').add({
@@ -77,9 +82,14 @@ class FirestoreService {
       'createdBy': currentUid,
       'inviteCode': inviteCode,
       'members': [currentUid],
-      'planType': planType, 
-      'totalDays': totalDays, 
-      'startDate': startDate != null ? Timestamp.fromDate(startDate) : null, 
+      'planType': planType,
+      'totalDays': totalDays,
+      'startDate': startDate != null ? Timestamp.fromDate(startDate) : null,
+      'rangeName': rangeName,
+      'startBookId': startBookId,
+      'endBookId': endBookId,
+      'minutesPerDay': minutesPerDay,
+      'schedule': schedule,
       'createdAt': FieldValue.serverTimestamp(),
     });
 
@@ -183,6 +193,43 @@ class FirestoreService {
         .collection('progress') 
         .doc(progress.uid)
         .set(progress.toFirestore(), SetOptions(merge: true));
+  }
+
+  /// 그룹 문서 단건 스트림 (플랜 등 그룹 메타 실시간 감시)
+  Stream<SarakGroup?> watchGroup(String groupId) {
+    return _db.collection('groups').doc(groupId).snapshots().map(
+          (doc) => doc.exists ? SarakGroup.fromFirestore(doc) : null,
+        );
+  }
+
+  /// 그룹 문서 단건 조회
+  Future<SarakGroup?> getGroup(String groupId) async {
+    final doc = await _db.collection('groups').doc(groupId).get();
+    if (!doc.exists) return null;
+    return SarakGroup.fromFirestore(doc);
+  }
+
+  /// 그룹의 플랜 필드 업데이트 (생성자만 허용됨)
+  Future<void> updateGroupPlan(
+    String groupId, {
+    required String rangeName,
+    required int startBookId,
+    required int endBookId,
+    required int minutesPerDay,
+    required int totalDays,
+    required List<Map<String, dynamic>> schedule,
+    DateTime? startDate,
+  }) async {
+    await _db.collection('groups').doc(groupId).update({
+      'rangeName': rangeName,
+      'planType': rangeName,
+      'startBookId': startBookId,
+      'endBookId': endBookId,
+      'minutesPerDay': minutesPerDay,
+      'totalDays': totalDays,
+      'schedule': schedule,
+      if (startDate != null) 'startDate': Timestamp.fromDate(startDate),
+    });
   }
 
   /// 2. 그룹 멤버들의 진행 상황 실시간으로 불러오기

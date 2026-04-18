@@ -52,19 +52,24 @@ class MainShellState extends ConsumerState<MainShell> {
   int _currentIndex = 0;
   final GlobalKey<CalendarScreenState> _calendarKey =
       GlobalKey<CalendarScreenState>();
+  final GlobalKey<HomeScreenState> _homeKey = GlobalKey<HomeScreenState>();
 
   void switchTab(int index) {
     setState(() => _currentIndex = index);
-    if (index == 1) {
-      _calendarKey.currentState?.loadData();
-    }
+    _onTabShown(index);
   }
 
-  // 🌟 변경된 부분: 팝업창이나 다른 로그인 페이지로 가는 코드를 지웠습니다.
-  // 🌟 이제 그룹 탭을 누르면 바로 그룹 화면으로 자연스럽게 넘어갑니다.
   Future<void> _onTabTapped(int index) async {
     setState(() => _currentIndex = index);
-    if (index == 1) {
+    _onTabShown(index);
+  }
+
+  void _onTabShown(int index) {
+    // 홈/달력은 IndexedStack에 보관되어 initState가 다시 돌지 않으므로
+    // 해당 탭이 보여질 때마다 state.loadData()로 강제 갱신한다.
+    if (index == 0) {
+      _homeKey.currentState?.loadData();
+    } else if (index == 1) {
       _calendarKey.currentState?.loadData();
     }
   }
@@ -72,7 +77,7 @@ class MainShellState extends ConsumerState<MainShell> {
   @override
   Widget build(BuildContext context) {
     final screens = [
-      HomeScreen(onTabSwitch: switchTab),
+      HomeScreen(key: _homeKey, onTabSwitch: switchTab),
       CalendarScreen(key: _calendarKey),
       const GroupScreen(),
       const SettingsScreen(),

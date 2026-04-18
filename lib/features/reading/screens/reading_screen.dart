@@ -6,6 +6,7 @@ import '../../../core/database/bible_database.dart';
 import '../../../core/database/reading_settings.dart';
 import '../../../core/database/local_storage.dart';
 import '../../../core/database/firestore_service.dart';
+import '../../../core/models/member_progress.dart';
 
 class ReadingScreen extends StatefulWidget {
   final int bookId;
@@ -99,21 +100,61 @@ class _ReadingScreenState extends State<ReadingScreen> with WidgetsBindingObserv
   }
 
   Future<void> _saveAndComplete() async {
+    final comment = _commentController.text;
+    final commentOrNull = comment.trim().isEmpty ? null : comment;
+
     await LocalStorage.markDayComplete(
       widget.dayNumber,
-      comment: _commentController.text,
+      comment: comment,
     );
-    // 로그인 상태면 Firestore에도 진도 동기화 (그룹원이 실시간으로 보게)
+
     final firestore = FirestoreService();
-    if (firestore.currentUid != null) {
+    final uid = firestore.currentUid;
+    if (uid == null) return;
+
+    // 1) 개인 유저 문서(기존 동작) 동기화
+    try {
+      await firestore.markTodayComplete(comment: commentOrNull);
+    } catch (_) {
+      // 네트워크 실패 무시
+    }
+
+    // 2) 활성 플랜이 그룹이면 그룹 출석부(progress/{uid})까지 동기화
+    final groupId = LocalStorage.activeGroupId();
+    if (groupId != null) {
       try {
-        await firestore.markTodayComplete(
-          comment: _commentController.text.isEmpty
-              ? null
-              : _commentController.text,
+        final progress = LocalStorage.getProgress();
+        final streak = LocalStorage.getStreak();
+        final displayName = FirestoreService()
+            .currentUid; // uid는 폴백용 — 실제 이름은 아래에서 시도
+        String name = displayName ?? '';
+        try {
+          // 현재 로그인 사용자의 이름 조회(최신화 위함)
+          // watchUser는 stream이라 바로 못 씀. 한 번만 read.
+          final snap = await FirestoreService()
+              .watchUser(uid)
+              .first
+              .timeout(const Duration(seconds: 2));
+          if (snap != null && snap.name.isNotEmpty) name = snap.name;
+        } catch (_) {
+          // 이름 조회 실패 시 기존 progress 문서 값이 유지됨(merge)
+        }
+
+        await firestore.updateMemberProgress(
+          groupId: groupId,
+          progress: MemberProgress(
+            uid: uid,
+            name: name,
+            currentDay: widget.dayNumber,
+            todayCompleted: true,
+            todayComment: commentOrNull,
+            progress: progress,
+            streak: streak,
+            lastReadAt: DateTime.now(),
+          ),
         );
       } catch (_) {
-        // 네트워크 실패는 무시 (로컬 저장은 이미 성공)
+        // 그룹 동기화 실패도 무시
       }
     }
   }

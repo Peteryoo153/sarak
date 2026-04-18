@@ -12,10 +12,26 @@ final authServiceProvider = Provider((ref) => AuthService());
 final firestoreServiceProvider = Provider((ref) => FirestoreService());
 
 // ─── 1. Firebase Auth 실시간 상태 (앱을 켜자마자 확인) ───
-// idTokenChanges()를 사용해야 ID 토큰이 Firestore에 전파된 뒤 스트림이 발화됨
-// (authStateChanges는 토큰 전파 전에 발화되어 permission-denied를 유발)
-final authStateProvider = StreamProvider<User?>((ref) {
-  return FirebaseAuth.instance.idTokenChanges();
+// idTokenChanges()를 사용해야 ID 토큰이 Firestore에 전파된 뒤 스트림이 발화됨.
+// 추가로, 로그인 직후(null → user) 전환 시에는 Firestore SDK 내부 credential listener에
+// 새 토큰이 전파될 시간을 짧게 대기한 뒤 사용자 값을 yield하여, 이 프로바이더를
+// watch 하는 하위 스트림(그룹 목록, 그룹 진도 등)이 permission-denied를 맞는 레이스를 방지.
+final authStateProvider = StreamProvider<User?>((ref) async* {
+  User? lastUser;
+  await for (final user in FirebaseAuth.instance.idTokenChanges()) {
+    final isFreshLogin = user != null && lastUser == null;
+    if (isFreshLogin) {
+      // 토큰을 한 번 강제로 갱신/획득해서 Firestore 내부 credential provider가
+      // 최신 auth를 확실히 받아 가도록 유도 (실패해도 무시)
+      try {
+        await user.getIdToken(true);
+      } catch (_) {}
+      // Firestore credential propagation 여유 시간
+      await Future.delayed(const Duration(milliseconds: 500));
+    }
+    lastUser = user;
+    yield user;
+  }
 });
 
 // ─── 2. 내 상세 프로필 (Firestore 데이터) ───
@@ -74,8 +90,11 @@ class AuthService {
       return result.user;
     } on FirebaseAuthException catch (e) {
       throw Exception(e.message ?? '구글 로그인에 실패했습니다.');
-    } catch (_) {
-      throw Exception('구글 로그인 중 문제가 발생했습니다.');
+    } catch (e, st) {
+      // 실제 원인은 콘솔에 찍어서 진단 가능하게 둠
+      // ignore: avoid_print
+      print('[signInWithGoogle] $e\n$st');
+      throw Exception('구글 로그인 중 문제가 발생했습니다: $e');
     }
   }
 
@@ -114,8 +133,10 @@ class AuthService {
       throw Exception(e.message);
     } on FirebaseAuthException catch (e) {
       throw Exception(e.message ?? '애플 로그인에 실패했습니다.');
-    } catch (_) {
-      throw Exception('애플 로그인 중 문제가 발생했습니다.');
+    } catch (e, st) {
+      // ignore: avoid_print
+      print('[signInWithApple] $e\n$st');
+      throw Exception('애플 로그인 중 문제가 발생했습니다: $e');
     }
   }
 
