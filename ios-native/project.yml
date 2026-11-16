@@ -28,7 +28,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.chanhoyoo.sarak
         PRODUCT_NAME: Sarak
-        TARGETED_DEVICE_FAMILY: "1"
+        TARGETED_DEVICE_FAMILY: "1,2"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         CODE_SIGN_ENTITLEMENTS: Sarak/App/Sarak.entitlements
         INFOPLIST_FILE: Sarak/App/Info.plist

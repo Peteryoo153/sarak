@@ -350,7 +350,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.chanhoyoo.sarak;
 				PRODUCT_NAME = Sarak;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -370,7 +370,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.chanhoyoo.sarak;
 				PRODUCT_NAME = Sarak;
 				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
