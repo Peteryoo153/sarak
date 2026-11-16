@@ -1,0 +1,72 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isSelf(uid) { return signedIn() && request.auth.uid == uid; }
+    function groupData(groupId) { return get(/databases/$(database)/documents/groups/$(groupId)).data; }
+    function isMember(groupId) { return signedIn() && request.auth.uid in groupData(groupId).members; }
+
+    // 사용자 프로필: 본인만 읽고 쓰고 지울 수 있음 (이메일 등 개인정보 보호)
+    // 그룹 화면의 이름은 groups/{id}/progress 문서에 따로 저장되므로 남의 문서를 읽을 필요가 없음
+    match /users/{uid} {
+      allow read, create, update, delete: if isSelf(uid);
+      match /completed_plans/{planId} {
+        allow read, write: if isSelf(uid);
+      }
+    }
+
+    // 초대코드 → 그룹 ID. 로그인 사용자는 코드 하나를 '조회(get)'만 할 수 있고 목록 조회는 불가.
+    match /invites/{code} {
+      allow get: if signedIn();
+      allow list: if false;
+      allow create: if signedIn()
+        && request.resource.data.createdBy == request.auth.uid
+        && groupData(request.resource.data.groupId).createdBy == request.auth.uid;
+      allow delete: if signedIn() && resource.data.createdBy == request.auth.uid;
+      allow update: if false;
+    }
+
+    match /groups/{groupId} {
+      allow read: if signedIn() && request.auth.uid in resource.data.members;
+
+      allow create: if signedIn()
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.members == [request.auth.uid];
+
+      // 일반 멤버: members 배열에서 '자기 자신만' 추가(참여) 또는 제거(나가기)
+      // 생성자: 그 외 필드(플랜 등) 수정 가능
+      allow update: if signedIn() && (
+        (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members'])
+          && (
+            request.resource.data.members.toSet().difference(resource.data.members.toSet()) == [request.auth.uid].toSet()
+            || resource.data.members.toSet().difference(request.resource.data.members.toSet()) == [request.auth.uid].toSet()
+          )
+        )
+        || request.auth.uid == resource.data.createdBy
+      );
+
+      allow delete: if signedIn() && request.auth.uid == resource.data.createdBy;
+
+      // 출석부: 멤버는 읽기, 본인 문서만 쓰기
+      match /progress/{memberUid} {
+        allow read: if isMember(groupId);
+        allow write: if isSelf(memberUid) && (isMember(groupId) || request.method == 'delete');
+      }
+
+      // 응원: 멤버끼리만, 보낸 사람 본인 명의로만 생성. 받은 사람/보낸 사람만 읽기.
+      match /cheers/{cheerId} {
+        allow read: if isMember(groupId)
+          && (resource.data.to == request.auth.uid || resource.data.from == request.auth.uid);
+        allow create: if isMember(groupId)
+          && request.resource.data.from == request.auth.uid
+          && request.resource.data.to is string
+          && request.resource.data.to != request.auth.uid
+          && request.resource.data.keys().hasOnly(['from', 'fromName', 'to', 'createdAt']);
+        allow update, delete: if false;
+      }
+    }
+  }
+}
