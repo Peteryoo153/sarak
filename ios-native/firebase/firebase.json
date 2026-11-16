@@ -1,0 +1,8 @@
+{
+  "firestore": { "rules": "firestore.rules", "indexes": "firestore.indexes.json" },
+  "hosting": {
+    "public": "hosting",
+    "cleanUrls": true,
+    "rewrites": [{ "source": "/join", "destination": "/join.html" }]
+  }
+}

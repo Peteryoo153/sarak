@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>사락 · 함께 읽기 초대</title>
+<meta property="og:title" content="사락에서 함께 성경을 읽어요">
+<meta property="og:description" content="초대코드로 그룹에 참여하고 매일 함께 읽어요.">
+<meta name="apple-itunes-app" content="app-id=6761447362">
+<style>
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#1A166E;color:#fff;font-family:-apple-system,"Apple SD Gothic Neo",sans-serif}
+  main{max-width:360px;padding:32px 24px;text-align:center}
+  h1{font-size:24px;margin:0 0 8px} p{color:#B9B6E6;line-height:1.6;margin:0 0 24px}
+  .code{font-size:34px;font-weight:800;letter-spacing:.2em;color:#6EE7B7;margin:8px 0 24px}
+  a.btn{display:block;padding:16px;border-radius:16px;font-weight:800;text-decoration:none;margin-bottom:10px}
+  .primary{background:#6EE7B7;color:#1A166E} .secondary{border:1px solid rgba(185,182,230,.4);color:#fff}
+</style>
+</head>
+<body>
+<main>
+  <h1>함께 읽기에 초대받았어요</h1>
+  <p>사락 앱에서 아래 초대코드로 그룹에 참여할 수 있어요.</p>
+  <div class="code" id="code">------</div>
+  <a class="btn primary" id="open" href="#">사락 앱에서 열기</a>
+  <a class="btn secondary" href="https://apps.apple.com/kr/app/id6761447362">App Store에서 받기</a>
+</main>
+<script>
+  var code = (new URLSearchParams(location.search).get('code') || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6);
+  document.getElementById('code').textContent = code || '------';
+  var deep = 'sarak://join?code=' + code;
+  document.getElementById('open').href = deep;
+  if (code) { setTimeout(function () { location.href = deep; }, 300); }
+</script>
+</body>
+</html>
