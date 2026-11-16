@@ -12,6 +12,10 @@ struct GroupView: View {
     @State private var confirmLeave: SarakGroup?
     @State private var cheered: Set<String> = []
     @State private var message: String?
+    @AppStorage("blockedUIDs") private var blockedRaw = ""
+    @Environment(\.openURL) private var openURL
+
+    private var blocked: Set<String> { Set(blockedRaw.split(separator: ",").map(String.init)) }
 
     private var selected: SarakGroup? {
         session.groups.first { $0.id == selectedId } ?? session.groups.first { $0.id == store.activeGroupId } ?? session.groups.first
@@ -183,6 +187,7 @@ struct GroupView: View {
 
     private func memberRow(_ m: MemberProgress, index: Int, group: SarakGroup) -> some View {
         let me = m.uid == session.uid
+        let isBlocked = blocked.contains(m.uid)
         let status: String = {
             if m.completedToday { return "Day \(m.currentDay) · 오늘 읽음" }
             let gap = group.todayDay - m.currentDay
@@ -192,7 +197,9 @@ struct GroupView: View {
             AvatarView(name: m.name, index: index)
             VStack(alignment: .leading, spacing: 2) {
                 Text(me ? "나 · \(m.name)" : m.name).font(.system(size: 15, weight: .bold)).foregroundStyle(SarakColor.ink)
-                if let c = m.todayComment, !c.isEmpty, m.completedToday {
+                if isBlocked {
+                    Text("숨긴 멤버").font(.system(size: 13)).foregroundStyle(SarakColor.inkFaint)
+                } else if let c = m.todayComment, !c.isEmpty, m.completedToday {
                     Text(c).font(.system(size: 13)).foregroundStyle(SarakColor.inkMuted).lineLimit(2)
                 } else {
                     Text(status).font(.system(size: 13)).foregroundStyle(SarakColor.inkMuted)
@@ -202,7 +209,7 @@ struct GroupView: View {
             if m.completedToday {
                 Text("완료").font(.system(size: 12, weight: .bold)).foregroundStyle(SarakColor.mintInk)
                     .padding(.horizontal, 10).frame(height: 26).background(SarakColor.mintSoft, in: Capsule())
-            } else if !me {
+            } else if !me && !isBlocked {
                 if cheered.contains("\(group.id)-\(m.uid)") {
                     Text("응원 보냄").font(.system(size: 12, weight: .bold)).foregroundStyle(SarakColor.inkMuted)
                         .padding(.horizontal, 12).frame(height: 32).background(SarakColor.sunken, in: Capsule())
@@ -215,8 +222,39 @@ struct GroupView: View {
                     }
                 }
             }
+            if !me {
+                Menu {
+                    Button { report(m, group) } label: { Label("신고하기", systemImage: "exclamationmark.bubble") }
+                    if isBlocked {
+                        Button { setBlocked(m.uid, false) } label: { Label("숨김 해제", systemImage: "eye") }
+                    } else {
+                        Button(role: .destructive) { setBlocked(m.uid, true) } label: { Label("이 사람 숨기기", systemImage: "eye.slash") }
+                    }
+                } label: {
+                    Image(systemName: "ellipsis").font(.system(size: 15, weight: .semibold)).foregroundStyle(SarakColor.inkFaint)
+                        .frame(width: 32, height: 44)
+                }
+                .accessibilityLabel("\(m.name) 더보기")
+            }
         }
         .padding(.horizontal, 16).padding(.vertical, 12)
+    }
+
+    private func setBlocked(_ uid: String, _ on: Bool) {
+        var b = blocked
+        if on { b.insert(uid) } else { b.remove(uid) }
+        blockedRaw = b.sorted().joined(separator: ",")
+    }
+
+    /// 신고: 운영자 이메일로 그룹·사용자 정보가 담긴 메일을 엽니다. 신고와 동시에 숨김 처리.
+    private func report(_ m: MemberProgress, _ g: SarakGroup) {
+        let body = "신고 사유를 적어 주세요:\n\n\n---\n그룹: \(g.name) (\(g.id))\n대상: \(m.name) (\(m.uid))\n내용: \(m.todayComment ?? "")"
+        var c = URLComponents()
+        c.scheme = "mailto"; c.path = AppLinks.contactEmail
+        c.queryItems = [URLQueryItem(name: "subject", value: "[사락] 부적절한 내용 신고"), URLQueryItem(name: "body", value: body)]
+        setBlocked(m.uid, true)
+        if let url = c.url { openURL(url) }
+        message = "신고가 접수되도록 메일 앱을 열었어요. 이 멤버의 글은 숨겨졌습니다."
     }
 
     private func activate(_ g: SarakGroup) {

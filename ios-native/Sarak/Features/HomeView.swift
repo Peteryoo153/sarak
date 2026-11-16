@@ -8,6 +8,7 @@ struct HomeView: View {
     @State private var showSetup = false
     @State private var confirmCancel = false
     @AppStorage("seenCheerIDs") private var seenCheerIDs = ""
+    @AppStorage("blockedUIDs") private var blockedRaw = ""
 
     var body: some View {
         NavigationStack {
@@ -62,7 +63,8 @@ struct HomeView: View {
 
     @ViewBuilder private var cheerBanner: some View {
         let seen = Set(seenCheerIDs.split(separator: ",").map(String.init))
-        let fresh = session.cheers.filter { !seen.contains($0.id) }
+        let blocked = Set(blockedRaw.split(separator: ",").map(String.init))
+        let fresh = session.cheers.filter { !seen.contains($0.id) && !blocked.contains($0.fromUid) }
         if let c = fresh.first {
             HStack(spacing: 12) {
                 Image(systemName: "hands.clap.fill").font(.system(size: 18)).foregroundStyle(SarakColor.mintInk)
