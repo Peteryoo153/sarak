@@ -63,7 +63,7 @@ struct SettingsView: View {
                         Button("로그아웃") { session.signOut() }.foregroundStyle(SarakColor.ink)
                         Button("계정 삭제", role: .destructive) { confirmDelete = true }
                     } footer: {
-                        Text("사락 · 생명의 말씀이 사락 넘어갑니다").frame(maxWidth: .infinity).padding(.top, 16)
+                        VStack(spacing: 10) { DoorLogo(size: 44); Text("사락 · 생명의 말씀이 사락 넘어갑니다") }.frame(maxWidth: .infinity).padding(.top, 16)
                     }
                 }
             }

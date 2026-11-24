@@ -545,8 +545,7 @@ struct LoginPrompt: View {
 
     var body: some View {
         VStack(spacing: 14) {
-            Image(systemName: "person.crop.circle.badge.checkmark").font(.system(size: 32)).foregroundStyle(SarakColor.mintInk)
-                .frame(width: 68, height: 68).background(SarakColor.mintSoft, in: Circle())
+            DoorLogo(size: 68)
             VStack(spacing: 4) {
                 Text(title).font(SarakFont.title2).foregroundStyle(SarakColor.ink).multilineTextAlignment(.center)
                 Text(subtitle).font(SarakFont.caption).foregroundStyle(SarakColor.inkMuted).multilineTextAlignment(.center)

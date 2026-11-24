@@ -40,7 +40,7 @@ struct ShareCard: View {
                 if let note, format == .story {
                     Text(note).font(.system(size: 13)).lineSpacing(4).foregroundStyle(Ink.sub).lineLimit(3).padding(.top, 10)
                 }
-                Text("사락").font(SarakFont.serif(16)).foregroundStyle(Ink.ink).padding(.top, format == .story ? 72 : 24)
+                HStack(spacing: 8) { DoorLogo(size: 24); Text("사락").font(SarakFont.serif(16)).foregroundStyle(Ink.ink) }.padding(.top, format == .story ? 72 : 24)
             }
             .padding(.horizontal, 30).padding(.top, 28).padding(.bottom, format == .story ? 130 : 30)
         }

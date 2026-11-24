@@ -35,7 +35,7 @@ struct SarakApp: App {
                 }
                 .opacity(showSplash && !skipIntro ? 0 : 1)
                 if showSplash && !skipIntro {
-                    SplashView { withAnimation(.easeInOut(duration: 0.45)) { showSplash = false } }
+                    SplashView { finishSplash() }
                         .transition(.opacity)
                         .zIndex(1)
                 }
@@ -56,9 +56,16 @@ struct SarakApp: App {
         }
     }
 
+    private func finishSplash() {
+        #if DEBUG
+        if Demo.screen == "splash" { return }
+        #endif
+        withAnimation(.easeInOut(duration: 0.45)) { showSplash = false }
+    }
+
     private var skipIntro: Bool {
         #if DEBUG
-        return Demo.on && Demo.screen != "welcome"
+        return Demo.on && !["welcome", "splash"].contains(Demo.screen)
         #else
         return false
         #endif

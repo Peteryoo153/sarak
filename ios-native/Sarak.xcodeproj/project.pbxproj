@@ -37,6 +37,7 @@
 		AB85AD4852929E863BCD6ECD /* Reading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F6AA2AB27595C1598FE332C /* Reading.swift */; };
 		ACD38FE77533AA02C9DCDF58 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7824531060D3DD9E8F3376B1 /* Models.swift */; };
 		AEB169F05BC7C4B2109BEBA1 /* PhoneLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B44CE54BF88757ACD36637 /* PhoneLink.swift */; };
+		B88881A6146FE3DEB66B083A /* DoorScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4B5DAB79B2F2650D6AC9A0 /* DoorScene.swift */; };
 		B9A939C576DA45223DE2F3EA /* GowunBatang-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B25AF47C6EB5E3B35EEB3A92 /* GowunBatang-Regular.ttf */; };
 		C6108C511FA6CC4810E14181 /* SarakDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A18E16BB56E8B0C2787D0A5 /* SarakDesign.swift */; };
 		CF459E08CEDCC8F10B1EEDED /* ReadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE40787BED2063BA1C5D416B /* ReadingView.swift */; };
@@ -97,6 +98,7 @@
 		88B44CE54BF88757ACD36637 /* PhoneLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneLink.swift; sourceTree = "<group>"; };
 		8F6AA2AB27595C1598FE332C /* Reading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reading.swift; sourceTree = "<group>"; };
 		A67C295777987954D0CA2516 /* SarakWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SarakWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AB4B5DAB79B2F2650D6AC9A0 /* DoorScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoorScene.swift; sourceTree = "<group>"; };
 		AE7D2FA70E4CB15D22B7FA63 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		B0F88BED127F7969914AF7F5 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		B187120665D5E3B51A0673D2 /* Sarak.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Sarak.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -137,6 +139,7 @@
 			isa = PBXGroup;
 			children = (
 				B9B34718465A20C9A99AED61 /* BibleDB.swift */,
+				AB4B5DAB79B2F2650D6AC9A0 /* DoorScene.swift */,
 				7824531060D3DD9E8F3376B1 /* Models.swift */,
 				2A9C4581116EB95A39A19FAD /* PathStore.swift */,
 				88B44CE54BF88757ACD36637 /* PhoneLink.swift */,
@@ -373,6 +376,7 @@
 			files = (
 				79D2D6369799B4AB8056F92D /* BibleDB.swift in Sources */,
 				F683E90CC9AFAEFE60CE2EF2 /* BibleView.swift in Sources */,
+				B88881A6146FE3DEB66B083A /* DoorScene.swift in Sources */,
 				A1BF5736C339C9E5F7E4CEC0 /* GroupView.swift in Sources */,
 				603ACDE6D3C23BE9EBA162C2 /* KeepView.swift in Sources */,
 				65F5D2469D8E5ADE306FC920 /* MainTabView.swift in Sources */,
