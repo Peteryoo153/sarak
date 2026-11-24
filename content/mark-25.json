@@ -1,0 +1,1157 @@
+{
+ "book": "마가복음",
+ "status": "초안 · 감수 전",
+ "charsPerMinute": 270,
+ "days": [
+  {
+   "day": 1,
+   "title": "복음이 시작되다",
+   "start": "1:1",
+   "end": "1:28",
+   "chars": 1242,
+   "minutes": 4.6,
+   "alerts": [
+    {
+     "slot": "아침",
+     "book": "마가복음",
+     "chapter": 1,
+     "verse": 1,
+     "text": "하나님의 아들 예수 그리스도의 복음의 시작이라",
+     "excerpt": false,
+     "linked": false
+    },
+    {
+     "slot": "한낮",
+     "book": "마가복음",
+     "chapter": 1,
+     "verse": 11,
+     "text": "너는 내 사랑하는 아들이라 내가 너를 기뻐하노라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "쉼",
+     "book": "마가복음",
+     "chapter": 1,
+     "verse": 17,
+     "text": "나를 따라오라 내가 너희로 사람을 낚는 어부가 되게 하리라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "밤",
+     "book": "마가복음",
+     "chapter": 1,
+     "verse": 15,
+     "text": "때가 찼고 하나님의 나라가 가까이 왔으니 회개하고 복음을 믿으라",
+     "excerpt": true,
+     "linked": false
+    }
+   ]
+  },
+  {
+   "day": 2,
+   "title": "손 내미시는 예수님",
+   "start": "1:29",
+   "end": "2:12",
+   "chars": 1403,
+   "minutes": 5.2,
+   "alerts": [
+    {
+     "slot": "아침",
+     "book": "마가복음",
+     "chapter": 1,
+     "verse": 35,
+     "text": "새벽 아직도 밝기 전에 예수께서 일어나 나가 한적한 곳으로 가사 거기서 기도하시더니",
+     "excerpt": false,
+     "linked": false
+    },
+    {
+     "slot": "한낮",
+     "book": "마가복음",
+     "chapter": 1,
+     "verse": 31,
+     "text": "나아가사 그 손을 잡아 일으키시니",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "쉼",
+     "book": "마가복음",
+     "chapter": 1,
+     "verse": 41,
+     "text": "내가 원하노니 깨끗함을 받으라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "밤",
+     "book": "마가복음",
+     "chapter": 2,
+     "verse": 5,
+     "text": "작은 자야 네 죄 사함을 받았느니라",
+     "excerpt": true,
+     "linked": false
+    }
+   ]
+  },
+  {
+   "day": 3,
+   "title": "죄인을 부르러 오신 분",
+   "start": "2:13",
+   "end": "3:6",
+   "chars": 1313,
+   "minutes": 4.9,
+   "alerts": [
+    {
+     "slot": "아침",
+     "book": "마가복음",
+     "chapter": 2,
+     "verse": 14,
+     "text": "나를 따르라 하시니 일어나 따르니라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "한낮",
+     "book": "마가복음",
+     "chapter": 2,
+     "verse": 17,
+     "text": "건강한 자에게는 의사가 쓸 데 없고 병든 자에게라야 쓸 데 있느니라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "쉼",
+     "book": "마가복음",
+     "chapter": 2,
+     "verse": 27,
+     "text": "안식일이 사람을 위하여 있는 것이요 사람이 안식일을 위하여 있는 것이 아니니",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "밤",
+     "book": "마가복음",
+     "chapter": 2,
+     "verse": 17,
+     "text": "나는 의인을 부르러 온 것이 아니요 죄인을 부르러 왔노라",
+     "excerpt": true,
+     "linked": false
+    }
+   ]
+  },
+  {
+   "day": 4,
+   "title": "함께 있도록 부르시다",
+   "start": "3:7",
+   "end": "3:35",
+   "chars": 1198,
+   "minutes": 4.4,
+   "alerts": [
+    {
+     "slot": "아침",
+     "book": "마가복음",
+     "chapter": 3,
+     "verse": 13,
+     "text": "자기가 원하는 자들을 부르시니 나아온지라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "한낮",
+     "book": "마가복음",
+     "chapter": 3,
+     "verse": 14,
+     "text": "이에 열둘을 세우셨으니 이는 자기와 함께 있게 하시고",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "쉼",
+     "book": "마가복음",
+     "chapter": 3,
+     "verse": 20,
+     "text": "무리가 다시 모이므로 식사할 겨를도 없는지라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "밤",
+     "book": "마가복음",
+     "chapter": 3,
+     "verse": 35,
+     "text": "누구든지 하나님의 뜻대로 행하는 자가 내 형제요 자매요 어머니이니라",
+     "excerpt": false,
+     "linked": false
+    }
+   ]
+  },
+  {
+   "day": 5,
+   "title": "마음에 심긴 씨앗",
+   "start": "4:1",
+   "end": "4:29",
+   "chars": 1283,
+   "minutes": 4.8,
+   "alerts": [
+    {
+     "slot": "아침",
+     "book": "마가복음",
+     "chapter": 4,
+     "verse": 9,
+     "text": "들을 귀 있는 자는 들으라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "한낮",
+     "book": "마가복음",
+     "chapter": 4,
+     "verse": 14,
+     "text": "뿌리는 자는 말씀을 뿌리는 것이라",
+     "excerpt": false,
+     "linked": false
+    },
+    {
+     "slot": "쉼",
+     "book": "마가복음",
+     "chapter": 4,
+     "verse": 20,
+     "text": "좋은 땅에 뿌려졌다는 것은 곧 말씀을 듣고 받아",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "밤",
+     "book": "마가복음",
+     "chapter": 4,
+     "verse": 27,
+     "text": "그가 밤낮 자고 깨고 하는 중에 씨가 나서 자라되",
+     "excerpt": true,
+     "linked": false
+    }
+   ]
+  },
+  {
+   "day": 6,
+   "title": "잠잠하라 고요하라",
+   "start": "4:30",
+   "end": "5:20",
+   "chars": 1516,
+   "minutes": 5.6,
+   "alerts": [
+    {
+     "slot": "아침",
+     "book": "마가복음",
+     "chapter": 4,
+     "verse": 31,
+     "text": "겨자씨 한 알과 같으니",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "한낮",
+     "book": "마가복음",
+     "chapter": 4,
+     "verse": 32,
+     "text": "심긴 후에는 자라서 모든 풀보다 커지며",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "쉼",
+     "book": "마가복음",
+     "chapter": 5,
+     "verse": 19,
+     "text": "집으로 돌아가 주께서 네게 어떻게 큰 일을 행하사 너를 불쌍히 여기신 것을 네 가족에게 알리라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "밤",
+     "book": "마가복음",
+     "chapter": 4,
+     "verse": 39,
+     "text": "잠잠하라 고요하라 하시니 바람이 그치고 아주 잔잔하여지더라",
+     "excerpt": true,
+     "linked": false
+    }
+   ]
+  },
+  {
+   "day": 7,
+   "title": "두려워하지 말고 믿기만 하라",
+   "start": "5:21",
+   "end": "6:6",
+   "chars": 1489,
+   "minutes": 5.5,
+   "alerts": [
+    {
+     "slot": "아침",
+     "book": "마가복음",
+     "chapter": 5,
+     "verse": 36,
+     "text": "두려워하지 말고 믿기만 하라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "한낮",
+     "book": "마가복음",
+     "chapter": 5,
+     "verse": 28,
+     "text": "내가 그의 옷에만 손을 대어도 구원을 받으리라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "쉼",
+     "book": "마가복음",
+     "chapter": 5,
+     "verse": 41,
+     "text": "내가 네게 말하노니 소녀야 일어나라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "밤",
+     "book": "마가복음",
+     "chapter": 5,
+     "verse": 34,
+     "text": "딸아 네 믿음이 너를 구원하였으니 평안히 가라",
+     "excerpt": true,
+     "linked": false
+    }
+   ]
+  },
+  {
+   "day": 8,
+   "title": "보내심을 받은 사람들",
+   "start": "6:7",
+   "end": "6:29",
+   "chars": 1157,
+   "minutes": 4.3,
+   "alerts": [
+    {
+     "slot": "아침",
+     "book": "마가복음",
+     "chapter": 6,
+     "verse": 7,
+     "text": "열두 제자를 부르사 둘씩 둘씩 보내시며",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "한낮",
+     "book": "마가복음",
+     "chapter": 6,
+     "verse": 8,
+     "text": "여행을 위하여 지팡이 외에는 양식이나 배낭이나 전대의 돈이나 아무 것도 가지지 말며",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "쉼",
+     "book": "마가복음",
+     "chapter": 6,
+     "verse": 20,
+     "text": "헤롯이 요한을 의롭고 거룩한 사람으로 알고 두려워하여 보호하며",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "밤",
+     "book": "시편",
+     "chapter": 116,
+     "verse": 15,
+     "text": "그의 경건한 자들의 죽음은 여호와께서 보시기에 귀중한 것이로다",
+     "excerpt": false,
+     "linked": true
+    }
+   ]
+  },
+  {
+   "day": 9,
+   "title": "빈 들에서, 바다 위에서",
+   "start": "6:30",
+   "end": "6:56",
+   "chars": 1223,
+   "minutes": 4.5,
+   "alerts": [
+    {
+     "slot": "아침",
+     "book": "마가복음",
+     "chapter": 6,
+     "verse": 34,
+     "text": "큰 무리를 보시고 그 목자 없는 양 같음으로 인하여 불쌍히 여기사",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "한낮",
+     "book": "마가복음",
+     "chapter": 6,
+     "verse": 42,
+     "text": "다 배불리 먹고",
+     "excerpt": false,
+     "linked": false
+    },
+    {
+     "slot": "쉼",
+     "book": "마가복음",
+     "chapter": 6,
+     "verse": 31,
+     "text": "너희는 따로 한적한 곳에 가서 잠깐 쉬어라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "밤",
+     "book": "마가복음",
+     "chapter": 6,
+     "verse": 50,
+     "text": "안심하라 내니 두려워하지 말라",
+     "excerpt": true,
+     "linked": false
+    }
+   ]
+  },
+  {
+   "day": 10,
+   "title": "마음을 보시는 예수님",
+   "start": "7:1",
+   "end": "7:30",
+   "chars": 1443,
+   "minutes": 5.3,
+   "alerts": [
+    {
+     "slot": "아침",
+     "book": "마가복음",
+     "chapter": 7,
+     "verse": 14,
+     "text": "너희는 다 내 말을 듣고 깨달으라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "한낮",
+     "book": "마가복음",
+     "chapter": 7,
+     "verse": 6,
+     "text": "이 백성이 입술로는 나를 공경하되 마음은 내게서 멀도다",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "쉼",
+     "book": "마가복음",
+     "chapter": 7,
+     "verse": 28,
+     "text": "주여 옳소이다마는 상 아래 개들도 아이들이 먹던 부스러기를 먹나이다",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "밤",
+     "book": "마가복음",
+     "chapter": 7,
+     "verse": 30,
+     "text": "여자가 집에 돌아가 본즉 아이가 침상에 누웠고 귀신이 나갔더라",
+     "excerpt": false,
+     "linked": false
+    }
+   ]
+  },
+  {
+   "day": 11,
+   "title": "에바다, 열리라",
+   "start": "7:31",
+   "end": "8:26",
+   "chars": 1558,
+   "minutes": 5.8,
+   "alerts": [
+    {
+     "slot": "아침",
+     "book": "마가복음",
+     "chapter": 7,
+     "verse": 34,
+     "text": "에바다 하시니 이는 열리라는 뜻이라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "한낮",
+     "book": "마가복음",
+     "chapter": 8,
+     "verse": 2,
+     "text": "내가 무리를 불쌍히 여기노라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "쉼",
+     "book": "마가복음",
+     "chapter": 8,
+     "verse": 18,
+     "text": "너희가 눈이 있어도 보지 못하며 귀가 있어도 듣지 못하느냐 또 기억하지 못하느냐",
+     "excerpt": false,
+     "linked": false
+    },
+    {
+     "slot": "밤",
+     "book": "마가복음",
+     "chapter": 7,
+     "verse": 37,
+     "text": "그가 모든 것을 잘하였도다",
+     "excerpt": true,
+     "linked": false
+    }
+   ]
+  },
+  {
+   "day": 12,
+   "title": "너희는 나를 누구라 하느냐",
+   "start": "8:27",
+   "end": "9:13",
+   "chars": 1413,
+   "minutes": 5.2,
+   "alerts": [
+    {
+     "slot": "아침",
+     "book": "마가복음",
+     "chapter": 8,
+     "verse": 29,
+     "text": "너희는 나를 누구라 하느냐",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "한낮",
+     "book": "마가복음",
+     "chapter": 8,
+     "verse": 34,
+     "text": "누구든지 나를 따라오려거든 자기를 부인하고 자기 십자가를 지고 나를 따를 것이니라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "쉼",
+     "book": "마가복음",
+     "chapter": 8,
+     "verse": 36,
+     "text": "사람이 만일 온 천하를 얻고도 자기 목숨을 잃으면 무엇이 유익하리요",
+     "excerpt": false,
+     "linked": false
+    },
+    {
+     "slot": "밤",
+     "book": "마가복음",
+     "chapter": 9,
+     "verse": 7,
+     "text": "이는 내 사랑하는 아들이니 너희는 그의 말을 들으라",
+     "excerpt": true,
+     "linked": false
+    }
+   ]
+  },
+  {
+   "day": 13,
+   "title": "나의 믿음 없는 것을 도와 주소서",
+   "start": "9:14",
+   "end": "9:37",
+   "chars": 1328,
+   "minutes": 4.9,
+   "alerts": [
+    {
+     "slot": "아침",
+     "book": "마가복음",
+     "chapter": 9,
+     "verse": 23,
+     "text": "믿는 자에게는 능히 하지 못할 일이 없느니라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "한낮",
+     "book": "마가복음",
+     "chapter": 9,
+     "verse": 24,
+     "text": "내가 믿나이다 나의 믿음 없는 것을 도와 주소서",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "쉼",
+     "book": "마가복음",
+     "chapter": 9,
+     "verse": 35,
+     "text": "누구든지 첫째가 되고자 하면 뭇 사람의 끝이 되며 뭇 사람을 섬기는 자가 되어야 하리라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "밤",
+     "book": "마가복음",
+     "chapter": 9,
+     "verse": 27,
+     "text": "예수께서 그 손을 잡아 일으키시니 이에 일어서니라",
+     "excerpt": false,
+     "linked": false
+    }
+   ]
+  },
+  {
+   "day": 14,
+   "title": "어린아이처럼",
+   "start": "9:38",
+   "end": "10:16",
+   "chars": 1303,
+   "minutes": 4.8,
+   "alerts": [
+    {
+     "slot": "아침",
+     "book": "마가복음",
+     "chapter": 9,
+     "verse": 50,
+     "text": "너희 속에 소금을 두고 서로 화목하라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "한낮",
+     "book": "마가복음",
+     "chapter": 9,
+     "verse": 40,
+     "text": "우리를 반대하지 않는 자는 우리를 위하는 자니라",
+     "excerpt": false,
+     "linked": false
+    },
+    {
+     "slot": "쉼",
+     "book": "마가복음",
+     "chapter": 10,
+     "verse": 9,
+     "text": "하나님이 짝지어 주신 것을 사람이 나누지 못할지니라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "밤",
+     "book": "마가복음",
+     "chapter": 10,
+     "verse": 16,
+     "text": "그 어린 아이들을 안고 그들 위에 안수하시고 축복하시니라",
+     "excerpt": false,
+     "linked": false
+    }
+   ]
+  },
+  {
+   "day": 15,
+   "title": "섬기러 오신 분",
+   "start": "10:17",
+   "end": "10:45",
+   "chars": 1681,
+   "minutes": 6.2,
+   "alerts": [
+    {
+     "slot": "아침",
+     "book": "마가복음",
+     "chapter": 10,
+     "verse": 21,
+     "text": "예수께서 그를 보시고 사랑하사",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "한낮",
+     "book": "마가복음",
+     "chapter": 10,
+     "verse": 27,
+     "text": "하나님으로서는 다 하실 수 있느니라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "쉼",
+     "book": "마가복음",
+     "chapter": 10,
+     "verse": 43,
+     "text": "너희 중에 누구든지 크고자 하는 자는 너희를 섬기는 자가 되고",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "밤",
+     "book": "마가복음",
+     "chapter": 10,
+     "verse": 45,
+     "text": "인자가 온 것은 섬김을 받으려 함이 아니라 도리어 섬기려 하고",
+     "excerpt": true,
+     "linked": false
+    }
+   ]
+  },
+  {
+   "day": 16,
+   "title": "그가 너를 부르신다",
+   "start": "10:46",
+   "end": "11:19",
+   "chars": 1433,
+   "minutes": 5.3,
+   "alerts": [
+    {
+     "slot": "아침",
+     "book": "마가복음",
+     "chapter": 10,
+     "verse": 49,
+     "text": "안심하고 일어나라 그가 너를 부르신다",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "한낮",
+     "book": "마가복음",
+     "chapter": 10,
+     "verse": 51,
+     "text": "네게 무엇을 하여 주기를 원하느냐",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "쉼",
+     "book": "마가복음",
+     "chapter": 11,
+     "verse": 9,
+     "text": "호산나 찬송하리로다 주의 이름으로 오시는 이여",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "밤",
+     "book": "마가복음",
+     "chapter": 11,
+     "verse": 17,
+     "text": "내 집은 만민이 기도하는 집이라",
+     "excerpt": true,
+     "linked": false
+    }
+   ]
+  },
+  {
+   "day": 17,
+   "title": "하나님을 믿으라",
+   "start": "11:20",
+   "end": "12:12",
+   "chars": 1257,
+   "minutes": 4.7,
+   "alerts": [
+    {
+     "slot": "아침",
+     "book": "마가복음",
+     "chapter": 11,
+     "verse": 22,
+     "text": "하나님을 믿으라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "한낮",
+     "book": "마가복음",
+     "chapter": 11,
+     "verse": 24,
+     "text": "무엇이든지 기도하고 구하는 것은 받은 줄로 믿으라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "쉼",
+     "book": "마가복음",
+     "chapter": 11,
+     "verse": 25,
+     "text": "서서 기도할 때에 아무에게나 혐의가 있거든 용서하라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "밤",
+     "book": "마가복음",
+     "chapter": 12,
+     "verse": 10,
+     "text": "건축자들이 버린 돌이 모퉁이의 머릿돌이 되었나니",
+     "excerpt": true,
+     "linked": false
+    }
+   ]
+  },
+  {
+   "day": 18,
+   "title": "가장 큰 계명",
+   "start": "12:13",
+   "end": "12:34",
+   "chars": 1344,
+   "minutes": 5.0,
+   "alerts": [
+    {
+     "slot": "아침",
+     "book": "마가복음",
+     "chapter": 12,
+     "verse": 29,
+     "text": "이스라엘아 들으라 주 곧 우리 하나님은 유일한 주시라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "한낮",
+     "book": "마가복음",
+     "chapter": 12,
+     "verse": 30,
+     "text": "네 마음을 다하고 목숨을 다하고 뜻을 다하고 힘을 다하여 주 너의 하나님을 사랑하라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "쉼",
+     "book": "마가복음",
+     "chapter": 12,
+     "verse": 31,
+     "text": "네 이웃을 네 자신과 같이 사랑하라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "밤",
+     "book": "마가복음",
+     "chapter": 12,
+     "verse": 27,
+     "text": "하나님은 죽은 자의 하나님이 아니요 산 자의 하나님이시라",
+     "excerpt": true,
+     "linked": false
+    }
+   ]
+  },
+  {
+   "day": 19,
+   "title": "두 렙돈의 마음",
+   "start": "12:35",
+   "end": "13:13",
+   "chars": 1281,
+   "minutes": 4.7,
+   "alerts": [
+    {
+     "slot": "아침",
+     "book": "마가복음",
+     "chapter": 12,
+     "verse": 42,
+     "text": "한 가난한 과부는 와서 두 렙돈 곧 한 고드란트를 넣는지라",
+     "excerpt": false,
+     "linked": false
+    },
+    {
+     "slot": "한낮",
+     "book": "마가복음",
+     "chapter": 12,
+     "verse": 44,
+     "text": "이 과부는 그 가난한 중에서 자기의 모든 소유 곧 생활비 전부를 넣었느니라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "쉼",
+     "book": "마가복음",
+     "chapter": 13,
+     "verse": 11,
+     "text": "무슨 말을 할까 미리 염려하지 말고",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "밤",
+     "book": "마가복음",
+     "chapter": 13,
+     "verse": 13,
+     "text": "끝까지 견디는 자는 구원을 받으리라",
+     "excerpt": true,
+     "linked": false
+    }
+   ]
+  },
+  {
+   "day": 20,
+   "title": "깨어 있으라",
+   "start": "13:14",
+   "end": "14:2",
+   "chars": 1181,
+   "minutes": 4.4,
+   "alerts": [
+    {
+     "slot": "아침",
+     "book": "마가복음",
+     "chapter": 13,
+     "verse": 33,
+     "text": "주의하라 깨어 있으라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "한낮",
+     "book": "마가복음",
+     "chapter": 13,
+     "verse": 31,
+     "text": "천지는 없어지겠으나 내 말은 없어지지 아니하리라",
+     "excerpt": false,
+     "linked": false
+    },
+    {
+     "slot": "쉼",
+     "book": "마가복음",
+     "chapter": 13,
+     "verse": 37,
+     "text": "내가 너희에게 하는 이 말은 모든 사람에게 하는 말이니라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "밤",
+     "book": "마가복음",
+     "chapter": 13,
+     "verse": 26,
+     "text": "인자가 구름을 타고 큰 권능과 영광으로 오는 것을 사람들이 보리라",
+     "excerpt": true,
+     "linked": false
+    }
+   ]
+  },
+  {
+   "day": 21,
+   "title": "향유와 떡과 잔",
+   "start": "14:3",
+   "end": "14:26",
+   "chars": 1309,
+   "minutes": 4.8,
+   "alerts": [
+    {
+     "slot": "아침",
+     "book": "마가복음",
+     "chapter": 14,
+     "verse": 6,
+     "text": "그가 내게 좋은 일을 하였느니라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "한낮",
+     "book": "마가복음",
+     "chapter": 14,
+     "verse": 22,
+     "text": "받으라 이것은 내 몸이니라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "쉼",
+     "book": "마가복음",
+     "chapter": 14,
+     "verse": 8,
+     "text": "그는 힘을 다하여 내 몸에 향유를 부어",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "밤",
+     "book": "마가복음",
+     "chapter": 14,
+     "verse": 24,
+     "text": "이것은 많은 사람을 위하여 흘리는 나의 피 곧 언약의 피니라",
+     "excerpt": true,
+     "linked": false
+    }
+   ]
+  },
+  {
+   "day": 22,
+   "title": "겟세마네의 밤",
+   "start": "14:27",
+   "end": "14:52",
+   "chars": 1251,
+   "minutes": 4.6,
+   "alerts": [
+    {
+     "slot": "아침",
+     "book": "마가복음",
+     "chapter": 14,
+     "verse": 28,
+     "text": "내가 살아난 후에 너희보다 먼저 갈릴리로 가리라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "한낮",
+     "book": "마가복음",
+     "chapter": 14,
+     "verse": 38,
+     "text": "시험에 들지 않게 깨어 있어 기도하라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "쉼",
+     "book": "마가복음",
+     "chapter": 14,
+     "verse": 34,
+     "text": "내 마음이 심히 고민하여 죽게 되었으니",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "밤",
+     "book": "마가복음",
+     "chapter": 14,
+     "verse": 36,
+     "text": "그러나 나의 원대로 마시옵고 아버지의 원대로 하옵소서",
+     "excerpt": true,
+     "linked": false
+    }
+   ]
+  },
+  {
+   "day": 23,
+   "title": "내가 그니라",
+   "start": "14:53",
+   "end": "15:5",
+   "chars": 1271,
+   "minutes": 4.7,
+   "alerts": [
+    {
+     "slot": "아침",
+     "book": "마가복음",
+     "chapter": 14,
+     "verse": 61,
+     "text": "네가 찬송 받을 이의 아들 그리스도냐",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "한낮",
+     "book": "마가복음",
+     "chapter": 14,
+     "verse": 62,
+     "text": "내가 그니라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "쉼",
+     "book": "마가복음",
+     "chapter": 14,
+     "verse": 61,
+     "text": "침묵하고 아무 대답도 아니하시거늘",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "밤",
+     "book": "마가복음",
+     "chapter": 14,
+     "verse": 72,
+     "text": "그 일을 생각하고 울었더라",
+     "excerpt": true,
+     "linked": false
+    }
+   ]
+  },
+  {
+   "day": 24,
+   "title": "십자가",
+   "start": "15:6",
+   "end": "15:41",
+   "chars": 1553,
+   "minutes": 5.8,
+   "alerts": [
+    {
+     "slot": "아침",
+     "book": "마가복음",
+     "chapter": 15,
+     "verse": 21,
+     "text": "억지로 같이 가게 하여 예수의 십자가를 지우고",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "한낮",
+     "book": "마가복음",
+     "chapter": 15,
+     "verse": 25,
+     "text": "때가 제삼시가 되어 십자가에 못 박으니라",
+     "excerpt": false,
+     "linked": false
+    },
+    {
+     "slot": "쉼",
+     "book": "마가복음",
+     "chapter": 15,
+     "verse": 38,
+     "text": "이에 성소 휘장이 위로부터 아래까지 찢어져 둘이 되니라",
+     "excerpt": false,
+     "linked": false
+    },
+    {
+     "slot": "밤",
+     "book": "마가복음",
+     "chapter": 15,
+     "verse": 39,
+     "text": "이 사람은 진실로 하나님의 아들이었도다",
+     "excerpt": true,
+     "linked": false
+    }
+   ]
+  },
+  {
+   "day": 25,
+   "title": "그가 살아나셨다",
+   "start": "15:42",
+   "end": "16:20",
+   "chars": 1311,
+   "minutes": 4.9,
+   "alerts": [
+    {
+     "slot": "아침",
+     "book": "마가복음",
+     "chapter": 16,
+     "verse": 6,
+     "text": "그가 살아나셨고 여기 계시지 아니하니라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "한낮",
+     "book": "마가복음",
+     "chapter": 16,
+     "verse": 7,
+     "text": "너희보다 먼저 갈릴리로 가시나니",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "쉼",
+     "book": "마가복음",
+     "chapter": 16,
+     "verse": 15,
+     "text": "너희는 온 천하에 다니며 만민에게 복음을 전파하라",
+     "excerpt": true,
+     "linked": false
+    },
+    {
+     "slot": "밤",
+     "book": "마가복음",
+     "chapter": 16,
+     "verse": 20,
+     "text": "주께서 함께 역사하사",
+     "excerpt": true,
+     "linked": false
+    }
+   ]
+  }
+ ]
+}

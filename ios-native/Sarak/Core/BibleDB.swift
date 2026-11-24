@@ -55,6 +55,21 @@ final class BibleDB {
         }
     }
 
+    func searchRows(_ q: String) -> [Verse] {
+        queue.sync {
+            guard let db else { return [] }
+            var st: OpaquePointer?
+            guard sqlite3_prepare_v2(db, "SELECT book_id, chapter, verse, text FROM verses WHERE instr(text, ?) > 0 ORDER BY book_id, chapter, verse LIMIT 60", -1, &st, nil) == SQLITE_OK, let st else { return [] }
+            defer { sqlite3_finalize(st) }
+            sqlite3_bind_text(st, 1, q, -1, unsafeBitCast(-1, to: sqlite3_destructor_type.self))
+            var out: [Verse] = []
+            while sqlite3_step(st) == SQLITE_ROW {
+                out.append(Verse(bookId: Int(sqlite3_column_int(st, 0)), chapter: Int(sqlite3_column_int(st, 1)), number: Int(sqlite3_column_int(st, 2)), text: Self.text(st, 3)))
+            }
+            return out
+        }
+    }
+
     lazy var books: [Book] = query("SELECT id, name, total_chapters FROM books ORDER BY id") {
         Book(id: Int(sqlite3_column_int($0, 0)), name: Self.text($0, 1), chapterCount: Int(sqlite3_column_int($0, 2)))
     }
@@ -70,5 +85,14 @@ final class BibleDB {
             """, bind: [startBook, endBook]) {
             (Int(sqlite3_column_int($0, 0)), Int(sqlite3_column_int($0, 1)), Int(sqlite3_column_int($0, 2)))
         }
+    }
+}
+
+extension BibleDB {
+    /// 절 안의 글자로 찾기 (앞에서부터 60개)
+    func search(_ q: String) -> [(book: String, verse: Verse)] {
+        let safe = q.trimmingCharacters(in: .whitespaces)
+        guard safe.count >= 2 else { return [] }
+        return searchRows(safe).map { (bookName($0.bookId), $0) }
     }
 }

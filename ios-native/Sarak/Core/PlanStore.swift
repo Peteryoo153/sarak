@@ -67,6 +67,14 @@ final class PlanStore {
         let raw = Prefs.json("completed_\(activeSource)", as: [String: CompletedEntry].self) ?? [:]
         completed = Dictionary(uniqueKeysWithValues: raw.compactMap { k, v in Int(k).map { ($0, v) } })
         bookmarks = (Prefs.json("bookmarks", as: [Bookmark].self) ?? []).sorted { $0.savedAt > $1.savedAt }
+        #if DEBUG
+        if Demo.on {
+            plan = nil; completed = [:]
+            let day = String(PlanDates.string(Date()).prefix(10))
+            bookmarks = [(4, 31, "겨자씨 한 알과 같으니", "07:10"), (6, 50, "안심하라 내니 두려워하지 말라", "16:05"), (2, 5, "작은 자야 네 죄 사함을 받았느니라", "21:40"), (1, 11, "너는 내 사랑하는 아들이라 내가 너를 기뻐하노라", "12:30")]
+                .map { Bookmark(bookId: 41, bookName: "마가복음", chapter: $0.0, verse: $0.1, text: $0.2, savedAt: "\(day)T\($0.3):00.000") }
+        }
+        #endif
     }
 
     static func loadPlan(for source: String) -> ReadingPlan? {

@@ -16,14 +16,14 @@ struct SettingsView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        Group {
             List {
                 Section {
                     if session.isSignedIn {
                         HStack(spacing: 14) {
                             AvatarView(name: session.displayName, size: 48)
                             VStack(alignment: .leading, spacing: 2) {
-                                Text(session.displayName).font(.system(size: 17, weight: .bold)).foregroundStyle(SarakColor.ink)
+                                Text(session.displayName).font(.system(size: 17, weight: .semibold)).foregroundStyle(SarakColor.ink)
                                 Text(session.user?.email ?? "").font(SarakFont.caption).foregroundStyle(SarakColor.inkMuted)
                             }
                         }
@@ -36,12 +36,13 @@ struct SettingsView: View {
                 }
 
                 Section("나의 기록") {
-                    NavigationLink { HistoryView() } label: { row("나의 통독 기록", "trophy") }
+                    NavigationLink { HistoryView() } label: { row("나의 통독 기록", "book.closed") }
+                    NavigationLink { PlanSettingsView() } label: { row("통독 플랜", "calendar", detail: store.plan?.rangeName ?? "말씀길") }
                     NavigationLink { BookmarksView() } label: { row("북마크한 말씀", "bookmark", detail: "\(store.bookmarks.count)") }
                 }
 
                 Section("설정") {
-                    NavigationLink { ReminderSettingsView() } label: { row("매일 읽기 알림", "bell") }
+                    NavigationLink { WordAlertsView() } label: { row("말씀 알림", "bell") }
                     Picker(selection: $appearance) {
                         ForEach(AppearanceMode.allCases) { Text($0.label).tag($0) }
                     } label: { row("화면 모드", "circle.lefthalf.filled") }
@@ -49,7 +50,7 @@ struct SettingsView: View {
                 }
 
                 Section("사역 후원 및 문의") {
-                    Button { openURL(AppLinks.support) } label: { row("사역 후원하기", "heart", tint: Color(hex: 0xD6457A), external: true) }
+                    Button { openURL(AppLinks.support) } label: { row("사역 후원하기", "heart", tint: SarakColor.ink, external: true) }
                     Button { openURL(URL(string: "mailto:\(AppLinks.contactEmail)?subject=%5B%EC%82%AC%EB%9D%BD%5D%20%EB%AC%B8%EC%9D%98")!) } label: {
                         row("앱 제안 및 문의", "envelope", detail: AppLinks.contactEmail)
                     }
@@ -68,7 +69,7 @@ struct SettingsView: View {
             }
             .scrollContentBackground(.hidden)
             .background(SarakColor.surface)
-            .navigationTitle("더보기")
+            .navigationTitle("설정")
             .confirmationDialog("계정을 삭제할까요?", isPresented: $confirmDelete, titleVisibility: .visible) {
                 Button("계정과 모든 데이터 삭제", role: .destructive) { deleteAccount() }
             } message: { Text("그룹 참여 기록과 완주 기록이 모두 지워지고 되돌릴 수 없어요. 이 기기에 저장된 개인 플랜은 남아요.") }
@@ -102,43 +103,31 @@ struct SettingsView: View {
     }
 }
 
-struct ReminderSettingsView: View {
-    @AppStorage("reminderEnabled") private var enabled = false
-    @AppStorage("reminderHour") private var hour = 7
-    @AppStorage("reminderMinute") private var minute = 0
-    @State private var denied = false
-
-    private var time: Binding<Date> {
-        Binding {
-            Calendar.current.date(bySettingHour: hour, minute: minute, second: 0, of: Date()) ?? Date()
-        } set: { d in
-            let c = Calendar.current.dateComponents([.hour, .minute], from: d)
-            hour = c.hour ?? 7; minute = c.minute ?? 0
-            if enabled { ReminderService.schedule(hour: hour, minute: minute) }
-        }
-    }
-
+/// 예전 통독 플랜을 이어 쓰거나 말씀길로 바꿉니다.
+struct PlanSettingsView: View {
+    @Environment(PlanStore.self) private var store
+    @State private var setup = false
+    @State private var confirm = false
     var body: some View {
-        Form {
-            Section {
-                Toggle("매일 읽기 알림", isOn: $enabled)
-                    .tint(SarakColor.mintInk)
-                    .onChange(of: enabled) { _, on in
-                        if on {
-                            Task {
-                                if !(await ReminderService.requestAndSchedule(hour: hour, minute: minute)) { enabled = false; denied = true }
-                            }
-                        } else { ReminderService.cancel() }
-                    }
-                if enabled { DatePicker("알림 시간", selection: time, displayedComponents: .hourAndMinute) }
-            } footer: {
-                Text(denied ? "알림 권한이 꺼져 있어요. 설정 앱 > 사락사락 Bible > 알림에서 켜 주세요."
-                            : "정한 시간에 매일 오늘의 말씀을 알려 드려요.")
+        List {
+            if let p = store.plan {
+                Section {
+                    LabeledContent("읽는 플랜", value: p.groupName ?? p.rangeName)
+                    LabeledContent("지금까지", value: "\(store.completed.count) / \(p.totalDays)일")
+                } footer: { Text("골방에서 이 플랜의 오늘 본문을 펼칩니다. 그만두면 마가복음 말씀길로 바뀝니다.") }
+                Section {
+                    Button("플랜 바꾸기") { setup = true }
+                    Button("플랜 그만두기", role: .destructive) { confirm = true }
+                }
+            } else {
+                Section { Button("통독 플랜 만들기") { setup = true } } footer: { Text("지금은 하루 5분 마가복음 말씀길을 읽고 있어요.") }
             }
         }
-        .scrollContentBackground(.hidden)
-        .background(SarakColor.surface)
-        .navigationTitle("매일 읽기 알림")
+        .tint(Ink.ink).scrollContentBackground(.hidden).background(Ink.canvas).navigationTitle("통독 플랜")
+        .sheet(isPresented: $setup) { PlanSetupView() }
+        .confirmationDialog("플랜을 그만둘까요?", isPresented: $confirm, titleVisibility: .visible) {
+            Button("플랜과 진도 기록 삭제", role: .destructive) { store.clearActivePlan() }
+        } message: { Text("지금 플랜과 이 플랜의 모든 진도 기록이 지워집니다.") }
     }
 }
 
@@ -157,9 +146,9 @@ struct HistoryView: View {
             ForEach(records) { r in
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
-                        Text(r.planName).font(.system(size: 16, weight: .bold)).foregroundStyle(SarakColor.ink)
+                        Text(r.planName).font(.system(size: 16, weight: .semibold)).foregroundStyle(SarakColor.ink)
                         Spacer()
-                        Text("완주").font(.system(size: 12, weight: .bold)).foregroundStyle(SarakColor.mintInk)
+                        Text("완주").font(.system(size: 12, weight: .semibold)).foregroundStyle(SarakColor.mintInk)
                             .padding(.horizontal, 10).frame(height: 24).background(SarakColor.mintSoft, in: Capsule())
                     }
                     Text("\(r.range) · \(r.startDate.formatted(.dateTime.year().month().day())) ~ \(r.completedAt.formatted(.dateTime.year().month().day()))")
@@ -186,7 +175,7 @@ struct BookmarksView: View {
             }
             ForEach(store.bookmarks) { b in
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("\(b.bookName) \(b.chapter):\(b.verse)").font(.system(size: 13, weight: .bold)).foregroundStyle(SarakColor.mintInk)
+                    Text("\(b.bookName) \(b.chapter):\(b.verse)").font(.system(size: 13, weight: .semibold)).foregroundStyle(SarakColor.mintInk)
                     Text(b.text).font(SarakFont.serif(16)).lineSpacing(6).foregroundStyle(SarakColor.ink)
                 }
                 .padding(.vertical, 6)
@@ -197,7 +186,7 @@ struct BookmarksView: View {
                     Button("카드") {
                         share = ShareVerses(verses: [Verse(bookId: b.bookId, chapter: b.chapter, number: b.verse, text: b.text)], bookName: b.bookName)
                     }
-                    .tint(SarakColor.indigo)
+                    .tint(Ink.control)
                 }
             }
         }

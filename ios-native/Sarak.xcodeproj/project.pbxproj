@@ -10,46 +10,93 @@
 		198C36114CD3BA1E6001F300 /* OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 869DBC27D8796133E975EAC0 /* OFL.txt */; };
 		1B26A84BF0BB3A82CB59B196 /* GowunBatang-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E42D18A5D4D53B378EF057BB /* GowunBatang-Bold.ttf */; };
 		209F4AEA8AECFDC5C5F4A482 /* Services.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCB40386C5953315EEE81082 /* Services.swift */; };
+		2511F198A7701CE7BEC2499A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE6D6BE29CA7FE8AE3DF57C9 /* Assets.xcassets */; };
 		36CCF3C0297C20BBC9624695 /* Plan.swift in Sources */ = {isa = PBXBuildFile; fileRef = B94FE10DD9EB8AD89E6599AA /* Plan.swift */; };
+		3EF82BD0629F701E8EFA05AA /* SarakWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = A67C295777987954D0CA2516 /* SarakWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		3F796C1A52D9A81CEE52711F /* ShareViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 410BE8F6F90CC324925A7932 /* ShareViews.swift */; };
 		40B2180F0AA9BE5758366996 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = C46DC68B8620A6DD1239ACCD /* FirebaseCore */; };
+		50730203CB3367E2D5F1B858 /* PathStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A9C4581116EB95A39A19FAD /* PathStore.swift */; };
 		52D29EEC16A81D7A727EB5F2 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F88BED127F7969914AF7F5 /* SettingsView.swift */; };
 		5878E5A6965171A8C165F9CD /* PlanSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18AE48F7AFA52ECDF0C9D94A /* PlanSetupView.swift */; };
+		5A545C7E0A71FD12AC55E343 /* mark-25.json in Resources */ = {isa = PBXBuildFile; fileRef = EB9F77F63B7E92ED8B6D21D6 /* mark-25.json */; };
 		5A5ED92CAC3F7F69DB40313E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6653B37D947A4C7A2428B009 /* Assets.xcassets */; };
+		603ACDE6D3C23BE9EBA162C2 /* KeepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D1121CCD3F31FE3B52B353 /* KeepView.swift */; };
 		6070F0451F40C00FEEB0CB8B /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 129262196A53201E20E8EE07 /* FirebaseFirestore */; };
 		65F5D2469D8E5ADE306FC920 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA5681E28C57DC6EAA35FBDE /* MainTabView.swift */; };
 		67C844E271F209F645977E49 /* bible.db in Resources */ = {isa = PBXBuildFile; fileRef = 2E642D3AF2F5E0BD0B1309E0 /* bible.db */; };
 		765C5C13B0D159C914112D00 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 50BFF2B7CBEB8D4B47E81A05 /* GoogleService-Info.plist */; };
 		79D2D6369799B4AB8056F92D /* BibleDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9B34718465A20C9A99AED61 /* BibleDB.swift */; };
 		9252C615DBC8C8C28383D05E /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B7A92D798A03C6F025BD81 /* SplashView.swift */; };
+		A056F0EE92C1B06607A1BDD3 /* mark-25.json in Resources */ = {isa = PBXBuildFile; fileRef = EB9F77F63B7E92ED8B6D21D6 /* mark-25.json */; };
+		A07B88B4C69ECF4C7DF92BAC /* GowunBatang-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B25AF47C6EB5E3B35EEB3A92 /* GowunBatang-Regular.ttf */; };
 		A0871CE8166F3C7861070D3E /* PlanStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A62C51A1179298073A42835 /* PlanStore.swift */; };
 		A1BF5736C339C9E5F7E4CEC0 /* GroupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC49D4155097398BF44CD0F9 /* GroupView.swift */; };
 		A339D794D8564AC7545C6AE8 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAC6930E844D2969D1F3D23 /* Session.swift */; };
+		A7122EB73A8C46E957B30E99 /* SarakWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03C10420F9F82086986808E5 /* SarakWatchApp.swift */; };
+		A983A443A96F6F0A58F546D9 /* RoomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42F040B30C9F7EBDB7470379 /* RoomView.swift */; };
+		AB85AD4852929E863BCD6ECD /* Reading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F6AA2AB27595C1598FE332C /* Reading.swift */; };
 		ACD38FE77533AA02C9DCDF58 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7824531060D3DD9E8F3376B1 /* Models.swift */; };
+		AEB169F05BC7C4B2109BEBA1 /* PhoneLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B44CE54BF88757ACD36637 /* PhoneLink.swift */; };
 		B9A939C576DA45223DE2F3EA /* GowunBatang-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B25AF47C6EB5E3B35EEB3A92 /* GowunBatang-Regular.ttf */; };
+		C6108C511FA6CC4810E14181 /* SarakDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A18E16BB56E8B0C2787D0A5 /* SarakDesign.swift */; };
 		CF459E08CEDCC8F10B1EEDED /* ReadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE40787BED2063BA1C5D416B /* ReadingView.swift */; };
+		CF87AB0A67F7231370BB1EA7 /* WordPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB2D71D93C2A1D0F2E0CCB3F /* WordPath.swift */; };
 		DB01905B8B0C068F35AF7C9C /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 4255EB41352AB06D4AD05A9D /* FirebaseAuth */; };
+		DC9B24C27157C5B30A4DC1F6 /* WordAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96EC666D459DB810A0C89EB /* WordAlerts.swift */; };
 		DCD355B1A1BBA6817BBB057C /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE7D2FA70E4CB15D22B7FA63 /* Theme.swift */; };
+		E30DEA0AE242703E4F9FF581 /* WordAlertsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54BDD113F613D09E3A3A1348 /* WordAlertsView.swift */; };
 		E37C907CC32E02BCE0CF58F2 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 4545873B9DBD664FD7DA3F62 /* GoogleSignIn */; };
-		E94190D04E82234EABD65346 /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D6A7180FE5A76D34B829AEA /* CalendarView.swift */; };
+		E95C755B6F34D85670A7BDB2 /* WordPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB2D71D93C2A1D0F2E0CCB3F /* WordPath.swift */; };
 		EE4ADC8688F8F61A728C08B1 /* SarakApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51F991D3C4113EE67E4A77D3 /* SarakApp.swift */; };
-		FB6520571368EB4AF4E974E6 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B14403FA8EF7869B9F7EF2C /* HomeView.swift */; };
+		F683E90CC9AFAEFE60CE2EF2 /* BibleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E620D9C9864C02EE393EC19D /* BibleView.swift */; };
+		F8AAB864CF6D4ED809B12B50 /* SarakDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A18E16BB56E8B0C2787D0A5 /* SarakDesign.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		C8CE3D1789FFE46581960B6B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EDE69F9323EAAEAFD839AA09 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 365AFB447AB322A02B43EF9A;
+			remoteInfo = SarakWatch;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		74F4800F77F1EFA184677D0D /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				3EF82BD0629F701E8EFA05AA /* SarakWatch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		0D6A7180FE5A76D34B829AEA /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
+		03C10420F9F82086986808E5 /* SarakWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SarakWatchApp.swift; sourceTree = "<group>"; };
 		18AE48F7AFA52ECDF0C9D94A /* PlanSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanSetupView.swift; sourceTree = "<group>"; };
 		2A62C51A1179298073A42835 /* PlanStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanStore.swift; sourceTree = "<group>"; };
-		2B14403FA8EF7869B9F7EF2C /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		2A9C4581116EB95A39A19FAD /* PathStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathStore.swift; sourceTree = "<group>"; };
 		2E642D3AF2F5E0BD0B1309E0 /* bible.db */ = {isa = PBXFileReference; path = bible.db; sourceTree = "<group>"; };
 		30B7A92D798A03C6F025BD81 /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
 		3922C2C617B67A2E65B516BD /* Sarak.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Sarak.entitlements; sourceTree = "<group>"; };
 		410BE8F6F90CC324925A7932 /* ShareViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViews.swift; sourceTree = "<group>"; };
+		42F040B30C9F7EBDB7470379 /* RoomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomView.swift; sourceTree = "<group>"; };
+		4A18E16BB56E8B0C2787D0A5 /* SarakDesign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SarakDesign.swift; sourceTree = "<group>"; };
 		50BFF2B7CBEB8D4B47E81A05 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		51F991D3C4113EE67E4A77D3 /* SarakApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SarakApp.swift; sourceTree = "<group>"; };
+		54BDD113F613D09E3A3A1348 /* WordAlertsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordAlertsView.swift; sourceTree = "<group>"; };
 		6653B37D947A4C7A2428B009 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		71D1121CCD3F31FE3B52B353 /* KeepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeepView.swift; sourceTree = "<group>"; };
 		7824531060D3DD9E8F3376B1 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		869DBC27D8796133E975EAC0 /* OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = OFL.txt; sourceTree = "<group>"; };
+		88B44CE54BF88757ACD36637 /* PhoneLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneLink.swift; sourceTree = "<group>"; };
+		8F6AA2AB27595C1598FE332C /* Reading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reading.swift; sourceTree = "<group>"; };
+		A67C295777987954D0CA2516 /* SarakWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SarakWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AE7D2FA70E4CB15D22B7FA63 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		B0F88BED127F7969914AF7F5 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		B187120665D5E3B51A0673D2 /* Sarak.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Sarak.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -59,9 +106,15 @@
 		BB486A3F684FB0335F728F20 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		BC49D4155097398BF44CD0F9 /* GroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupView.swift; sourceTree = "<group>"; };
 		BEAC6930E844D2969D1F3D23 /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
+		C8A02D624B7C327D0E976C7C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		CE6D6BE29CA7FE8AE3DF57C9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DA5681E28C57DC6EAA35FBDE /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		DE40787BED2063BA1C5D416B /* ReadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingView.swift; sourceTree = "<group>"; };
 		E42D18A5D4D53B378EF057BB /* GowunBatang-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "GowunBatang-Bold.ttf"; sourceTree = "<group>"; };
+		E620D9C9864C02EE393EC19D /* BibleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BibleView.swift; sourceTree = "<group>"; };
+		E96EC666D459DB810A0C89EB /* WordAlerts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordAlerts.swift; sourceTree = "<group>"; };
+		EB9F77F63B7E92ED8B6D21D6 /* mark-25.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "mark-25.json"; sourceTree = "<group>"; };
+		FB2D71D93C2A1D0F2E0CCB3F /* WordPath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordPath.swift; sourceTree = "<group>"; };
 		FCB40386C5953315EEE81082 /* Services.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -85,11 +138,17 @@
 			children = (
 				B9B34718465A20C9A99AED61 /* BibleDB.swift */,
 				7824531060D3DD9E8F3376B1 /* Models.swift */,
+				2A9C4581116EB95A39A19FAD /* PathStore.swift */,
+				88B44CE54BF88757ACD36637 /* PhoneLink.swift */,
 				B94FE10DD9EB8AD89E6599AA /* Plan.swift */,
 				2A62C51A1179298073A42835 /* PlanStore.swift */,
+				8F6AA2AB27595C1598FE332C /* Reading.swift */,
+				4A18E16BB56E8B0C2787D0A5 /* SarakDesign.swift */,
 				FCB40386C5953315EEE81082 /* Services.swift */,
 				BEAC6930E844D2969D1F3D23 /* Session.swift */,
 				AE7D2FA70E4CB15D22B7FA63 /* Theme.swift */,
+				E96EC666D459DB810A0C89EB /* WordAlerts.swift */,
+				FB2D71D93C2A1D0F2E0CCB3F /* WordPath.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -100,6 +159,7 @@
 				6653B37D947A4C7A2428B009 /* Assets.xcassets */,
 				2E642D3AF2F5E0BD0B1309E0 /* bible.db */,
 				50BFF2B7CBEB8D4B47E81A05 /* GoogleService-Info.plist */,
+				EB9F77F63B7E92ED8B6D21D6 /* mark-25.json */,
 				718AFD29637387C2B8E24428 /* Fonts */,
 			);
 			path = Resources;
@@ -108,15 +168,17 @@
 		14627530A60077DE9163296D /* Features */ = {
 			isa = PBXGroup;
 			children = (
-				0D6A7180FE5A76D34B829AEA /* CalendarView.swift */,
+				E620D9C9864C02EE393EC19D /* BibleView.swift */,
 				BC49D4155097398BF44CD0F9 /* GroupView.swift */,
-				2B14403FA8EF7869B9F7EF2C /* HomeView.swift */,
+				71D1121CCD3F31FE3B52B353 /* KeepView.swift */,
 				DA5681E28C57DC6EAA35FBDE /* MainTabView.swift */,
 				18AE48F7AFA52ECDF0C9D94A /* PlanSetupView.swift */,
 				DE40787BED2063BA1C5D416B /* ReadingView.swift */,
+				42F040B30C9F7EBDB7470379 /* RoomView.swift */,
 				B0F88BED127F7969914AF7F5 /* SettingsView.swift */,
 				410BE8F6F90CC324925A7932 /* ShareViews.swift */,
 				30B7A92D798A03C6F025BD81 /* SplashView.swift */,
+				54BDD113F613D09E3A3A1348 /* WordAlertsView.swift */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -156,14 +218,26 @@
 			isa = PBXGroup;
 			children = (
 				7ABAC37C085D1DF878F292BC /* Sarak */,
+				B6D0F2A1881D6B988D9FD031 /* SarakWatch */,
 				E4E57FD50383C31F8AB24173 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		B6D0F2A1881D6B988D9FD031 /* SarakWatch */ = {
+			isa = PBXGroup;
+			children = (
+				CE6D6BE29CA7FE8AE3DF57C9 /* Assets.xcassets */,
+				C8A02D624B7C327D0E976C7C /* Info.plist */,
+				03C10420F9F82086986808E5 /* SarakWatchApp.swift */,
+			);
+			path = SarakWatch;
 			sourceTree = "<group>";
 		};
 		E4E57FD50383C31F8AB24173 /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				B187120665D5E3B51A0673D2 /* Sarak.app */,
+				A67C295777987954D0CA2516 /* SarakWatch.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -171,6 +245,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		365AFB447AB322A02B43EF9A /* SarakWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F3CB8EF95A719B1124EA7EAC /* Build configuration list for PBXNativeTarget "SarakWatch" */;
+			buildPhases = (
+				7B36C697BAFA5FCBD23A0683 /* Sources */,
+				9BD7A27DC0CD0FC6F4064F93 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SarakWatch;
+			packageProductDependencies = (
+			);
+			productName = SarakWatch;
+			productReference = A67C295777987954D0CA2516 /* SarakWatch.app */;
+			productType = "com.apple.product-type.application";
+		};
 		4FF48A48762FB16130D21CFB /* Sarak */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 98C6118C9BF37B6D8AD97299 /* Build configuration list for PBXNativeTarget "Sarak" */;
@@ -178,10 +270,12 @@
 				EE844C6AAAFC2A6A798D3EB7 /* Sources */,
 				95F0E74583CECCFE0AADAF25 /* Resources */,
 				4CB80800205CFFE431941535 /* Frameworks */,
+				74F4800F77F1EFA184677D0D /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				1E1274CE4A4314B5BAE137C3 /* PBXTargetDependency */,
 			);
 			name = Sarak;
 			packageProductDependencies = (
@@ -203,6 +297,9 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					365AFB447AB322A02B43EF9A = {
+						DevelopmentTeam = 7VAL2U8BVL;
+					};
 					4FF48A48762FB16130D21CFB = {
 						DevelopmentTeam = 7VAL2U8BVL;
 					};
@@ -227,6 +324,7 @@
 			projectRoot = "";
 			targets = (
 				4FF48A48762FB16130D21CFB /* Sarak */,
+				365AFB447AB322A02B43EF9A /* SarakWatch */,
 			);
 		};
 /* End PBXProject section */
@@ -242,37 +340,74 @@
 				B9A939C576DA45223DE2F3EA /* GowunBatang-Regular.ttf in Resources */,
 				198C36114CD3BA1E6001F300 /* OFL.txt in Resources */,
 				67C844E271F209F645977E49 /* bible.db in Resources */,
+				5A545C7E0A71FD12AC55E343 /* mark-25.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9BD7A27DC0CD0FC6F4064F93 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2511F198A7701CE7BEC2499A /* Assets.xcassets in Resources */,
+				A07B88B4C69ECF4C7DF92BAC /* GowunBatang-Regular.ttf in Resources */,
+				A056F0EE92C1B06607A1BDD3 /* mark-25.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		7B36C697BAFA5FCBD23A0683 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C6108C511FA6CC4810E14181 /* SarakDesign.swift in Sources */,
+				A7122EB73A8C46E957B30E99 /* SarakWatchApp.swift in Sources */,
+				CF87AB0A67F7231370BB1EA7 /* WordPath.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		EE844C6AAAFC2A6A798D3EB7 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				79D2D6369799B4AB8056F92D /* BibleDB.swift in Sources */,
-				E94190D04E82234EABD65346 /* CalendarView.swift in Sources */,
+				F683E90CC9AFAEFE60CE2EF2 /* BibleView.swift in Sources */,
 				A1BF5736C339C9E5F7E4CEC0 /* GroupView.swift in Sources */,
-				FB6520571368EB4AF4E974E6 /* HomeView.swift in Sources */,
+				603ACDE6D3C23BE9EBA162C2 /* KeepView.swift in Sources */,
 				65F5D2469D8E5ADE306FC920 /* MainTabView.swift in Sources */,
 				ACD38FE77533AA02C9DCDF58 /* Models.swift in Sources */,
+				50730203CB3367E2D5F1B858 /* PathStore.swift in Sources */,
+				AEB169F05BC7C4B2109BEBA1 /* PhoneLink.swift in Sources */,
 				36CCF3C0297C20BBC9624695 /* Plan.swift in Sources */,
 				5878E5A6965171A8C165F9CD /* PlanSetupView.swift in Sources */,
 				A0871CE8166F3C7861070D3E /* PlanStore.swift in Sources */,
+				AB85AD4852929E863BCD6ECD /* Reading.swift in Sources */,
 				CF459E08CEDCC8F10B1EEDED /* ReadingView.swift in Sources */,
+				A983A443A96F6F0A58F546D9 /* RoomView.swift in Sources */,
 				EE4ADC8688F8F61A728C08B1 /* SarakApp.swift in Sources */,
+				F8AAB864CF6D4ED809B12B50 /* SarakDesign.swift in Sources */,
 				209F4AEA8AECFDC5C5F4A482 /* Services.swift in Sources */,
 				A339D794D8564AC7545C6AE8 /* Session.swift in Sources */,
 				52D29EEC16A81D7A727EB5F2 /* SettingsView.swift in Sources */,
 				3F796C1A52D9A81CEE52711F /* ShareViews.swift in Sources */,
 				9252C615DBC8C8C28383D05E /* SplashView.swift in Sources */,
 				DCD355B1A1BBA6817BBB057C /* Theme.swift in Sources */,
+				DC9B24C27157C5B30A4DC1F6 /* WordAlerts.swift in Sources */,
+				E30DEA0AE242703E4F9FF581 /* WordAlertsView.swift in Sources */,
+				E95C755B6F34D85670A7BDB2 /* WordPath.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		1E1274CE4A4314B5BAE137C3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 365AFB447AB322A02B43EF9A /* SarakWatch */;
+			targetProxy = C8CE3D1789FFE46581960B6B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		1389C0470B97F2117BF64C3B /* Release */ = {
@@ -309,7 +444,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 12;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 7VAL2U8BVL;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -323,14 +458,14 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 2.0.0;
+				MARKETING_VERSION = 3.0.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Release;
 		};
@@ -408,7 +543,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 12;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 7VAL2U8BVL;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -428,17 +563,43 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 2.0.0;
+				MARKETING_VERSION = 3.0.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Debug;
+		};
+		D4172B137F884FF69B43196E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = SarakWatch/Info.plist;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chanhoyoo.sarak.watchkitapp;
+				PRODUCT_NAME = SarakWatch;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Debug;
+		};
+		F85995DC3F491A0BC42CD0D8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = SarakWatch/Info.plist;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chanhoyoo.sarak.watchkitapp;
+				PRODUCT_NAME = SarakWatch;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
@@ -457,6 +618,15 @@
 			buildConfigurations = (
 				A56D9FF7B5E0A5BD7E127EBC /* Debug */,
 				1389C0470B97F2117BF64C3B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F3CB8EF95A719B1124EA7EAC /* Build configuration list for PBXNativeTarget "SarakWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D4172B137F884FF69B43196E /* Debug */,
+				F85995DC3F491A0BC42CD0D8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

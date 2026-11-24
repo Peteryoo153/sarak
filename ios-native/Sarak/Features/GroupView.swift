@@ -22,7 +22,7 @@ struct GroupView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        Group {
             ScrollView {
                 VStack(spacing: 14) {
                     header
@@ -63,7 +63,7 @@ struct GroupView: View {
             Spacer()
             if let g = selected, session.isSignedIn {
                 Button { inviteGroup = g } label: {
-                    Label("초대", systemImage: "person.badge.plus").font(.system(size: 13, weight: .bold))
+                    Label("초대", systemImage: "person.badge.plus").font(.system(size: 13, weight: .semibold))
                         .padding(.horizontal, 14).frame(height: 36)
                         .foregroundStyle(SarakColor.ink)
                         .background(SarakColor.raised, in: Capsule()).overlay(Capsule().stroke(SarakColor.line))
@@ -97,7 +97,7 @@ struct GroupView: View {
                     Button { showCreate = true } label: { Label("새 그룹 만들기", systemImage: "plus") }
                     Button { showJoin = true } label: { Label("초대코드로 참여", systemImage: "ticket") }
                 } label: {
-                    Image(systemName: "plus").font(.system(size: 14, weight: .bold)).foregroundStyle(SarakColor.inkMuted)
+                    Image(systemName: "plus").font(.system(size: 14, weight: .semibold)).foregroundStyle(SarakColor.inkMuted)
                         .frame(width: 36, height: 36)
                         .overlay(Circle().strokeBorder(SarakColor.inkFaint, style: StrokeStyle(lineWidth: 1, dash: [3])))
                 }
@@ -111,7 +111,7 @@ struct GroupView: View {
             if a.uid == session.uid { return true }
             if b.uid == session.uid { return false }
             if a.completedToday != b.completedToday { return a.completedToday }
-            return a.currentDay > b.currentDay
+            return a.name < b.name   // 순위를 매기지 않습니다
         }
         let done = members.filter(\.completedToday).count
         let total = max(members.count, 1)
@@ -121,18 +121,18 @@ struct GroupView: View {
         HeroCard {
             HStack(spacing: 18) {
                 ZStack {
-                    Circle().stroke(Color.white.opacity(0.14), lineWidth: 9)
+                    Circle().stroke(Ink.ink.opacity(0.12), lineWidth: 5)
                     Circle().trim(from: 0, to: Double(done) / Double(total))
-                        .stroke(SarakColor.mint, style: StrokeStyle(lineWidth: 9, lineCap: .round)).rotationEffect(.degrees(-90))
-                    Text("\(done)/\(members.count)").font(.system(size: 20, weight: .heavy))
+                        .stroke(Ink.primary, style: StrokeStyle(lineWidth: 5, lineCap: .round)).rotationEffect(.degrees(-90))
+                    Text("\(done)/\(members.count)").font(.system(size: 20, weight: .semibold))
                 }
                 .frame(width: 84, height: 84)
                 .accessibilityElement().accessibilityLabel("\(members.count)명 중 \(done)명 완료")
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("오늘 함께 읽은 사람").font(.system(size: 13)).foregroundStyle(SarakColor.onIndigoMuted)
-                    Text(done == 0 ? "첫 번째로 읽어볼까요?" : "\(done)명이 읽었어요").font(.system(size: 20, weight: .heavy))
+                    Text("오늘 함께 읽은 사람").font(.system(size: 13)).foregroundStyle(Ink.sub)
+                    Text(done == 0 ? "첫 번째로 읽어볼까요?" : "\(done)명이 읽었어요").font(.system(size: 20, weight: .semibold))
                     if g.hasSchedule {
-                        Text("\(g.rangeName) · Day \(g.todayDay)").font(.system(size: 12, weight: .bold)).foregroundStyle(SarakColor.mint)
+                        Text("\(g.rangeName) · Day \(g.todayDay)").font(.system(size: 12, weight: .semibold)).foregroundStyle(Ink.ink)
                     }
                 }
             }
@@ -160,7 +160,7 @@ struct GroupView: View {
     private func planCard(_ g: SarakGroup, isCreator: Bool, isActive: Bool) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("그룹 플랜").font(.system(size: 17, weight: .bold)).foregroundStyle(SarakColor.ink)
+                Text("그룹 플랜").font(.system(size: 17, weight: .semibold)).foregroundStyle(SarakColor.ink)
                 Spacer()
                 if isCreator && g.hasSchedule { Button("수정") { editGroup = g }.font(.system(size: 14, weight: .semibold)).foregroundStyle(SarakColor.mintInk) }
             }
@@ -168,7 +168,7 @@ struct GroupView: View {
                 Text("\(g.rangeName) · 총 \(g.totalDays)일 · 하루 약 \(g.minutesPerDay)분").font(.system(size: 14)).foregroundStyle(SarakColor.inkMuted)
                 if isActive {
                     Label("지금 이 플랜으로 읽는 중", systemImage: "checkmark.circle.fill")
-                        .font(.system(size: 13, weight: .bold)).foregroundStyle(SarakColor.mintInk)
+                        .font(.system(size: 13, weight: .semibold)).foregroundStyle(SarakColor.mintInk)
                         .padding(.horizontal, 12).frame(height: 32).background(SarakColor.mintSoft, in: Capsule())
                 } else {
                     Button { activate(g) } label: { Label("이 플랜으로 함께 읽기", systemImage: "book.pages") }.buttonStyle(PrimaryButtonStyle())
@@ -189,14 +189,14 @@ struct GroupView: View {
         let me = m.uid == session.uid
         let isBlocked = blocked.contains(m.uid)
         let status: String = {
-            if m.completedToday { return "Day \(m.currentDay) · 오늘 읽음" }
+            if m.completedToday { return "오늘 불을 켰어요" }
             let gap = group.todayDay - m.currentDay
-            return gap > 1 ? "Day \(m.currentDay) · 이어서 읽는 중" : "Day \(m.currentDay) · 아직 안 읽음"
+            return gap > 1 ? "이어서 읽는 중" : "아직 조용해요"
         }()
         return HStack(spacing: 12) {
             AvatarView(name: m.name, index: index)
             VStack(alignment: .leading, spacing: 2) {
-                Text(me ? "나 · \(m.name)" : m.name).font(.system(size: 15, weight: .bold)).foregroundStyle(SarakColor.ink)
+                Text(me ? "나 · \(m.name)" : m.name).font(.system(size: 15, weight: .semibold)).foregroundStyle(SarakColor.ink)
                 if isBlocked {
                     Text("숨긴 멤버").font(.system(size: 13)).foregroundStyle(SarakColor.inkFaint)
                 } else if let c = m.todayComment, !c.isEmpty, m.completedToday {
@@ -207,15 +207,15 @@ struct GroupView: View {
             }
             Spacer(minLength: 8)
             if m.completedToday {
-                Text("완료").font(.system(size: 12, weight: .bold)).foregroundStyle(SarakColor.mintInk)
+                Text("완료").font(.system(size: 12, weight: .semibold)).foregroundStyle(SarakColor.mintInk)
                     .padding(.horizontal, 10).frame(height: 26).background(SarakColor.mintSoft, in: Capsule())
             } else if !me && !isBlocked {
                 if cheered.contains("\(group.id)-\(m.uid)") {
-                    Text("응원 보냄").font(.system(size: 12, weight: .bold)).foregroundStyle(SarakColor.inkMuted)
+                    Text("응원 보냄").font(.system(size: 12, weight: .semibold)).foregroundStyle(SarakColor.inkMuted)
                         .padding(.horizontal, 12).frame(height: 32).background(SarakColor.sunken, in: Capsule())
                 } else {
                     Button { cheer(m, group) } label: {
-                        Label("응원하기", systemImage: "hands.clap").font(.system(size: 12, weight: .bold))
+                        Label("응원하기", systemImage: "hands.clap").font(.system(size: 12, weight: .semibold))
                             .padding(.horizontal, 12).frame(height: 32)
                             .foregroundStyle(SarakColor.primaryFill)
                             .overlay(Capsule().stroke(SarakColor.primaryFill))
@@ -396,7 +396,7 @@ struct JoinGroupSheet: View {
             VStack(alignment: .leading, spacing: 18) {
                 Text("받은 초대코드 6자리를 입력하세요.").font(.system(size: 15)).foregroundStyle(SarakColor.inkMuted)
                 TextField("ABC123", text: $code)
-                    .font(.system(size: 30, weight: .heavy)).tracking(8)
+                    .font(.system(size: 30, weight: .semibold)).tracking(8)
                     .multilineTextAlignment(.center)
                     .textInputAutocapitalization(.characters).autocorrectionDisabled()
                     .focused($focused)
@@ -475,14 +475,14 @@ struct InviteSheet: View {
                     if mode == 0 {
                         VStack(spacing: 12) {
                             Text("\(group.name) · 초대코드").font(.system(size: 13, weight: .semibold)).foregroundStyle(SarakColor.inkMuted)
-                            Text(group.inviteCode).font(.system(size: 36, weight: .heavy)).tracking(6).foregroundStyle(SarakColor.primaryFill)
+                            Text(group.inviteCode).font(.system(size: 36, weight: .semibold)).tracking(6).foregroundStyle(SarakColor.primaryFill)
                                 .textSelection(.enabled)
                             Button {
                                 UIPasteboard.general.string = group.inviteCode
                                 copied = true
                             } label: {
                                 Label(copied ? "복사했어요" : "코드 복사", systemImage: copied ? "checkmark" : "doc.on.doc")
-                                    .font(.system(size: 13, weight: .bold)).padding(.horizontal, 14).frame(height: 36)
+                                    .font(.system(size: 13, weight: .semibold)).padding(.horizontal, 14).frame(height: 36)
                                     .foregroundStyle(SarakColor.ink)
                                     .background(SarakColor.raised, in: Capsule()).overlay(Capsule().stroke(SarakColor.line))
                             }
@@ -492,19 +492,19 @@ struct InviteSheet: View {
                     }
 
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("이렇게 보내져요").font(.system(size: 13, weight: .bold)).foregroundStyle(SarakColor.ink)
+                        Text("이렇게 보내져요").font(.system(size: 13, weight: .semibold)).foregroundStyle(SarakColor.ink)
                         VStack(alignment: .leading, spacing: 0) {
                             HStack(spacing: 12) {
-                                Image("Logo").resizable().scaledToFit().frame(width: 22, height: 32)
+                                HourChip(hour: .now)
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(mode == 0 ? "\(session.displayName)님이 함께 읽자고 초대했어요" : "오늘 말씀 같이 읽어요")
-                                        .font(.system(size: 15, weight: .heavy)).foregroundStyle(.white)
+                                        .font(.system(size: 15, weight: .semibold)).foregroundStyle(Ink.ink)
                                     Text(mode == 0 ? "\(group.name) · \(group.memberUids.count)명이 읽는 중" : (store.plan?.day(store.currentDay) ?? today)?.displayRange ?? "")
-                                        .font(.system(size: 12)).foregroundStyle(SarakColor.onIndigoMuted)
+                                        .font(.system(size: 12)).foregroundStyle(Ink.sub)
                                 }
                             }
                             .padding(16).frame(maxWidth: .infinity, alignment: .leading)
-                            .background(SarakColor.indigo)
+                            .background(SarakHour.now.page)
                             Text(message).font(.system(size: 13)).foregroundStyle(SarakColor.inkMuted)
                                 .padding(16).frame(maxWidth: .infinity, alignment: .leading)
                         }
@@ -564,7 +564,7 @@ struct LoginPrompt: View {
                 Task { do { try await session.signInWithGoogle() } catch { self.error = error.localizedDescription } }
             } label: {
                 HStack(spacing: 8) {
-                    Text("G").font(.system(size: 18, weight: .heavy)).foregroundStyle(Color(hex: 0x4285F4))
+                    Text("G").font(.system(size: 18, weight: .semibold)).foregroundStyle(Color(hex: 0x4285F4))
                     Text("Google로 로그인")
                 }
             }

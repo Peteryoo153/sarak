@@ -21,33 +21,21 @@ extension Color {
     init(hex: UInt32) { self.init(uiColor: UIColor(hex: hex)) }
 }
 
+/// 예전 이름을 쓰는 화면도 새 디자인의 색을 쓰도록 잇습니다. 새 화면은 Ink / SarakHour를 직접 씁니다.
 enum SarakColor {
-    static let indigo = Color(hex: 0x1A166E)
-    static let indigoDeep = Color(light: 0x110E4A, dark: 0x0C0A36)
-    /// 히어로 카드 바탕. 다크 모드에서도 브랜드 인디고를 유지하되 살짝 밝게.
-    static let hero = Color(light: 0x1A166E, dark: 0x221D86)
-    static let mint = Color(hex: 0x6EE7B7)
-    static let mintInk = Color(light: 0x0E7A55, dark: 0x6EE7B7)
-    static let mintSoft = Color(light: 0xDDF7EB, dark: 0x123B32)
-    static let surface = Color(light: 0xF7F6F1, dark: 0x121124)
-    static let raised = Color(light: 0xFFFFFF, dark: 0x1C1B33)
-    static let sunken = Color(light: 0xEFEDE6, dark: 0x0B0A1A)
-    static let ink = Color(light: 0x17153B, dark: 0xEEEDF7)
-    static let inkMuted = Color(light: 0x5E5C7A, dark: 0xA9A7C4)
-    static let inkFaint = Color(light: 0x8F8DA8, dark: 0x77759A)
-    static let onIndigo = Color.white
-    static let onIndigoMuted = Color(hex: 0xB9B6E6)
-    static let line = Color(light: 0xE3E1EA, dark: 0x2C2A48)
-    static let danger = Color(light: 0xC0392B, dark: 0xFF8A7A)
-    static let streak = Color(light: 0xC26A12, dark: 0xF5B266)
-    /// 인디고 배경 위 버튼(주요 버튼) — 다크 모드에서는 민트로 반전
-    static let primaryFill = Color(light: 0x1A166E, dark: 0x6EE7B7)
-    static let onPrimary = Color(light: 0xFFFFFF, dark: 0x1A166E)
-
-    static let avatar: [Color] = [
-        Color(hex: 0x1A166E), Color(hex: 0x0E7A55), Color(hex: 0xC26A12), Color(hex: 0x5E5C7A),
-        Color(hex: 0x2E6BE6), Color(hex: 0xA23B72), Color(hex: 0x3F7F8C), Color(hex: 0x7A5C2E),
-    ]
+    static let mintInk = Ink.sub
+    static let mintSoft = SarakHour.morning.page
+    static let surface = Ink.canvas
+    static let raised = Ink.raised
+    static let sunken = Color(light: 0xF5F0ED, dark: 0x171312)
+    static let ink = Ink.ink
+    static let inkMuted = Ink.sub
+    static let inkFaint = Ink.control
+    static let line = Ink.line
+    static let danger = Ink.danger
+    static let primaryFill = Ink.primary
+    static let onPrimary = Ink.onPrimary
+    static let avatar: [Color] = SarakHour.allCases.map(\.page)
 }
 
 // MARK: - Type
@@ -56,9 +44,9 @@ enum SarakFont {
     static func serif(_ size: CGFloat, bold: Bool = false) -> Font {
         .custom(bold ? "GowunBatang-Bold" : "GowunBatang-Regular", size: size)
     }
-    static let display = Font.system(size: 34, weight: .heavy)
-    static let title1 = Font.system(size: 26, weight: .heavy)
-    static let title2 = Font.system(size: 20, weight: .bold)
+    static let display = Font.system(size: 34, weight: .semibold)
+    static let title1 = Font.system(size: 26, weight: .semibold)
+    static let title2 = Font.system(size: 20, weight: .semibold)
     static let headline = Font.system(size: 17, weight: .semibold)
     static let body = Font.system(size: 16)
     static let callout = Font.system(size: 15, weight: .medium)
@@ -102,10 +90,10 @@ struct PrimaryButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: 16, weight: .heavy))
+            .font(.system(size: 16, weight: .semibold))
             .frame(maxWidth: .infinity, minHeight: 56)
             .foregroundStyle(foreground)
-            .background(fill.opacity(isEnabled ? 1 : 0.4), in: RoundedRectangle(cornerRadius: Radius.md, style: .continuous))
+            .background(fill.opacity(isEnabled ? 1 : 0.4), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
             .opacity(configuration.isPressed ? 0.85 : 1)
             .scaleEffect(configuration.isPressed ? 0.98 : 1)
             .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
@@ -115,7 +103,7 @@ struct PrimaryButtonStyle: ButtonStyle {
 struct SecondaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: 15, weight: .bold))
+            .font(.system(size: 15, weight: .semibold))
             .frame(maxWidth: .infinity, minHeight: 52)
             .foregroundStyle(SarakColor.ink)
             .background(SarakColor.raised, in: RoundedRectangle(cornerRadius: Radius.md, style: .continuous))
@@ -147,11 +135,9 @@ struct CardModifier: ViewModifier {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(SarakColor.raised, in: RoundedRectangle(cornerRadius: Radius.lg, style: .continuous))
             .overlay {
-                if scheme == .dark {
-                    RoundedRectangle(cornerRadius: Radius.lg, style: .continuous).stroke(SarakColor.line)
-                }
+                RoundedRectangle(cornerRadius: Radius.lg, style: .continuous).stroke(SarakColor.line)
             }
-            .shadow(color: scheme == .dark ? .clear : Color(hex: 0x17153B).opacity(0.06), radius: 12, y: 6)
+            
     }
 }
 
@@ -163,47 +149,10 @@ struct HeroCard<Content: View>: View {
     @ViewBuilder var content: Content
     var body: some View {
         content
-            .padding(24)
+            .padding(24).padding(.bottom, 20)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .foregroundStyle(SarakColor.onIndigo)
-            .background {
-                ZStack(alignment: .topTrailing) {
-                    SarakColor.hero
-                    PageStrokes()
-                        .stroke(SarakColor.mint.opacity(0.22), style: StrokeStyle(lineWidth: 2, lineCap: .round))
-                        .frame(width: 180, height: 180)
-                        .offset(x: 36, y: -28)
-                }
-            }
-            .clipShape(RoundedRectangle(cornerRadius: Radius.lg, style: .continuous))
-    }
-}
-
-/// 로고의 책장 선을 본뜬 장식 패턴
-struct PageStrokes: Shape {
-    func path(in rect: CGRect) -> Path {
-        let s = rect.width / 180
-        var p = Path()
-        let lines: [(CGFloat, CGFloat, CGFloat, CGFloat)] = [(40, 10, 110, 146), (56, 22, 104, 136), (72, 34, 98, 124)]
-        for (x, top, bend, endY) in lines {
-            p.move(to: CGPoint(x: x * s, y: top * s))
-            p.addLine(to: CGPoint(x: x * s, y: bend * s))
-            p.addQuadCurve(to: CGPoint(x: (x + 24) * s, y: endY * s), control: CGPoint(x: x * s, y: (bend + 24) * s))
-            p.addLine(to: CGPoint(x: 172 * s, y: (endY + 24) * s))
-        }
-        return p
-    }
-}
-
-struct DayBadge: View {
-    let text: String
-    var onIndigo = true
-    var body: some View {
-        Text(text)
-            .font(.system(size: 12, weight: .bold))
-            .foregroundStyle(onIndigo ? SarakColor.mint : SarakColor.mintInk)
-            .padding(.horizontal, 10).padding(.vertical, 5)
-            .background(onIndigo ? SarakColor.mint.opacity(0.15) : SarakColor.mintSoft, in: Capsule())
+            .foregroundStyle(Ink.ink)
+            .background { SarakPage(hour: .now, lift: 44) }
     }
 }
 
@@ -213,8 +162,8 @@ struct AvatarView: View {
     var size: CGFloat = 40
     var body: some View {
         Text(Self.initials(name))
-            .font(.system(size: size * 0.33, weight: .bold))
-            .foregroundStyle(.white)
+            .font(.system(size: size * 0.33, weight: .semibold))
+            .foregroundStyle(Ink.ink)
             .frame(width: size, height: size)
             .background(SarakColor.avatar[abs(index) % SarakColor.avatar.count], in: Circle())
     }
@@ -232,7 +181,7 @@ struct AvatarView: View {
 struct SectionHeader: View {
     let title: String
     var body: some View {
-        Text(title).font(.system(size: 13, weight: .bold)).foregroundStyle(SarakColor.inkMuted)
+        Text(title).font(.system(size: 13, weight: .semibold)).foregroundStyle(SarakColor.inkMuted)
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
