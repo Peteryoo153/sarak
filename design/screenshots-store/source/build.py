@@ -13,7 +13,7 @@ def canvas(id,w,h,t,head,sub,body,fs,pad,top,c):
     out.append(f'<section id="{id}" style="width:{w}px;height:{h}px">{curve(w,h,c,t)}<h1 style="left:{pad}px;top:{top}px;font-size:{fs}px;color:{ink}">{head}<small style="color:{s2};font-size:{fs*.36:.0f}px">{sub}</small></h1>{body}</section>')
 def phone(id,t,head,sub,src): canvas(id,1320,2868,t,head,sub,shot('iPhone/'+src,1010,141,870,130,14),128,120,190,700)
 phone('iPhone-1','n','오늘의 말씀이<br>찾아옵니다','아침을 여는 한 구절','ph-room-morning.png')
-xs=[('ph-room-morning.png',110,640),('ph-room-noon.png',680,760),('ph-room-rest.png',110,1860),('ph-room-night.png',680,1980)]
+xs=[('ph-room-morning.png',110,730),('ph-room-noon.png',680,850),('ph-room-rest.png',110,1940),('ph-room-night.png',680,2060)]
 canvas('iPhone-2',1320,2868,'l','하루 네 번,<br>사락','아침 · 한낮 · 쉼 · 밤',''.join(shot('iPhone/'+a,512,x,y,66,9) for a,x,y in xs),128,120,190,700)
 phone('iPhone-3','r','하루 5분,<br>마가복음 한 권','25일이면 끝까지 읽어요','ph-read-morning.png')
 phone('iPhone-4','l','마음에 머문 말씀을<br>품어 두세요','받은 때의 색이 책갈피가 됩니다','ph-keep-morning.png')
