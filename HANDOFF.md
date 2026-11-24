@@ -32,7 +32,7 @@ cd ios-native && xcodegen generate && open Sarak.xcodeproj
 | `Sarak/Features/RoomView.swift`, `BibleView.swift`, `KeepView.swift` | 골방, 성경(찾기 포함), 말씀첩과 달력 |
 | `Sarak/Core/Theme.swift` | 예전 화면의 색을 새 색으로 연결 |
 | `SarakWatch/`, `Sarak/Core/PhoneLink.swift` | 애플워치 앱 |
-| `project.yml`, `Info.plist` | 3.0.0 (12), 워치 타깃, 전체 화면 고정 해제(듀오·아이패드 분할), 아이폰 가로 허용 |
+| `project.yml`, `Info.plist` | 3.0.0 (13), 워치 타깃, 전체 화면 고정 해제(듀오·아이패드 분할), 아이폰 가로 허용 |
 
 기존 사용자의 통독 플랜·진도·북마크·그룹은 유지합니다. 플랜이 있으면 골방에서 그 플랜의 오늘 본문을 펼칩니다. 홈·달력 화면은 새 구조로 대체해 삭제했고, 연속 기록과 순위 표시는 없앴습니다. 서버에 올리는 연속 일수 값은 1.x 호환을 위해 그대로 보냅니다.
 
@@ -67,7 +67,7 @@ cd ios-native && xcodegen generate && open Sarak.xcodeproj
 5. [ ] **말씀 감수**: `content/마가복음-25일-감수표.md`가 아직 '초안 · 감수 전'
 6. [ ] **역본 사용 허락**: 개역개정은 대한성서공회 확인 필요
 7. [ ] **Firestore 규칙·인덱스·호스팅 배포**: `ios-native/README.md`의 출시 전 할 일
-8. [x] **빌드 12 업로드**, App Store Connect에 3.0.0 생성·빌드 연결. 심사 제출은 안 함
+8. [x] **빌드 12 업로드**(이후 골방 아이콘을 넣은 빌드 13으로 교체 예정), App Store Connect에 3.0.0 생성·빌드 연결. 심사 제출은 안 함
 9. [x] 스크린샷 23장·설명·업그레이드 문구·심사 메모 등록. [ ] TestFlight 실기기 확인, 연령 등급 질문, 감수·역본 허락 뒤 직접 심사 제출
 
 ### 시안에는 있고 앱에는 아직 없는 것
