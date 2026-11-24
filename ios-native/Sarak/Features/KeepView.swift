@@ -20,13 +20,13 @@ struct KeepView: View {
                     }
                 } else { list.frame(maxWidth: 760).frame(maxWidth: .infinity) }
             }
-            .background(Ink.canvas).navigationTitle("말씀첩")
+            .background(Ink.canvas).toolbar(.hidden, for: .navigationBar)
         }
         .tint(Ink.ink)
         .onAppear {
             store.reload(); path.reload()
             #if DEBUG
-            if Demo.screen == "calendar" { tab = .calendar }
+            if Demo.screen == "calendar" { tab = .calendar } else if Demo.screen == "notes" { tab = .notes }
             #endif
         }
         .sheet(item: $share) { s in ShareCardSheet(verses: s.verses, bookName: s.bookName, note: nil, dayNumber: nil) }
@@ -35,22 +35,26 @@ struct KeepView: View {
     private var list: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
+                ScreenTitle("말씀첩")
                 HStack(spacing: 24) {
                     ForEach(Tab.allCases, id: \.self) { t in
                         Button { tab = t } label: {
-                            Text(t.rawValue).font(tab == t ? .callout.weight(.semibold) : .callout).foregroundStyle(tab == t ? Ink.ink : Ink.sub)
+                            Text(t.rawValue).font(tab == t ? .subheadline.weight(.semibold) : .subheadline).foregroundStyle(tab == t ? Ink.ink : Ink.sub)
                                 .frame(minHeight: 44).overlay(alignment: .bottom) { if tab == t { Rectangle().fill(Ink.ink).frame(height: 2) } }
                         }
                         .accessibilityAddTraits(tab == t ? .isSelected : [])
                     }
                 }
-                .padding(.bottom, 12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .overlay(alignment: .bottom) { Rectangle().fill(Ink.line).frame(height: 1).zIndex(-1) }
+                .padding(.bottom, 8)
                 switch tab {
                 case .kept: kept
                 case .notes: notes
                 case .calendar: ReadCalendar(dates: readDates)
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 24).padding(.bottom, 24)
         }
     }
@@ -87,11 +91,11 @@ struct KeepView: View {
 
     private func row(hour: SarakHour, _ text: String, _ ref: String) -> some View {
         VStack(spacing: 0) {
-            HStack(alignment: .top, spacing: 18) {
-                Ribbon().fill(hour.page).frame(width: 16, height: 46).overlay(Ribbon().stroke(Ink.ink.opacity(0.12), lineWidth: 0.5)).accessibilityHidden(true)
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(text).font(SarakFont.serif(20)).foregroundStyle(Ink.ink).fixedSize(horizontal: false, vertical: true).multilineTextAlignment(.leading)
-                    Text(ref).font(.subheadline).foregroundStyle(Ink.sub)
+            HStack(alignment: .top, spacing: 14) {
+                Ribbon().fill(hour.ribbon).frame(width: 12, height: 22).overlay(Ribbon().stroke(Ink.ink.opacity(0.12), lineWidth: 0.5)).padding(.top, 4).accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(text).font(SarakFont.serif(19)).foregroundStyle(Ink.ink).fixedSize(horizontal: false, vertical: true).multilineTextAlignment(.leading)
+                    Text(ref).font(.footnote).foregroundStyle(Ink.sub)
                 }
                 Spacer(minLength: 0)
             }
@@ -102,9 +106,9 @@ struct KeepView: View {
     }
     private func empty(_ t: String, _ s: String) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(t).font(SarakFont.serif(24)).foregroundStyle(Ink.ink)
+            Text(t).font(SarakFont.serif(22)).foregroundStyle(Ink.ink)
             Text(s).font(.subheadline).foregroundStyle(Ink.sub)
-        }.padding(.top, 120)
+        }.frame(maxWidth: .infinity, alignment: .leading).padding(.top, 48)
     }
     @ViewBuilder private var detail: some View {
         if let b = picked ?? store.bookmarks.first {
@@ -120,7 +124,7 @@ struct Ribbon: Shape {
     func path(in r: CGRect) -> Path {
         var p = Path()
         p.move(to: r.origin); p.addLine(to: CGPoint(x: r.maxX, y: r.minY)); p.addLine(to: CGPoint(x: r.maxX, y: r.maxY))
-        p.addLine(to: CGPoint(x: r.midX, y: r.maxY - r.height * 0.18)); p.addLine(to: CGPoint(x: r.minX, y: r.maxY)); p.closeSubpath()
+        p.addLine(to: CGPoint(x: r.midX, y: r.maxY - r.width * 0.5)); p.addLine(to: CGPoint(x: r.minX, y: r.maxY)); p.closeSubpath()
         return p
     }
 }
@@ -136,7 +140,7 @@ struct ReadCalendar: View {
         let lead = (cal.component(.weekday, from: month) + 5) % 7
         VStack(alignment: .leading, spacing: 14) {
             HStack {
-                Text(verbatim: "\(c.year!)년 \(c.month!)월").font(.headline)
+                Text(verbatim: "\(c.year!)년 \(c.month!)월").font(SarakFont.serif(20))
                 Spacer()
                 Button { shift(-1) } label: { Image(systemName: "chevron.left").frame(width: 44, height: 44) }.accessibilityLabel("이전 달")
                 Button { shift(1) } label: { Image(systemName: "chevron.right").frame(width: 44, height: 44) }.accessibilityLabel("다음 달")

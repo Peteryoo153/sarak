@@ -28,7 +28,7 @@ cd ios-native && xcodegen generate && open Sarak.xcodeproj
 | `Sarak/Core/SarakDesign.swift` | 색, 종이, 말씀 글자, 버튼, 골방 배치(한 장 / 펼친 책), 워치 화면 |
 | `Sarak/Core/WordPath.swift`, `PathStore.swift`, `Resources/mark-25.json` | 마가복음 25일 말씀길과 진도 |
 | `Sarak/Core/WordAlerts.swift`, `Features/WordAlertsView.swift` | 하루 네 번 알림, 첫 실행, 알림 설정 |
-| `Sarak/Core/Reading.swift`, `Features/ReadingView.swift` | 본문 읽기, 절 선택, 듣기, 마침 |
+| `Sarak/Core/Reading.swift`, `Features/ReadingView.swift` | 본문 읽기, 절 선택, 마침 |
 | `Sarak/Features/RoomView.swift`, `BibleView.swift`, `KeepView.swift` | 골방, 성경(찾기 포함), 말씀첩과 달력 |
 | `Sarak/Core/Theme.swift` | 예전 화면의 색을 새 색으로 연결 |
 | `SarakWatch/`, `Sarak/Core/PhoneLink.swift` | 애플워치 앱 |
@@ -71,4 +71,4 @@ cd ios-native && xcodegen generate && open Sarak.xcodeproj
 9. [x] 스크린샷 23장·설명·업그레이드 문구·심사 메모 등록. [ ] TestFlight 실기기 확인, 연령 등급 질문, 감수·역본 허락 뒤 직접 심사 제출
 
 ### 시안에는 있고 앱에는 아직 없는 것
-위젯, 펼친 알림의 종이 화면, 워치 컴플리케이션과 스마트 스택, '5분 더'와 10분 읽기(구약 본문 자료 없음), 사락 소리 파일, 시간 추가·요일 선택, 듀오 반쯤 접힘 듣기, 말씀첩의 '받은 말씀'
+위젯, 펼친 알림의 종이 화면, 워치 컴플리케이션과 스마트 스택, '5분 더'와 10분 읽기(구약 본문 자료 없음), 사락 소리 파일, 시간 추가·요일 선택, 말씀첩의 '받은 말씀'

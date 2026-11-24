@@ -52,7 +52,7 @@ struct WordAlertsView: View {
             }
         }
         .tint(Ink.primary).scrollContentBackground(.hidden).background(Ink.canvas)
-        .navigationTitle("알림")
+        .navigationTitle("말씀 알림").navigationBarTitleDisplayMode(.inline)
         .onChange(of: s) { _, v in
             WordAlerts.save(v)
             Task { await WordAlerts.reschedule(v, from: path.readToday ? max(path.nextDay - 1, 1) : path.nextDay, readToday: path.readToday) }

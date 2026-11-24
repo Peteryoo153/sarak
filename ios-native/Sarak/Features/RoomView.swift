@@ -13,17 +13,15 @@ struct RoomView: View {
     @State private var showSettings = false
     @State private var showDone = false
 
-    /// 통독 플랜을 쓰던 분은 그 플랜을, 아니면 말씀길을 읽습니다.
     private var reading: Reading {
-        if let plan = store.plan, !store.isFinished, let d = plan.day(store.currentDay) { return .plan(d) }
-        return .path(path.today)
+        .today(store, path)
     }
     private var readToday: Bool { store.plan != nil && !store.isFinished ? store.readToday : path.readToday }
 
     var body: some View {
         let a = path.today.alert(hour)
         NavigationStack {
-            RoomScreen(hour: hour, greeting: path.isBack ? "책갈피는 그 자리에 있어요" : hour.greeting, date: Date().koreanFullDate,
+            RoomScreen(hour: hour, date: Date().koreanFullDate, label: hour.alertTitle,
                        verse: a.text.versed(12), source: a.reference) {
                 HStack(spacing: 0) {
                     tool("person.2", "함께") { showGroup = true }
@@ -31,12 +29,12 @@ struct RoomView: View {
                 }
                 .padding(.trailing, -12)
             } action: {
+                todayReading
                 Button(buttonTitle) { openReading() }.buttonStyle(SarakButtonStyle())
-                Text(caption).font(.footnote).foregroundStyle(Ink.sub).multilineTextAlignment(.center)
             } reading: {
                 if let model {
                     VStack(spacing: 8) {
-                        HStack { Text(model.reading.title).font(.headline).foregroundStyle(Ink.ink); Spacer(); ReaderTools(model: model) }
+                        HStack { Text(model.reading.title).font(.headline).foregroundStyle(Ink.ink); Spacer(); ReaderTools() }
                             .padding(.top, 12)
                         PassageBody(model: model) { showDone = true }
                     }
@@ -65,17 +63,19 @@ struct RoomView: View {
         #endif
     }
 
-    private var buttonTitle: String {
-        if readToday { return "오늘의 본문 다시 펼치기" }
-        if path.isBack { return "이어서 펼치기" }
-        return "오늘의 본문 \(reading.minutes ?? 5)분쯤 읽기"
+    /// 무엇을, 얼마나 읽는지 먼저 보여 주고 버튼에는 할 일만 적습니다.
+    private var todayReading: some View {
+        HStack(alignment: .lastTextBaseline) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(readToday ? "오늘 읽은 본문" : path.isBack ? "이어서 읽을 본문" : "오늘 읽을 본문").font(.subheadline).foregroundStyle(Ink.sub)
+                Text(reading.title).font(.custom("GowunBatang-Regular", size: 22, relativeTo: .title2)).foregroundStyle(Ink.ink)
+            }
+            Spacer(minLength: 12)
+            if let m = reading.minutes { Text("약 \(m)분").font(.subheadline).foregroundStyle(Ink.sub) }
+        }
+        .accessibilityElement(children: .combine)
     }
-    private var caption: String {
-        if readToday { return "오늘의 종이는 이미 넘겼어요." }
-        if case .plan = reading.kind { return reading.title }
-        if path.isBack { return "오늘 5분부터 다시 펼쳐요." }
-        return "하루 5분, 25일이면 마가복음 한 권."
-    }
+    private var buttonTitle: String { readToday ? "다시 읽기" : path.isBack ? "이어서 읽기" : "본문 읽기" }
     private func tool(_ icon: String, _ label: String, _ f: @escaping () -> Void) -> some View {
         Button(action: f) { Image(systemName: icon).font(.system(size: 18)).foregroundStyle(Ink.ink).frame(width: 44, height: 44) }.accessibilityLabel(label)
     }

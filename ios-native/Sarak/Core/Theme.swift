@@ -54,6 +54,27 @@ enum SarakFont {
     static let micro = Font.system(size: 11, weight: .semibold)
 }
 
+/// 탭 첫 화면의 제목. 내용과 같은 왼쪽 여백(24)에 놓습니다.
+struct ScreenTitle: View {
+    let text: String
+    init(_ text: String) { self.text = text }
+    var body: some View {
+        Text(text).font(.custom("GowunBatang-Regular", size: 30, relativeTo: .largeTitle)).foregroundStyle(Ink.ink)
+            .frame(maxWidth: .infinity, alignment: .leading).padding(.top, 20).padding(.bottom, 12)
+            .accessibilityAddTraits(.isHeader)
+    }
+}
+
+/// 위쪽 막대의 가운데 제목도 같은 글꼴로 맞춥니다.
+enum SarakBar {
+    static func apply() {
+        let font = UIFont(name: "GowunBatang-Bold", size: 18) ?? .systemFont(ofSize: 17, weight: .medium)
+        UINavigationBar.appearance().titleTextAttributes = [.font: font, .foregroundColor: UIColor(Ink.ink)]
+        let large = UIFont(name: "GowunBatang-Regular", size: 30) ?? .systemFont(ofSize: 30)
+        UINavigationBar.appearance().largeTitleTextAttributes = [.font: large, .foregroundColor: UIColor(Ink.ink)]
+    }
+}
+
 enum Radius {
     static let sm: CGFloat = 10
     static let md: CGFloat = 16
@@ -90,10 +111,10 @@ struct PrimaryButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: 16, weight: .semibold))
-            .frame(maxWidth: .infinity, minHeight: 56)
+            .font(.body.weight(.medium))
+            .frame(maxWidth: .infinity, minHeight: 54)
             .foregroundStyle(foreground)
-            .background(fill.opacity(isEnabled ? 1 : 0.4), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+            .background(fill.opacity(isEnabled ? 1 : 0.4), in: RoundedRectangle(cornerRadius: 27, style: .continuous))
             .opacity(configuration.isPressed ? 0.85 : 1)
             .scaleEffect(configuration.isPressed ? 0.98 : 1)
             .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
@@ -103,11 +124,11 @@ struct PrimaryButtonStyle: ButtonStyle {
 struct SecondaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: 15, weight: .semibold))
-            .frame(maxWidth: .infinity, minHeight: 52)
+            .font(.body.weight(.medium))
+            .frame(maxWidth: .infinity, minHeight: 54)
             .foregroundStyle(SarakColor.ink)
-            .background(SarakColor.raised, in: RoundedRectangle(cornerRadius: Radius.md, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: Radius.md, style: .continuous).stroke(SarakColor.line))
+            .background(SarakColor.raised, in: RoundedRectangle(cornerRadius: 27, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 27, style: .continuous).strokeBorder(Ink.control))
             .opacity(configuration.isPressed ? 0.7 : 1)
     }
 }

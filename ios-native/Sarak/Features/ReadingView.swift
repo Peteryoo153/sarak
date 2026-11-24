@@ -110,14 +110,10 @@ struct PassageBody: View {
 }
 
 struct ReaderTools: View {
-    @Bindable var model: ReaderModel
     @State private var settings = false
     var body: some View {
         HStack(spacing: 4) {
             Button { settings = true } label: { Text("가").font(SarakFont.serif(19)).frame(minWidth: 44, minHeight: 44) }.accessibilityLabel("글자 설정")
-            Button { model.speech.toggle(model.allText) } label: {
-                Image(systemName: model.speech.speaking ? "pause" : "headphones").frame(minWidth: 44, minHeight: 44)
-            }.accessibilityLabel(model.speech.speaking ? "듣기 멈추기" : "듣기")
         }
         .foregroundStyle(Ink.ink)
         .sheet(isPresented: $settings) { ReadingSettingsSheet().presentationDetents([.medium, .large]) }
@@ -134,8 +130,9 @@ struct ReadingView: View {
                 .background(Ink.canvas)
                 .navigationTitle(model.reading.title).navigationBarTitleDisplayMode(.inline)
                 .toolbar {
-                    ToolbarItem(placement: .topBarLeading) { Button { model.speech.stop(); dismiss() } label: { Image(systemName: "chevron.left") }.accessibilityLabel("닫기") }
-                    ToolbarItem(placement: .topBarTrailing) { ReaderTools(model: model) }
+                    ToolbarItem(placement: .topBarLeading) { Button { dismiss() } label: { Image(systemName: "chevron.left") }.accessibilityLabel("닫기") }
+                    ToolbarItem(placement: .principal) { Text(model.reading.title).font(SarakFont.serif(18, bold: true)).foregroundStyle(Ink.ink).lineLimit(1).minimumScaleFactor(0.7).accessibilityAddTraits(.isHeader) }
+                    ToolbarItem(placement: .topBarTrailing) { ReaderTools() }
                 }
                 .toolbarBackground(Ink.canvas, for: .navigationBar)
                 .fullScreenCover(isPresented: $model.finishing) { DoneView(model: model) { dismiss() } }
@@ -213,7 +210,6 @@ struct DoneView: View {
         case .free: break
         }
         UINotificationFeedbackGenerator().notificationOccurred(.success)
-        model.speech.stop()
         dismiss(); onClose()
     }
 }

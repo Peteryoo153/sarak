@@ -16,7 +16,7 @@ struct MainTabView: View {
         #if DEBUG
         .onAppear {
             if Demo.screen == "bible" { tab = .bible }
-            if ["keep", "calendar"].contains(Demo.screen) { tab = .keep }
+            if ["keep", "empty", "notes", "calendar"].contains(Demo.screen) { tab = .keep }
         }
         #endif
     }

@@ -1,6 +1,5 @@
 import Foundation
 import Observation
-import AVFoundation
 
 /// 한 번에 읽는 본문
 struct Reading: Identifiable, Hashable {
@@ -20,6 +19,11 @@ struct Reading: Identifiable, Hashable {
         let end = f.chapter == t.chapter ? "\(t.verse)" : d.end
         return Reading(title: "마가복음 \(d.start)–\(end)", minutes: Int(d.minutes.rounded()), segments: segs, kind: .path(d.day))
     }
+    /// 통독 플랜을 쓰던 분은 그 플랜을, 아니면 말씀길을 읽습니다.
+    static func today(_ store: PlanStore, _ path: PathStore) -> Reading {
+        if let plan = store.plan, !store.isFinished, let d = plan.day(store.currentDay) { return .plan(d) }
+        return .path(path.today)
+    }
     static func plan(_ d: DayPlan) -> Reading {
         Reading(title: d.displayRange, minutes: d.estimatedMinutes,
                 segments: d.chapters.map { Segment(bookId: $0.bookId, bookName: $0.bookName, chapter: $0.chapter) }, kind: .plan(d))
@@ -38,13 +42,12 @@ final class ReaderModel {
     var selected: Set<String> = []
     var position: Int?
     var finishing = false
-    let speech = Speaker()
 
     init(_ r: Reading) { reading = r; load() }
 
     func show(_ r: Reading) {
         guard r != reading else { return }
-        reading = r; selected = []; position = nil; speech.stop(); load()
+        reading = r; selected = []; position = nil; load()
     }
     private func load() {
         var out: [Block] = []
@@ -59,22 +62,4 @@ final class ReaderModel {
     func toggle(_ id: String) { if selected.remove(id) == nil { selected.insert(id) } }
     var selectedVerses: [Verse] { blocks.flatMap(\.verses).filter { selected.contains($0.id) } }
     func bookName(_ v: Verse) -> String { reading.segments.first { $0.bookId == v.bookId }?.bookName ?? "" }
-    var allText: String { blocks.flatMap(\.verses).map(\.text).joined(separator: " ") }
-}
-
-@Observable
-final class Speaker: NSObject, AVSpeechSynthesizerDelegate {
-    private let synth = AVSpeechSynthesizer()
-    private(set) var speaking = false
-    override init() { super.init(); synth.delegate = self }
-    func toggle(_ text: String) {
-        if speaking { stop(); return }
-        let u = AVSpeechUtterance(string: text)
-        u.voice = AVSpeechSynthesisVoice(language: "ko-KR")
-        u.rate = 0.46
-        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio)
-        synth.speak(u); speaking = true
-    }
-    func stop() { synth.stopSpeaking(at: .immediate); speaking = false }
-    func speechSynthesizer(_ s: AVSpeechSynthesizer, didFinish u: AVSpeechUtterance) { DispatchQueue.main.async { self.speaking = false } }
 }

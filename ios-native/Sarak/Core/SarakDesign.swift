@@ -55,6 +55,15 @@ enum SarakHour: String, CaseIterable, Codable, Identifiable {
         case .night: return .sarak(0xF2EFF6, 0x575164)
         }
     }
+    /// 말씀첩의 책갈피. 어두운 화면에서도 시간의 색이 구별됩니다.
+    var ribbon: Color {
+        switch self {
+        case .morning: return .sarak(0xF3C9B5, 0xC79B87)
+        case .noon: return .sarak(0xE9D596, 0xB5A477)
+        case .rest: return .sarak(0xBFD3BD, 0x8BA58E)
+        case .night: return .sarak(0xC9BFDA, 0x978DB0)
+        }
+    }
     /// 워치의 검은 바탕에 쓰는 밝은 색
     var glow: Color {
         switch self {
@@ -171,8 +180,8 @@ struct HourChip: View {
 #if !os(watchOS)
 struct RoomScreen<Tools: View, Action: View, Reading: View>: View {
     let hour: SarakHour
-    let greeting: String
     let date: String
+    let label: String                          // 이 말씀이 무엇인지 (쉼의 말씀)
     let verse: String
     let source: String
     @ViewBuilder var tools: Tools
@@ -193,9 +202,11 @@ struct RoomScreen<Tools: View, Action: View, Reading: View>: View {
                 ScrollView {
                     VStack(spacing: 0) {
                         page(bleed: geo.safeAreaInsets, full: false, bottom: 56, size: geo.size.width >= 600 ? 52 : 36)
-                            .frame(minHeight: geo.size.height * (geo.size.height < 620 ? 0.68 : 0.74))
-                        VStack(spacing: Space.m) { action }
-                            .frame(maxWidth: 400).padding(Space.margin)
+                            .frame(minHeight: geo.size.height * (geo.size.height < 620 ? 0.66 : 0.72))
+                        VStack(alignment: .leading, spacing: Space.l) { action }
+                            .frame(maxWidth: geo.size.width >= 600 ? 480 : .infinity)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, geo.size.width >= 600 ? 56 : 28).padding(.vertical, Space.margin)
                     }
                 }
                 .scrollBounceBehavior(.basedOnSize)
@@ -207,16 +218,14 @@ struct RoomScreen<Tools: View, Action: View, Reading: View>: View {
 
     private func page(bleed i: EdgeInsets, full: Bool, bottom: CGFloat, size: CGFloat) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(date).font(.footnote).foregroundStyle(Ink.sub)
-                    Text(greeting).font(.body).foregroundStyle(Ink.ink)
-                }
+            HStack(alignment: .center) {
+                Text(date).font(.subheadline).foregroundStyle(Ink.sub)
                 Spacer()
                 tools
             }
             .dynamicTypeSize(...DynamicTypeSize.accessibility1)
             Spacer(minLength: Space.huge)
+            Text(label).font(.subheadline).foregroundStyle(Ink.sub).padding(.bottom, Space.l)
             VerseText(text: verse, source: source, size: verse.count > 44 ? size * 0.72 : size)
         }
         .frame(maxWidth: .infinity, alignment: .leading)

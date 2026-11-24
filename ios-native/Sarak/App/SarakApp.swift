@@ -7,6 +7,7 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         FirebaseApp.configure()
+        SarakBar.apply()
         UNUserNotificationCenter.current().delegate = self
         WordAlerts.registerCategory()
         PhoneLink.shared.start()

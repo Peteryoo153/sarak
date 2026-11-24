@@ -73,6 +73,7 @@ final class PlanStore {
             let day = String(PlanDates.string(Date()).prefix(10))
             bookmarks = [(4, 31, "겨자씨 한 알과 같으니", "07:10"), (6, 50, "안심하라 내니 두려워하지 말라", "16:05"), (2, 5, "작은 자야 네 죄 사함을 받았느니라", "21:40"), (1, 11, "너는 내 사랑하는 아들이라 내가 너를 기뻐하노라", "12:30")]
                 .map { Bookmark(bookId: 41, bookName: "마가복음", chapter: $0.0, verse: $0.1, text: $0.2, savedAt: "\(day)T\($0.3):00.000") }
+            if Demo.screen == "empty" { bookmarks = [] }
         }
         #endif
     }

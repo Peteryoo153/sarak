@@ -28,6 +28,7 @@ struct SettingsView: View {
                             }
                         }
                         .padding(.vertical, 6)
+                        .listRowBackground(Ink.raised)
                     } else {
                         LoginPrompt(title: "로그인하고 함께 읽어요", subtitle: "그룹 통독과 완주 기록을 안전하게 보관해요.")
                             .listRowInsets(EdgeInsets())
@@ -38,8 +39,9 @@ struct SettingsView: View {
                 Section("나의 기록") {
                     NavigationLink { HistoryView() } label: { row("나의 통독 기록", "book.closed") }
                     NavigationLink { PlanSettingsView() } label: { row("통독 플랜", "calendar", detail: store.plan?.rangeName ?? "말씀길") }
-                    NavigationLink { BookmarksView() } label: { row("북마크한 말씀", "bookmark", detail: "\(store.bookmarks.count)") }
+                    NavigationLink { BookmarksView() } label: { row("품은 말씀", "bookmark", detail: "\(store.bookmarks.count)") }
                 }
+                .listRowBackground(Ink.raised)
 
                 Section("설정") {
                     NavigationLink { WordAlertsView() } label: { row("말씀 알림", "bell") }
@@ -48,6 +50,7 @@ struct SettingsView: View {
                     } label: { row("화면 모드", "circle.lefthalf.filled") }
                     row("성경 역본", "text.book.closed", detail: "개역개정")
                 }
+                .listRowBackground(Ink.raised)
 
                 Section("사역 후원 및 문의") {
                     Button { openURL(AppLinks.support) } label: { row("사역 후원하기", "heart", tint: SarakColor.ink, external: true) }
@@ -57,6 +60,7 @@ struct SettingsView: View {
                     Button { openURL(AppLinks.maker) } label: { row("만든 사람", "person", detail: "유찬호 목사", external: true) }
                     row("버전", "info.circle", detail: version)
                 }
+                .listRowBackground(Ink.raised)
 
                 if session.isSignedIn {
                     Section {
@@ -65,11 +69,13 @@ struct SettingsView: View {
                     } footer: {
                         VStack(spacing: 10) { DoorLogo(size: 44); Text("사락 · 생명의 말씀이 사락 넘어갑니다") }.frame(maxWidth: .infinity).padding(.top, 16)
                     }
+                    .listRowBackground(Ink.raised)
                 }
             }
+            .listSectionSpacing(24).contentMargins(.top, 12, for: .scrollContent).contentMargins(.horizontal, 24, for: .scrollContent)
             .scrollContentBackground(.hidden)
             .background(SarakColor.surface)
-            .navigationTitle("설정")
+            .navigationTitle("설정").navigationBarTitleDisplayMode(.inline)
             .confirmationDialog("계정을 삭제할까요?", isPresented: $confirmDelete, titleVisibility: .visible) {
                 Button("계정과 모든 데이터 삭제", role: .destructive) { deleteAccount() }
             } message: { Text("그룹 참여 기록과 완주 기록이 모두 지워지고 되돌릴 수 없어요. 이 기기에 저장된 개인 플랜은 남아요.") }
@@ -81,9 +87,9 @@ struct SettingsView: View {
     private func row(_ title: String, _ icon: String, detail: String? = nil, tint: Color = SarakColor.ink, external: Bool = false) -> some View {
         HStack(spacing: 12) {
             Image(systemName: icon).font(.system(size: 16)).foregroundStyle(tint).frame(width: 24)
-            Text(title).font(.system(size: 16)).foregroundStyle(SarakColor.ink)
+            Text(title).font(.body).foregroundStyle(SarakColor.ink)
             Spacer()
-            if let detail { Text(detail).font(.system(size: 14)).foregroundStyle(SarakColor.inkMuted).lineLimit(1) }
+            if let detail { Text(detail).font(.subheadline).foregroundStyle(SarakColor.inkMuted).lineLimit(1) }
             if external { Image(systemName: "arrow.up.right").font(.system(size: 12, weight: .semibold)).foregroundStyle(SarakColor.inkFaint) }
         }
         .contentShape(Rectangle())
@@ -123,7 +129,7 @@ struct PlanSettingsView: View {
                 Section { Button("통독 플랜 만들기") { setup = true } } footer: { Text("지금은 하루 5분 마가복음 말씀길을 읽고 있어요.") }
             }
         }
-        .tint(Ink.ink).scrollContentBackground(.hidden).background(Ink.canvas).navigationTitle("통독 플랜")
+        .tint(Ink.ink).scrollContentBackground(.hidden).background(Ink.canvas).navigationTitle("통독 플랜").navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $setup) { PlanSetupView() }
         .confirmationDialog("플랜을 그만둘까요?", isPresented: $confirm, titleVisibility: .visible) {
             Button("플랜과 진도 기록 삭제", role: .destructive) { store.clearActivePlan() }
@@ -159,7 +165,7 @@ struct HistoryView: View {
         }
         .scrollContentBackground(.hidden)
         .background(SarakColor.surface)
-        .navigationTitle("나의 통독 기록")
+        .navigationTitle("나의 통독 기록").navigationBarTitleDisplayMode(.inline)
         .task { records = await session.completionRecords(); loaded = true }
     }
 }
@@ -171,7 +177,7 @@ struct BookmarksView: View {
     var body: some View {
         List {
             if store.bookmarks.isEmpty {
-                Text("읽기 화면에서 구절을 누르고 '저장'을 누르면 여기에 모여요.").foregroundStyle(SarakColor.inkMuted)
+                Text("읽기 화면에서 구절을 누르고 '품기'를 누르면 여기에 모여요.").foregroundStyle(SarakColor.inkMuted)
             }
             ForEach(store.bookmarks) { b in
                 VStack(alignment: .leading, spacing: 6) {
@@ -192,7 +198,7 @@ struct BookmarksView: View {
         }
         .scrollContentBackground(.hidden)
         .background(SarakColor.surface)
-        .navigationTitle("북마크한 말씀")
+        .navigationTitle("품은 말씀").navigationBarTitleDisplayMode(.inline)
         .sheet(item: $share) { s in ShareCardSheet(verses: s.verses, bookName: s.bookName, note: nil, dayNumber: nil) }
     }
 }

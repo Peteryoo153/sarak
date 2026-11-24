@@ -37,9 +37,10 @@ struct GroupView: View {
                         if let g = selected { groupDetail(g) }
                     }
                 }
-                .padding(.horizontal, 20).padding(.top, 8).padding(.bottom, 24)
+                .padding(.horizontal, 24).padding(.top, 8).padding(.bottom, 24)
             }
             .background(SarakColor.surface)
+            .navigationTitle("함께").navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $showCreate) { GroupEditorView(group: nil) { selectedId = $0.id } }
             .sheet(item: $editGroup) { g in GroupEditorView(group: g) { _ in } }
             .sheet(isPresented: $showJoin) { JoinGroupSheet { selectedId = $0.id } }
@@ -57,8 +58,7 @@ struct GroupView: View {
     private var header: some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
-                Text("함께").font(SarakFont.title1).foregroundStyle(SarakColor.ink)
-                Text("함께 읽으면 더 멀리 갑니다").font(SarakFont.caption).foregroundStyle(SarakColor.inkMuted)
+                Text("함께 읽으면 더 멀리 갑니다").font(.subheadline).foregroundStyle(SarakColor.inkMuted)
             }
             Spacer()
             if let g = selected, session.isSignedIn {
@@ -542,34 +542,84 @@ struct LoginPrompt: View {
     @Environment(Session.self) private var session
     @Environment(\.colorScheme) private var scheme
     @State private var error: String?
+    @State private var apple = AppleSignIn()
 
     var body: some View {
-        VStack(spacing: 14) {
-            DoorLogo(size: 68)
-            VStack(spacing: 4) {
-                Text(title).font(SarakFont.title2).foregroundStyle(SarakColor.ink).multilineTextAlignment(.center)
-                Text(subtitle).font(SarakFont.caption).foregroundStyle(SarakColor.inkMuted).multilineTextAlignment(.center)
-            }
-            SignInWithAppleButton(.signIn) { req in
-                session.prepareAppleRequest(req)
-            } onCompletion: { result in
-                Task { do { try await session.completeApple(result) } catch { self.error = error.localizedDescription } }
-            }
-            .signInWithAppleButtonStyle(scheme == .dark ? .white : .black)
-            .frame(height: 52)
-            .clipShape(RoundedRectangle(cornerRadius: Radius.md, style: .continuous))
-
-            Button {
-                Task { do { try await session.signInWithGoogle() } catch { self.error = error.localizedDescription } }
-            } label: {
-                HStack(spacing: 8) {
-                    Text("G").font(.system(size: 18, weight: .semibold)).foregroundStyle(Color(hex: 0x4285F4))
-                    Text("Google로 로그인")
+        VStack(alignment: .leading, spacing: 0) {
+            DoorLogo(size: 60)
+            Text(title).font(.custom("GowunBatang-Regular", size: 24, relativeTo: .title2)).foregroundStyle(Ink.ink).padding(.top, 20)
+                .fixedSize(horizontal: false, vertical: true)
+            Text(subtitle).font(.subheadline).foregroundStyle(Ink.sub).padding(.top, 6)
+                .fixedSize(horizontal: false, vertical: true)
+            VStack(spacing: 12) {
+                button("Apple로 로그인", fg: scheme == .dark ? .black : .white, bg: scheme == .dark ? .white : .black) {
+                    Image(systemName: "apple.logo").font(.system(size: 19))
+                } action: {
+                    apple.start { session.prepareAppleRequest($0) } done: { r in
+                        Task { await run { try await session.completeApple(r) } }
+                    }
                 }
+                button("Google로 로그인", fg: Color(hex: 0x1F1F1F), bg: .white, border: scheme == .dark ? .clear : Color(hex: 0x747775)) {
+                    GoogleMark().frame(width: 18, height: 18)
+                } action: { Task { await run { try await session.signInWithGoogle() } } }
             }
-            .buttonStyle(SecondaryButtonStyle())
-            if let error { Text(error).font(SarakFont.caption).foregroundStyle(SarakColor.danger).multilineTextAlignment(.center) }
+            .padding(.top, 28)
+            if let error { Text(error).font(.footnote).foregroundStyle(Ink.danger).padding(.top, 12) }
         }
-        .card(padding: 24)
+        .padding(24).padding(.bottom, 44)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background { SarakPage(hour: .now, lift: 52) }
+        .clipShape(RoundedRectangle(cornerRadius: Radius.lg, style: .continuous))
+    }
+
+    /// 두 버튼은 글자, 높이, 모서리, 그림 자리가 같습니다.
+    private func button<I: View>(_ text: String, fg: Color, bg: Color, border: Color = .clear, @ViewBuilder icon: () -> I, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 10) { icon().frame(width: 22, height: 22); Text(text).font(.body.weight(.medium)).lineLimit(1) }
+                .dynamicTypeSize(...DynamicTypeSize.accessibility1).padding(.horizontal, 16)
+                .foregroundStyle(fg).frame(maxWidth: .infinity, minHeight: 54)
+                .background(bg, in: Capsule()).overlay(Capsule().strokeBorder(border))
+                .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+    }
+    private func run(_ f: () async throws -> Void) async {
+        do { try await f() } catch { self.error = error.localizedDescription }
+    }
+}
+
+/// 글자 크기를 Google 버튼과 맞추려고 Apple 로그인 창을 직접 엽니다.
+final class AppleSignIn: NSObject, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
+    private var done: ((Result<ASAuthorization, Error>) -> Void)?
+    private var controller: ASAuthorizationController?
+    func start(_ prepare: (ASAuthorizationAppleIDRequest) -> Void, done: @escaping (Result<ASAuthorization, Error>) -> Void) {
+        let r = ASAuthorizationAppleIDProvider().createRequest()
+        prepare(r)
+        self.done = done
+        let c = ASAuthorizationController(authorizationRequests: [r])
+        c.delegate = self; c.presentationContextProvider = self
+        controller = c
+        c.performRequests()
+    }
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization a: ASAuthorization) { done?(.success(a)) }
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithError e: Error) { done?(.failure(e)) }
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        return scenes.flatMap(\.windows).first(where: \.isKeyWindow) ?? ASPresentationAnchor()
+    }
+}
+
+struct GoogleMark: View {
+    var body: some View {
+        Canvas { ctx, size in
+            let w = size.width, t = w * 0.2, c = CGPoint(x: w / 2, y: w / 2), r = (w - t) / 2
+            func arc(_ a: Double, _ b: Double, _ hex: UInt32) {
+                var p = Path(); p.addArc(center: c, radius: r, startAngle: .degrees(a), endAngle: .degrees(b), clockwise: false)
+                ctx.stroke(p, with: .color(Color(hex: hex)), lineWidth: t)
+            }
+            arc(0, 50, 0x4285F4); arc(50, 145, 0x34A853); arc(145, 210, 0xFBBC05); arc(210, 318, 0xEA4335)
+            ctx.fill(Path(CGRect(x: w / 2, y: w / 2 - t / 2, width: w / 2, height: t)), with: .color(Color(hex: 0x4285F4)))
+        }
+        .accessibilityHidden(true)
     }
 }

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct BibleView: View {
     @Environment(PathStore.self) private var path
+    @Environment(PlanStore.self) private var store
     @State private var old = false
     @State private var query = ""
     @State private var hits: [(book: String, verse: Verse)] = []
@@ -10,8 +11,24 @@ struct BibleView: View {
     var body: some View {
         NavigationStack {
             List {
+                VStack(spacing: 4) {
+                    ScreenTitle("성경")
+                    HStack(spacing: 10) {
+                        Image(systemName: "magnifyingglass").foregroundStyle(Ink.sub).accessibilityHidden(true)
+                        TextField("말씀 찾기", text: $query, prompt: Text("말씀 찾기").foregroundStyle(Ink.sub)).foregroundStyle(Ink.ink)
+                            .autocorrectionDisabled().submitLabel(.search)
+                        if !query.isEmpty {
+                            Button { query = "" } label: { Image(systemName: "xmark.circle.fill").foregroundStyle(Ink.control).frame(width: 44, height: 44) }
+                                .buttonStyle(.plain).accessibilityLabel("지우기")
+                        }
+                    }
+                    .padding(.leading, 16).padding(.trailing, query.isEmpty ? 16 : 0).frame(minHeight: 48)
+                    .background(Ink.raised, in: Capsule()).overlay(Capsule().strokeBorder(Ink.line))
+                }
+                .padding(.bottom, 16)
+                .listRowInsets(EdgeInsets()).listRowSeparator(.hidden).listRowBackground(Color.clear)
                 if query.isEmpty {
-                    Button { model = ReaderModel(.path(path.today)) } label: { resume }
+                    Button { model = ReaderModel(.today(store, path)) } label: { resume }
                         .buttonStyle(.plain).listRowInsets(EdgeInsets()).listRowSeparator(.hidden).listRowBackground(Color.clear)
                         .padding(.bottom, 12)
                     Picker("", selection: $old) { Text("구약").tag(true); Text("신약").tag(false) }
@@ -39,10 +56,9 @@ struct BibleView: View {
                     }
                 }
             }
-            .listStyle(.plain).contentMargins(.horizontal, 24, for: .scrollContent)
+            .listStyle(.plain).scrollDismissesKeyboard(.immediately).contentMargins(.horizontal, 24, for: .scrollContent)
             .frame(maxWidth: 760).frame(maxWidth: .infinity)
-            .background(Ink.canvas).navigationTitle("성경")
-            .searchable(text: $query, prompt: "말씀 찾기")
+            .background(Ink.canvas).toolbar(.hidden, for: .navigationBar)
             .onChange(of: query) { _, q in hits = q.count < 2 ? [] : BibleDB.shared.search(q) }
         }
         .tint(Ink.ink)
@@ -50,8 +66,8 @@ struct BibleView: View {
     }
 
     private var resume: some View {
-        let r = Reading.path(path.today)
-        let first = BibleDB.shared.chapter(bookId: 41, chapter: path.today.from.chapter).first { $0.number == path.today.from.verse }
+        let r = Reading.today(store, path)
+        let first = r.segments.first.flatMap { s in BibleDB.shared.chapter(bookId: s.bookId, chapter: s.chapter).first { $0.number >= s.from } }
         return VStack(alignment: .leading, spacing: 8) {
             Text("이어 읽기 · \(r.title)").font(.footnote).foregroundStyle(Ink.sub)
             Text(first?.text ?? "").font(SarakFont.serif(21)).foregroundStyle(Ink.ink).fixedSize(horizontal: false, vertical: true)
@@ -59,6 +75,7 @@ struct BibleView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(22).padding(.bottom, 36)
         .background { SarakPage(hour: .now, lift: 44) }
+        .clipShape(RoundedRectangle(cornerRadius: Radius.lg, style: .continuous))
         .contentShape(Rectangle())
     }
 }
@@ -79,6 +96,6 @@ struct ChapterGrid: View {
             .padding(24).frame(maxWidth: 760)
         }
         .frame(maxWidth: .infinity)
-        .background(Ink.canvas).navigationTitle(book.name)
+        .background(Ink.canvas).navigationTitle(book.name).navigationBarTitleDisplayMode(.inline)
     }
 }
