@@ -208,6 +208,12 @@ struct SectionHeader: View {
 }
 
 extension Date {
+    var koreanDay: String {
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "ko_KR")
+        f.dateFormat = "M월 d일"
+        return f.string(from: self)
+    }
     var koreanFullDate: String {
         let f = DateFormatter()
         f.locale = Locale(identifier: "ko_KR")

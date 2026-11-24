@@ -66,7 +66,7 @@ struct SarakApp: App {
 
     private var skipIntro: Bool {
         #if DEBUG
-        return Demo.on && !["welcome", "splash"].contains(Demo.screen)
+        return Demo.on && !Demo.screen.hasPrefix("welcome") && Demo.screen != "splash"
         #else
         return false
         #endif

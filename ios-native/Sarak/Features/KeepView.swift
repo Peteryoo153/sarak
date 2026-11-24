@@ -9,6 +9,8 @@ struct KeepView: View {
     @State private var tab: Tab = .kept
     @State private var picked: Bookmark?
     @State private var share: ShareVerses?
+    @State private var note: KeptNote?
+    @State private var noteTick = 0
 
     var body: some View {
         NavigationStack {
@@ -29,6 +31,7 @@ struct KeepView: View {
             if Demo.screen == "calendar" { tab = .calendar } else if Demo.screen == "notes" { tab = .notes }
             #endif
         }
+        .sheet(item: $note) { n in NoteSheet(note: n, inGroup: store.activeGroupId != nil && n.isPlan) { saveNote(n, $0) } }
         .sheet(item: $share) { s in ShareCardSheet(verses: s.verses, bookName: s.bookName, note: nil, dayNumber: nil) }
     }
 
@@ -73,16 +76,30 @@ struct KeepView: View {
         }
     }
     @ViewBuilder private var notes: some View {
+        let _ = noteTick
         let all = noteItems
         if all.isEmpty { empty("아직 남긴 글이 없어요.", "본문을 마칠 때 한 줄 남길 수 있어요.") }
-        ForEach(all, id: \.2) { n in row(hour: SarakHour.at(n.2), n.0, n.1) }
+        ForEach(all) { n in
+            Button { note = n } label: { row(hour: SarakHour.at(n.date), n.text, "\(n.reference)  \(n.date.koreanDay)") }.buttonStyle(.plain)
+        }
     }
-    private var noteItems: [(String, String, Date)] {
-        var out: [(String, String, Date)] = []
-        for (d, e) in path.completed { if let c = e.comment, !c.isEmpty, let t = e.date { out.append((c, Reading.path(WordPath.mark.day(d)).title, t)) } }
-        for (d, e) in store.completed { if let c = e.comment, !c.isEmpty, let t = e.date { out.append((c, store.plan?.day(d)?.displayRange ?? "", t)) } }
-        for n in Prefs.json("word_notes", as: [WordNote].self) ?? [] { if let t = PlanDates.parse(n.savedAt) { out.append((n.text, n.reference, t)) } }
-        return out.sorted { $0.2 > $1.2 }
+    private var noteItems: [KeptNote] {
+        var out: [KeptNote] = []
+        for (d, e) in path.completed { if let c = e.comment, !c.isEmpty, let t = e.date { out.append(KeptNote(origin: .path(d), text: c, reference: Reading.path(WordPath.mark.day(d)).title, date: t)) } }
+        for (d, e) in store.completed { if let c = e.comment, !c.isEmpty, let t = e.date { out.append(KeptNote(origin: .plan(d), text: c, reference: store.plan?.day(d)?.displayRange ?? "", date: t)) } }
+        for n in Prefs.json("word_notes", as: [WordNote].self) ?? [] { if let t = PlanDates.parse(n.savedAt) { out.append(KeptNote(origin: .alert(n.id), text: n.text, reference: n.reference, date: t)) } }
+        return out.sorted { $0.date > $1.date }
+    }
+    private func saveNote(_ n: KeptNote, _ text: String?) {
+        switch n.origin {
+        case .path(let d): path.setNote(day: d, text)
+        case .plan(let d): store.setNote(day: d, text)
+        case .alert(let id):
+            var list = Prefs.json("word_notes", as: [WordNote].self) ?? []
+            if let i = list.firstIndex(where: { $0.id == id }) { if let text { list[i].text = text } else { list.remove(at: i) } }
+            Prefs.setJSON(list, "word_notes")
+        }
+        noteTick += 1
     }
     private var readDates: Set<Date> {
         Set((Array(path.completed.values) + Array(store.completed.values)).compactMap { $0.date.map(Calendar.current.startOfDay) })
@@ -117,6 +134,52 @@ struct KeepView: View {
                 Button("나누기") { share = ShareVerses(verses: [verse(b)], bookName: b.bookName) }.buttonStyle(SarakButtonStyle(quiet: true)).frame(maxWidth: 240)
             }.padding(.top, 24)
         }
+    }
+}
+
+struct KeptNote: Identifiable, Hashable {
+    enum Origin: Hashable { case path(Int), plan(Int), alert(String) }
+    let origin: Origin, text: String, reference: String, date: Date
+    var id: Origin { origin }
+    var isPlan: Bool { if case .plan = origin { true } else { false } }
+}
+
+/// 남긴 한 줄을 펼쳐 보고, 고치고, 지웁니다.
+struct NoteSheet: View {
+    let note: KeptNote
+    let inGroup: Bool
+    let save: (String?) -> Void
+    @Environment(\.dismiss) private var dismiss
+    @State private var text = ""
+    @State private var confirm = false
+    private var trimmed: String { text.trimmingCharacters(in: .whitespacesAndNewlines) }
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("\(note.date.koreanFullDate)에 남긴 글").font(.footnote).foregroundStyle(Ink.sub)
+                    TextField("한 줄", text: $text, axis: .vertical).font(SarakFont.serif(20)).lineSpacing(6).foregroundStyle(Ink.ink)
+                        .frame(maxWidth: .infinity, minHeight: 96, alignment: .topLeading)
+                    Rectangle().fill(Ink.line).frame(height: 1)
+                    Text("글을 눌러 고칠 수 있어요. 지워도 읽은 기록은 남아요.\(inGroup ? " 그룹에 이미 보인 글은 바뀌지 않아요." : "")").font(.footnote).foregroundStyle(Ink.sub)
+                    Button("이 글 지우기") { confirm = true }.font(.body).foregroundStyle(Ink.danger).frame(minHeight: 44)
+                }
+                .padding(24)
+            }
+            .background(Ink.canvas)
+            .navigationTitle(note.reference).navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("닫기") { dismiss() } }
+                ToolbarItem(placement: .confirmationAction) { Button("저장") { save(trimmed); dismiss() }.disabled(trimmed.isEmpty || trimmed == note.text) }
+            }
+            .alert("이 글을 지울까요?", isPresented: $confirm) {
+                Button("지우기", role: .destructive) { save(nil); dismiss() }
+                Button("취소", role: .cancel) {}
+            } message: { Text("지운 글은 되돌릴 수 없어요.") }
+        }
+        .tint(Ink.ink)
+        .presentationDetents([.medium, .large])
+        .onAppear { text = note.text }
     }
 }
 

@@ -7,6 +7,7 @@ struct SettingsView: View {
     @AppStorage("appearance") private var appearance: AppearanceMode = .system
     @State private var confirmDelete = false
     @State private var deleting = false
+    @State private var tour = false
     @State private var message: String?
 
     private var version: String {
@@ -58,6 +59,7 @@ struct SettingsView: View {
                         row("앱 제안 및 문의", "envelope", detail: AppLinks.contactEmail)
                     }
                     Button { openURL(AppLinks.maker) } label: { row("만든 사람", "person", detail: "유찬호 목사", external: true) }
+                    Button { tour = true } label: { row("사락 둘러보기", "book.pages") }
                     row("버전", "info.circle", detail: version)
                 }
                 .listRowBackground(Ink.raised)
@@ -80,6 +82,7 @@ struct SettingsView: View {
                 Button("계정과 모든 데이터 삭제", role: .destructive) { deleteAccount() }
             } message: { Text("그룹 참여 기록과 완주 기록이 모두 지워지고 되돌릴 수 없어요. 이 기기에 저장된 개인 플랜은 남아요.") }
             .alert(message ?? "", isPresented: Binding(get: { message != nil }, set: { if !$0 { message = nil } })) { Button("확인") {} }
+            .fullScreenCover(isPresented: $tour) { WelcomeView(revisit: true) { tour = false } }
             .overlay { if deleting { ProgressView().padding(24).background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16)) } }
         }
     }

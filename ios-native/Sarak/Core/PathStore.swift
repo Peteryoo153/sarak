@@ -36,6 +36,12 @@ final class PathStore {
         completed[day] = CompletedEntry(completedAt: PlanDates.string(Date()), comment: note)
         Prefs.setJSON(Dictionary(uniqueKeysWithValues: completed.map { (String($0.key), $0.value) }), "path_mark_completed")
     }
+    /// 남긴 한 줄만 고치거나 지웁니다. 읽은 기록은 그대로 둡니다.
+    func setNote(day: Int, _ note: String?) {
+        guard completed[day] != nil else { return }
+        completed[day]?.comment = note
+        Prefs.setJSON(Dictionary(uniqueKeysWithValues: completed.map { (String($0.key), $0.value) }), "path_mark_completed")
+    }
     func restart() {
         completed = [:]
         Prefs.remove("path_mark_completed")

@@ -189,6 +189,15 @@ final class PlanStore {
         if streak > (Prefs.int("best_streak_\(activeSource)") ?? 0) { Prefs.set(streak, "best_streak_\(activeSource)") }
     }
 
+    /// 남긴 한 줄만 고치거나 지웁니다. 읽은 기록은 그대로 둡니다.
+    func setNote(day: Int, _ note: String?) {
+        var raw = Prefs.json("completed_\(activeSource)", as: [String: CompletedEntry].self) ?? [:]
+        guard raw[String(day)] != nil else { return }
+        raw[String(day)]?.comment = note ?? ""
+        Prefs.setJSON(raw, "completed_\(activeSource)")
+        reload()
+    }
+
     func isBookmarked(_ v: Verse) -> Bool { bookmarks.contains { $0.id == v.id } }
 
     func toggleBookmark(_ v: Verse, bookName: String) {

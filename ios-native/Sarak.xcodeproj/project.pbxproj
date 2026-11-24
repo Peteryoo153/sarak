@@ -37,6 +37,7 @@
 		AB85AD4852929E863BCD6ECD /* Reading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F6AA2AB27595C1598FE332C /* Reading.swift */; };
 		ACD38FE77533AA02C9DCDF58 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7824531060D3DD9E8F3376B1 /* Models.swift */; };
 		AEB169F05BC7C4B2109BEBA1 /* PhoneLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B44CE54BF88757ACD36637 /* PhoneLink.swift */; };
+		B0DDA1036484ADF9BC0CB935 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 637D736C554DB3B46C068CDD /* WelcomeView.swift */; };
 		B88881A6146FE3DEB66B083A /* DoorScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB4B5DAB79B2F2650D6AC9A0 /* DoorScene.swift */; };
 		B9A939C576DA45223DE2F3EA /* GowunBatang-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B25AF47C6EB5E3B35EEB3A92 /* GowunBatang-Regular.ttf */; };
 		C6108C511FA6CC4810E14181 /* SarakDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A18E16BB56E8B0C2787D0A5 /* SarakDesign.swift */; };
@@ -91,6 +92,7 @@
 		50BFF2B7CBEB8D4B47E81A05 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		51F991D3C4113EE67E4A77D3 /* SarakApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SarakApp.swift; sourceTree = "<group>"; };
 		54BDD113F613D09E3A3A1348 /* WordAlertsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordAlertsView.swift; sourceTree = "<group>"; };
+		637D736C554DB3B46C068CDD /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
 		6653B37D947A4C7A2428B009 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		71D1121CCD3F31FE3B52B353 /* KeepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeepView.swift; sourceTree = "<group>"; };
 		7824531060D3DD9E8F3376B1 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
@@ -181,6 +183,7 @@
 				B0F88BED127F7969914AF7F5 /* SettingsView.swift */,
 				410BE8F6F90CC324925A7932 /* ShareViews.swift */,
 				30B7A92D798A03C6F025BD81 /* SplashView.swift */,
+				637D736C554DB3B46C068CDD /* WelcomeView.swift */,
 				54BDD113F613D09E3A3A1348 /* WordAlertsView.swift */,
 			);
 			path = Features;
@@ -397,6 +400,7 @@
 				3F796C1A52D9A81CEE52711F /* ShareViews.swift in Sources */,
 				9252C615DBC8C8C28383D05E /* SplashView.swift in Sources */,
 				DCD355B1A1BBA6817BBB057C /* Theme.swift in Sources */,
+				B0DDA1036484ADF9BC0CB935 /* WelcomeView.swift in Sources */,
 				DC9B24C27157C5B30A4DC1F6 /* WordAlerts.swift in Sources */,
 				E30DEA0AE242703E4F9FF581 /* WordAlertsView.swift in Sources */,
 				E95C755B6F34D85670A7BDB2 /* WordPath.swift in Sources */,
@@ -448,7 +452,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 14;
+				CURRENT_PROJECT_VERSION = 15;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 7VAL2U8BVL;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -547,7 +551,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 14;
+				CURRENT_PROJECT_VERSION = 15;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 7VAL2U8BVL;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
