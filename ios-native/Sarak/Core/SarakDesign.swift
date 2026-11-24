@@ -215,6 +215,7 @@ struct RoomScreen<Tools: View, Action: View, Reading: View>: View {
                 Spacer()
                 tools
             }
+            .dynamicTypeSize(...DynamicTypeSize.accessibility1)
             Spacer(minLength: Space.huge)
             VerseText(text: verse, source: source, size: verse.count > 44 ? size * 0.72 : size)
         }
@@ -238,32 +239,34 @@ struct WatchVerse: View {
     let source: String
     let next: String
     @Environment(\.isLuminanceReduced) private var dimmed
-    @ScaledMetric(relativeTo: .title2) private var size: CGFloat = 23
+    @ScaledMetric(relativeTo: .title2) private var scale: CGFloat = 1
+    private var size: CGFloat { (verse.count > 30 ? 20 : 23) * scale }
     var body: some View {
         GeometryReader { geo in
+            let i = geo.safeAreaInsets
             ScrollView {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(verse.versed(8)).font(.custom("GowunBatang-Regular", fixedSize: size)).lineSpacing(1)
+                    Text(verse.versed(verse.count > 30 ? 9 : 8)).font(.custom("GowunBatang-Regular", fixedSize: size)).lineSpacing(1)
                         .foregroundStyle(dimmed ? Ink.sub : hour.glow).fixedSize(horizontal: false, vertical: true)
                     Text(source).font(.footnote).foregroundStyle(.secondary)
-                    if !dimmed { Text(next).font(.caption2).foregroundStyle(.secondary).padding(.top, 18) }
+                    if verse.count > 30, !dimmed { Text(next).font(.caption2).foregroundStyle(.secondary).padding(.top, 10) }
+                    Spacer(minLength: 8)
+                    // 종이 끝은 글 아래에 놓입니다. 긴 말씀에서는 끝까지 내려야 보이고 글과 겹치지 않습니다.
+                    if !dimmed {
+                        ZStack {
+                            Rectangle().fill(hour.next.page)
+                            LiftedPage(lift: 42, layer: 0.42).fill(hour.glow)
+                            LiftedPage(lift: 42).fill(.black)
+                        }
+                        .frame(height: 46)
+                        .padding(.horizontal, -10).padding(.leading, -i.leading).padding(.trailing, -i.trailing)
+                        .accessibilityHidden(true)
+                    }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(maxWidth: .infinity, minHeight: geo.size.height + i.bottom, alignment: .leading)
                 .padding(.horizontal, 10)
             }
-            // 종이 끝은 화면 바닥에 고정합니다. 어두워지면 끕니다.
-            .background(alignment: .bottom) {
-                if !dimmed {
-                    ZStack {
-                        Rectangle().fill(hour.next.page)
-                        LiftedPage(lift: 46, layer: 0.42).fill(hour.glow)
-                        LiftedPage(lift: 46).fill(.black)
-                    }
-                    .frame(width: geo.size.width + geo.safeAreaInsets.leading + geo.safeAreaInsets.trailing, height: 60)
-                    .padding(.bottom, -geo.safeAreaInsets.bottom)
-                    .accessibilityHidden(true)
-                }
-            }
+            .ignoresSafeArea(edges: .bottom)
         }
         .background(Color.black)
     }

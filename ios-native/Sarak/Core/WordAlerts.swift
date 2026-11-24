@@ -63,11 +63,16 @@ enum WordAlerts {
                 var c = cal.dateComponents([.year, .month, .day], from: date)
                 c.hour = slot.h; c.minute = slot.m
                 guard let fire = cal.date(from: c), fire > now else { continue }
-                try? await center.add(UNNotificationRequest(identifier: "\(prefix)\(dayKey(date)).\(slot.id)",
+                let request = UNNotificationRequest(identifier: "\(prefix)\(dayKey(date)).\(slot.id)",
                     content: content(plan.alert(slot.hour), slot: slot.hour, showVerse: s.showVerse),
-                    trigger: UNCalendarNotificationTrigger(dateMatching: c, repeats: false)))
+                    trigger: UNCalendarNotificationTrigger(dateMatching: c, repeats: false))
+                do { try await center.add(request) } catch { NSLog("SARAK add failed \(error)") }
             }
         }
+        #if DEBUG
+        let p = await center.pendingNotificationRequests()
+        NSLog("SARAK alerts enabled \(s.enabled) slots \(s.slots.filter(\.on).count) skip \(s.skipDate ?? "-") old \(old.count) pending \(p.count) auth \(await center.notificationSettings().authorizationStatus.rawValue) first \(p.compactMap { ($0.trigger as? UNCalendarNotificationTrigger)?.nextTriggerDate() }.min().map(\.description) ?? "-")")
+        #endif
     }
 
     static func content(_ a: WordPath.Alert, slot: SarakHour, showVerse: Bool) -> UNMutableNotificationContent {

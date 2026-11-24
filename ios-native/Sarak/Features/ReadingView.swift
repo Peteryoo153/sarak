@@ -84,6 +84,7 @@ struct PassageBody: View {
                 act("나누기", "square.and.arrow.up") { share = ShareVerses(verses: picked, bookName: model.bookName(picked[0])) }
                 Button { model.selected = [] } label: { Image(systemName: "xmark").frame(width: 44, height: 44) }.accessibilityLabel("선택 해제")
             }
+            .dynamicTypeSize(...DynamicTypeSize.xLarge)
             .padding(.horizontal, 12).frame(minHeight: 60).frame(maxWidth: 420)
             .foregroundStyle(Ink.ink)
             .background(Ink.raised, in: Capsule())
