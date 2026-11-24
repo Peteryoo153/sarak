@@ -14,17 +14,15 @@ struct PlanPicker: View {
                     Button { preset = p } label: {
                         HStack {
                             VStack(alignment: .leading, spacing: 2) {
-                                Text(p.label).font(.system(size: 16, weight: .bold)).foregroundStyle(SarakColor.ink)
+                                Text(p.label).font(.subheadline.weight(.medium)).foregroundStyle(SarakColor.ink)
                                 Text("\(p.chapters)장").font(SarakFont.caption).foregroundStyle(SarakColor.inkMuted)
                             }
                             Spacer()
                             Image(systemName: preset == p ? "checkmark.circle.fill" : "circle")
-                                .font(.system(size: 22)).foregroundStyle(preset == p ? SarakColor.primaryFill : SarakColor.inkFaint)
+                                .font(.system(size: 18)).foregroundStyle(preset == p ? SarakColor.primaryFill : SarakColor.inkFaint)
                         }
-                        .padding(16)
-                        .background(SarakColor.raised, in: RoundedRectangle(cornerRadius: Radius.md, style: .continuous))
-                        .overlay(RoundedRectangle(cornerRadius: Radius.md, style: .continuous)
-                            .stroke(preset == p ? SarakColor.primaryFill : SarakColor.line, lineWidth: preset == p ? 2 : 1))
+                        .padding(.vertical, 12).contentShape(Rectangle())
+                        .overlay(alignment: .bottom) { Rectangle().fill(Ink.line).frame(height: 1) }
                     }
                     .buttonStyle(.plain)
                     .accessibilityAddTraits(preset == p ? .isSelected : [])
@@ -45,11 +43,11 @@ struct PlanPicker: View {
                 Image(systemName: "clock").font(.system(size: 18)).foregroundStyle(SarakColor.mintInk)
                     .frame(width: 40, height: 40).background(SarakColor.mintSoft, in: Circle())
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("하루 약 \(ScheduleEngine.estimatedMinutes(preset: preset, days: days))분").font(.system(size: 17, weight: .bold)).foregroundStyle(SarakColor.ink)
+                    Text("하루 약 \(ScheduleEngine.estimatedMinutes(preset: preset, days: days))분").font(.subheadline.weight(.medium)).foregroundStyle(SarakColor.ink)
                     Text("\(preset.label)을 \(days == 365 ? "1년" : "\(days)일") 동안 나눠 읽어요").font(SarakFont.caption).foregroundStyle(SarakColor.inkMuted)
                 }
             }
-            .card(padding: 16)
+            .padding(.vertical, 8)
         }
     }
 }
@@ -71,7 +69,7 @@ struct PlanSetupView: View {
                             .font(SarakFont.caption).foregroundStyle(SarakColor.inkMuted)
                     }
                 }
-                .padding(20)
+                .padding(32)
             }
             .background(SarakColor.surface)
             .safeAreaInset(edge: .bottom) {
@@ -79,7 +77,7 @@ struct PlanSetupView: View {
                     if store.plan != nil && store.activeGroupId == nil { confirmReplace = true } else { start() }
                 }
                 .buttonStyle(PrimaryButtonStyle())
-                .padding(.horizontal, 20).padding(.vertical, 12)
+                .padding(.horizontal, 32).padding(.vertical, 12)
                 .background(SarakColor.surface)
             }
             .navigationTitle("통독 플랜")

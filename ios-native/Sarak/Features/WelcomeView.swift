@@ -105,8 +105,7 @@ struct WelcomeView: View {
                 Spacer()
                 if !last {
                     Button { next() } label: {
-                        Image(systemName: "chevron.right").font(.system(size: 16, weight: .medium)).foregroundStyle(Ink.onPrimary)
-                            .frame(width: 52, height: 52).background(Ink.primary, in: Circle())
+                        TurnMark()
                     }
                     .buttonStyle(.plain).accessibilityLabel("다음")
                 }

@@ -24,36 +24,36 @@ struct SettingsView: View {
                         HStack(spacing: 14) {
                             AvatarView(name: session.displayName, size: 48)
                             VStack(alignment: .leading, spacing: 2) {
-                                Text(session.displayName).font(.system(size: 17, weight: .semibold)).foregroundStyle(SarakColor.ink)
+                                Text(session.displayName).font(.subheadline.weight(.medium)).foregroundStyle(SarakColor.ink)
                                 Text(session.user?.email ?? "").font(SarakFont.caption).foregroundStyle(SarakColor.inkMuted)
                             }
                         }
                         .padding(.vertical, 6)
-                        .listRowBackground(Ink.raised)
+                        .listRowBackground(Color.clear)
                     } else {
                         LoginPrompt(title: "로그인하고 함께 읽어요", subtitle: "그룹 통독과 완주 기록을 안전하게 보관해요.")
-                            .listRowInsets(EdgeInsets())
+                            .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                             .listRowBackground(Color.clear)
                     }
                 }
 
-                Section("나의 기록") {
+                Section {
                     NavigationLink { HistoryView() } label: { row("나의 통독 기록", "book.closed") }
                     NavigationLink { PlanSettingsView() } label: { row("통독 플랜", "calendar", detail: store.plan?.rangeName ?? "말씀길") }
                     NavigationLink { BookmarksView() } label: { row("품은 말씀", "bookmark", detail: "\(store.bookmarks.count)") }
-                }
-                .listRowBackground(Ink.raised)
+                } header: { Text("나의 기록").font(.footnote).foregroundStyle(Ink.sub) }
+                .listRowBackground(Color.clear)
 
-                Section("설정") {
+                Section {
                     NavigationLink { WordAlertsView() } label: { row("말씀 알림", "bell") }
                     Picker(selection: $appearance) {
                         ForEach(AppearanceMode.allCases) { Text($0.label).tag($0) }
                     } label: { row("화면 모드", "circle.lefthalf.filled") }
                     row("성경 역본", "text.book.closed", detail: "개역개정")
-                }
-                .listRowBackground(Ink.raised)
+                } header: { Text("설정").font(.footnote).foregroundStyle(Ink.sub) }
+                .listRowBackground(Color.clear)
 
-                Section("사역 후원 및 문의") {
+                Section {
                     Button { openURL(AppLinks.support) } label: { row("사역 후원하기", "heart", tint: SarakColor.ink, external: true) }
                     Button { openURL(URL(string: "mailto:\(AppLinks.contactEmail)?subject=%5B%EC%82%AC%EB%9D%BD%5D%20%EB%AC%B8%EC%9D%98")!) } label: {
                         row("앱 제안 및 문의", "envelope", detail: AppLinks.contactEmail)
@@ -61,8 +61,8 @@ struct SettingsView: View {
                     Button { openURL(AppLinks.maker) } label: { row("만든 사람", "person", detail: "유찬호 목사", external: true) }
                     Button { tour = true } label: { row("사락 둘러보기", "book.pages") }
                     row("버전", "info.circle", detail: version)
-                }
-                .listRowBackground(Ink.raised)
+                } header: { Text("사역 후원 및 문의").font(.footnote).foregroundStyle(Ink.sub) }
+                .listRowBackground(Color.clear)
 
                 if session.isSignedIn {
                     Section {
@@ -71,10 +71,10 @@ struct SettingsView: View {
                     } footer: {
                         VStack(spacing: 10) { DoorLogo(size: 44); Text("사락 · 생명의 말씀이 사락 넘어갑니다") }.frame(maxWidth: .infinity).padding(.top, 16)
                     }
-                    .listRowBackground(Ink.raised)
+                    .listRowBackground(Color.clear)
                 }
             }
-            .listSectionSpacing(24).contentMargins(.top, 12, for: .scrollContent).contentMargins(.horizontal, 24, for: .scrollContent)
+            .listSectionSpacing(24).contentMargins(.top, 12, for: .scrollContent).contentMargins(.horizontal, 16, for: .scrollContent)
             .scrollContentBackground(.hidden)
             .background(SarakColor.surface)
             .navigationTitle("설정").navigationBarTitleDisplayMode(.inline)
@@ -89,10 +89,10 @@ struct SettingsView: View {
 
     private func row(_ title: String, _ icon: String, detail: String? = nil, tint: Color = SarakColor.ink, external: Bool = false) -> some View {
         HStack(spacing: 12) {
-            Image(systemName: icon).font(.system(size: 16)).foregroundStyle(tint).frame(width: 24)
-            Text(title).font(.body).foregroundStyle(SarakColor.ink)
+            Image(systemName: icon).font(.system(size: 14)).foregroundStyle(tint).frame(width: 24)
+            Text(title).font(.subheadline).foregroundStyle(SarakColor.ink)
             Spacer()
-            if let detail { Text(detail).font(.subheadline).foregroundStyle(SarakColor.inkMuted).lineLimit(1) }
+            if let detail { Text(detail).font(.footnote).foregroundStyle(SarakColor.inkMuted).lineLimit(1) }
             if external { Image(systemName: "arrow.up.right").font(.system(size: 12, weight: .semibold)).foregroundStyle(SarakColor.inkFaint) }
         }
         .contentShape(Rectangle())
@@ -118,7 +118,7 @@ struct PlanSettingsView: View {
     @State private var setup = false
     @State private var confirm = false
     var body: some View {
-        List {
+        List { Group {
             if let p = store.plan {
                 Section {
                     LabeledContent("읽는 플랜", value: p.groupName ?? p.rangeName)
@@ -131,7 +131,8 @@ struct PlanSettingsView: View {
             } else {
                 Section { Button("통독 플랜 만들기") { setup = true } } footer: { Text("지금은 하루 5분 마가복음 말씀길을 읽고 있어요.") }
             }
-        }
+        }.listRowBackground(Color.clear) }
+        .font(.subheadline)
         .tint(Ink.ink).scrollContentBackground(.hidden).background(Ink.canvas).navigationTitle("통독 플랜").navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $setup) { PlanSetupView() }
         .confirmationDialog("플랜을 그만둘까요?", isPresented: $confirm, titleVisibility: .visible) {
@@ -146,7 +147,7 @@ struct HistoryView: View {
     @State private var loaded = false
 
     var body: some View {
-        List {
+        List { Group {
             if !session.isSignedIn {
                 Text("로그인하면 완주 기록이 저장돼요.").foregroundStyle(SarakColor.inkMuted)
             } else if loaded && records.isEmpty {
@@ -155,7 +156,7 @@ struct HistoryView: View {
             ForEach(records) { r in
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
-                        Text(r.planName).font(.system(size: 16, weight: .semibold)).foregroundStyle(SarakColor.ink)
+                        Text(r.planName).font(.subheadline.weight(.medium)).foregroundStyle(SarakColor.ink)
                         Spacer()
                         Text("완주").font(.system(size: 12, weight: .semibold)).foregroundStyle(SarakColor.mintInk)
                             .padding(.horizontal, 10).frame(height: 24).background(SarakColor.mintSoft, in: Capsule())
@@ -165,7 +166,8 @@ struct HistoryView: View {
                 }
                 .padding(.vertical, 4)
             }
-        }
+        }.listRowBackground(Color.clear) }
+        .font(.subheadline)
         .scrollContentBackground(.hidden)
         .background(SarakColor.surface)
         .navigationTitle("나의 통독 기록").navigationBarTitleDisplayMode(.inline)
@@ -178,13 +180,13 @@ struct BookmarksView: View {
     @State private var share: ShareVerses?
 
     var body: some View {
-        List {
+        List { Group {
             if store.bookmarks.isEmpty {
                 Text("읽기 화면에서 구절을 누르고 '품기'를 누르면 여기에 모여요.").foregroundStyle(SarakColor.inkMuted)
             }
             ForEach(store.bookmarks) { b in
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("\(b.bookName) \(b.chapter):\(b.verse)").font(.system(size: 13, weight: .semibold)).foregroundStyle(SarakColor.mintInk)
+                    Text("\(b.bookName) \(b.chapter):\(b.verse)").font(.footnote.weight(.medium)).foregroundStyle(SarakColor.mintInk)
                     Text(b.text).font(SarakFont.serif(16)).lineSpacing(6).foregroundStyle(SarakColor.ink)
                 }
                 .padding(.vertical, 6)
@@ -198,7 +200,8 @@ struct BookmarksView: View {
                     .tint(Ink.control)
                 }
             }
-        }
+        }.listRowBackground(Color.clear) }
+        .font(.subheadline)
         .scrollContentBackground(.hidden)
         .background(SarakColor.surface)
         .navigationTitle("품은 말씀").navigationBarTitleDisplayMode(.inline)

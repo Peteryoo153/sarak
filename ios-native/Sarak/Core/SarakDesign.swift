@@ -141,7 +141,7 @@ struct VerseText: View {
                 .lineSpacing(size * scale * 0.04)
                 .foregroundStyle(color)
                 .fixedSize(horizontal: false, vertical: true)   // 말씀은 자르지 않습니다
-            Text(source).font(.subheadline).foregroundStyle(sourceColor)
+            Text(source).font(.footnote).foregroundStyle(sourceColor)
         }
         .accessibilityElement(children: .combine)
     }
@@ -154,10 +154,10 @@ struct SarakButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var enabled
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.body.weight(.medium))
+            .font(.subheadline.weight(.medium))
             .multilineTextAlignment(.center)
             .padding(.horizontal, Space.xl).padding(.vertical, Space.m)
-            .frame(maxWidth: .infinity, minHeight: 54)
+            .frame(maxWidth: .infinity, minHeight: 50)
             .foregroundStyle(!enabled ? Ink.sub : quiet ? Ink.ink : Ink.onPrimary)
             .background(!enabled ? Ink.line : quiet ? Color.clear : Ink.primary, in: RoundedRectangle(cornerRadius: 27))
             .overlay { if quiet { RoundedRectangle(cornerRadius: 27).strokeBorder(Ink.control) } }
@@ -172,6 +172,14 @@ struct HourChip: View {
         RoundedRectangle(cornerRadius: 5).fill(hour.page)
             .overlay(RoundedRectangle(cornerRadius: 5).strokeBorder(Ink.ink.opacity(0.14)))
             .frame(width: 26, height: 34).accessibilityHidden(true)
+    }
+}
+
+/// 들린 귀퉁이에 놓는 둥근 버튼의 모양
+struct TurnMark: View {
+    var body: some View {
+        Image(systemName: "chevron.right").font(.system(size: 16, weight: .medium)).foregroundStyle(Ink.onPrimary)
+            .frame(width: 52, height: 52).background(Ink.primary, in: Circle())
     }
 }
 
@@ -193,47 +201,61 @@ struct RoomScreen<Tools: View, Action: View, Reading: View>: View {
             switch SarakLayout(size: geo.size) {
             case .spread:
                 HStack(spacing: 0) {
-                    page(bleed: geo.safeAreaInsets, full: true, bottom: 110, size: 38)
+                    page(bleed: geo.safeAreaInsets)
                         // 접힘선은 안전 영역이 아니라 화면 전체의 가운데
                         .frame(width: (geo.size.width + geo.safeAreaInsets.leading + geo.safeAreaInsets.trailing) / 2 - geo.safeAreaInsets.leading)
                     reading.frame(maxWidth: Space.measure).padding(.horizontal, 28).frame(maxWidth: .infinity)
                 }
             case .single, .wide:
+                // 화면 전체가 종이 한 장. 말씀은 가운데 아래, 오늘의 본문은 들린 귀퉁이에 놓입니다.
+                let wide = geo.size.width >= 600
                 ScrollView {
-                    VStack(spacing: 0) {
-                        page(bleed: geo.safeAreaInsets, full: false, bottom: 56, size: geo.size.width >= 600 ? 52 : 36)
-                            .frame(minHeight: geo.size.height * (geo.size.height < 620 ? 0.66 : 0.72))
-                        VStack(alignment: .leading, spacing: Space.l) { action }
-                            .frame(maxWidth: geo.size.width >= 600 ? 480 : .infinity)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.horizontal, geo.size.width >= 600 ? 56 : 28).padding(.vertical, Space.margin)
+                    VStack(alignment: .leading, spacing: 0) {
+                        top
+                        Spacer(minLength: Space.huge)
+                        words(size: wide ? 40 : 27)
+                        Spacer(minLength: Space.huge)
+                        action.padding(.bottom, 36)
                     }
+                    .padding(.horizontal, wide ? 72 : 32).padding(.top, Space.s)
+                    .frame(maxWidth: .infinity, minHeight: geo.size.height, alignment: .leading)
                 }
-                .scrollBounceBehavior(.basedOnSize)
-                .scrollClipDisabled()
+                .scrollBounceBehavior(.basedOnSize).scrollIndicators(.hidden)
+                .background { SarakPage(hour: hour, lift: 150 + geo.safeAreaInsets.bottom + (wide ? 60 : 0)).ignoresSafeArea() }
             }
         }
         .background(Ink.canvas)
     }
 
-    private func page(bleed i: EdgeInsets, full: Bool, bottom: CGFloat, size: CGFloat) -> some View {
+    private var top: some View {
+        HStack(alignment: .center) {
+            Text(date).font(.footnote).foregroundStyle(Ink.sub)
+            Spacer()
+            tools
+        }
+        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+    }
+    private func words(size: CGFloat) -> some View {
+        VStack(alignment: .leading, spacing: Space.m) {
+            Text(label).font(.footnote).foregroundStyle(Ink.sub)
+            VerseText(text: verse, source: source, size: verse.count > 44 ? size * 0.82 : size)
+        }
+        .frame(maxWidth: Space.measure, alignment: .leading)
+    }
+    /// 펼친 책의 왼쪽 면
+    private func page(bleed i: EdgeInsets) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack(alignment: .center) {
-                Text(date).font(.subheadline).foregroundStyle(Ink.sub)
-                Spacer()
-                tools
-            }
-            .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+            top
             Spacer(minLength: Space.huge)
-            Text(label).font(.subheadline).foregroundStyle(Ink.sub).padding(.bottom, Space.l)
-            VerseText(text: verse, source: source, size: verse.count > 44 ? size * 0.72 : size)
+            words(size: 30)
+            Spacer(minLength: 110)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, size > 40 ? 56 : 28).padding(.top, Space.l).padding(.bottom, bottom)
+        .padding(.horizontal, 40).padding(.top, Space.l)
         // 종이는 상태 표시줄과 Duo의 옆 시스템 띠까지 이어지고, 글은 안전 영역 안에 둡니다.
         .background {
-            SarakPage(hour: hour, lift: size > 40 ? 150 : 92)
-                .padding(EdgeInsets(top: -i.top, leading: -i.leading, bottom: full ? -i.bottom : 0, trailing: full ? 0 : -i.trailing))
+            SarakPage(hour: hour, lift: 110)
+                .padding(EdgeInsets(top: -i.top, leading: -i.leading, bottom: -i.bottom, trailing: 0))
         }
     }
 }

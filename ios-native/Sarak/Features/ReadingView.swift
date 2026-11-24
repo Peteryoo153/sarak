@@ -29,7 +29,7 @@ struct PassageBody: View {
             .scrollTargetLayout()
             .padding(.top, 12)
             Text(model.reading.kind == .free ? "여기까지예요." : "오늘의 본문은 여기까지예요.")
-                .font(.subheadline).foregroundStyle(Ink.sub).frame(maxWidth: .infinity, alignment: .leading).padding(.top, 28)
+                .font(.footnote).foregroundStyle(Ink.sub).frame(maxWidth: .infinity, alignment: .leading).padding(.top, 28)
             if model.reading.kind != .free {
                 Button("오늘 본문 마치기", action: onFinish).buttonStyle(SarakButtonStyle()).padding(.top, 24)
             }
@@ -131,7 +131,7 @@ struct ReadingView: View {
                 .navigationTitle(model.reading.title).navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .topBarLeading) { Button { dismiss() } label: { Image(systemName: "chevron.left") }.accessibilityLabel("닫기") }
-                    ToolbarItem(placement: .principal) { Text(model.reading.title).font(SarakFont.serif(18, bold: true)).foregroundStyle(Ink.ink).lineLimit(1).minimumScaleFactor(0.7).accessibilityAddTraits(.isHeader) }
+                    ToolbarItem(placement: .principal) { Text(model.reading.title).font(SarakFont.serif(17)).foregroundStyle(Ink.ink).lineLimit(1).minimumScaleFactor(0.7).accessibilityAddTraits(.isHeader) }
                     ToolbarItem(placement: .topBarTrailing) { ReaderTools() }
                 }
                 .toolbarBackground(Ink.canvas, for: .navigationBar)
@@ -168,25 +168,25 @@ struct DoneView: View {
                 VStack(spacing: 0) {
                     VStack(alignment: .leading) {
                         Spacer(minLength: 120)
-                        VerseText(text: message, source: finishedBook ? "다음은 시편에서 잠시 쉬어가요." : model.reading.title, size: 34)
+                        VerseText(text: message, source: finishedBook ? "다음은 시편에서 잠시 쉬어가요." : model.reading.title, size: 24)
                     }
-                    .frame(maxWidth: .infinity, minHeight: geo.size.height * 0.62, alignment: .leading)
-                    .padding(.horizontal, 28).padding(.bottom, 130)
+                    .frame(maxWidth: .infinity, minHeight: geo.size.height * 0.54, alignment: .leading)
+                    .padding(.horizontal, 32).padding(.bottom, 130)
                     .background {
                         SarakPage(hour: .now, lift: lift)
                             .padding(EdgeInsets(top: -geo.safeAreaInsets.top, leading: -geo.safeAreaInsets.leading, bottom: 0, trailing: -geo.safeAreaInsets.trailing))
                     }
                     VStack(spacing: 12) {
                         TextField("한 줄", text: $note, prompt: Text("감사나 묵상을 한 줄 남겨요 (선택)").foregroundStyle(Ink.sub), axis: .vertical).lineLimit(1...4)
-                            .padding(16).background(Ink.raised, in: RoundedRectangle(cornerRadius: 14))
-                            .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Ink.control))
+                            .font(.subheadline).padding(.vertical, 14)
+                            .overlay(alignment: .bottom) { Rectangle().fill(Ink.control).frame(height: 1) }
                         if store.activeGroupId != nil, case .plan = model.reading.kind {
                             Text("남긴 글은 함께 읽는 그룹에 보여요.").font(.footnote).foregroundStyle(Ink.sub)
                         }
                         Button("마치기") { finish() }.buttonStyle(SarakButtonStyle()).padding(.top, 12)
-                        Button("함께 나누기") { share = true }.font(.body).foregroundStyle(Ink.ink).frame(minHeight: 44)
+                        Button("함께 나누기") { share = true }.font(.footnote).foregroundStyle(Ink.ink).frame(minHeight: 44)
                     }
-                    .frame(maxWidth: 460).padding(24)
+                    .frame(maxWidth: 460).padding(32)
                 }
             }
             .scrollClipDisabled()

@@ -29,12 +29,12 @@ struct RoomView: View {
                 }
                 .padding(.trailing, -12)
             } action: {
-                todayReading
-                Button(buttonTitle) { openReading() }.buttonStyle(SarakButtonStyle())
+                Button { openReading() } label: { todayReading }.buttonStyle(.plain)
+                    .accessibilityLabel("\(readingLabel), \(reading.title), \(buttonTitle)")
             } reading: {
                 if let model {
                     VStack(spacing: 8) {
-                        HStack { Text(model.reading.title).font(.headline).foregroundStyle(Ink.ink); Spacer(); ReaderTools() }
+                        HStack { Text(model.reading.title).font(SarakFont.serif(17)).foregroundStyle(Ink.ink); Spacer(); ReaderTools() }
                             .padding(.top, 12)
                         PassageBody(model: model) { showDone = true }
                     }
@@ -63,21 +63,24 @@ struct RoomView: View {
         #endif
     }
 
-    /// 무엇을, 얼마나 읽는지 먼저 보여 주고 버튼에는 할 일만 적습니다.
+    /// 무엇을, 얼마나 읽는지 보여 주고 귀퉁이의 버튼으로 넘깁니다.
     private var todayReading: some View {
-        HStack(alignment: .lastTextBaseline) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(readToday ? "오늘 읽은 본문" : path.isBack ? "이어서 읽을 본문" : "오늘 읽을 본문").font(.subheadline).foregroundStyle(Ink.sub)
-                Text(reading.title).font(.custom("GowunBatang-Regular", size: 22, relativeTo: .title2)).foregroundStyle(Ink.ink)
+        HStack(alignment: .center, spacing: 16) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(readingLabel).font(.footnote).foregroundStyle(Ink.sub)
+                Text(reading.title).font(.custom("GowunBatang-Regular", size: 18, relativeTo: .title3)).foregroundStyle(Ink.ink)
+                    .multilineTextAlignment(.leading)
+                Text(readToday ? "다시 읽기" : reading.minutes.map { "\(buttonTitle), 약 \($0)분" } ?? buttonTitle).font(.footnote).foregroundStyle(Ink.sub)
             }
             Spacer(minLength: 12)
-            if let m = reading.minutes { Text("약 \(m)분").font(.subheadline).foregroundStyle(Ink.sub) }
+            TurnMark()
         }
-        .accessibilityElement(children: .combine)
+        .contentShape(Rectangle())
     }
+    private var readingLabel: String { readToday ? "오늘 읽은 본문" : path.isBack ? "이어서 읽을 본문" : "오늘 읽을 본문" }
     private var buttonTitle: String { readToday ? "다시 읽기" : path.isBack ? "이어서 읽기" : "본문 읽기" }
     private func tool(_ icon: String, _ label: String, _ f: @escaping () -> Void) -> some View {
-        Button(action: f) { Image(systemName: icon).font(.system(size: 18)).foregroundStyle(Ink.ink).frame(width: 44, height: 44) }.accessibilityLabel(label)
+        Button(action: f) { Image(systemName: icon).font(.system(size: 16)).foregroundStyle(Ink.ink).frame(width: 44, height: 44) }.accessibilityLabel(label)
     }
     private func refresh() {
         hour = .now

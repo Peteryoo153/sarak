@@ -22,8 +22,8 @@ struct BibleView: View {
                                 .buttonStyle(.plain).accessibilityLabel("지우기")
                         }
                     }
-                    .padding(.leading, 16).padding(.trailing, query.isEmpty ? 16 : 0).frame(minHeight: 48)
-                    .background(Ink.raised, in: Capsule()).overlay(Capsule().strokeBorder(Ink.line))
+                    .font(.subheadline).frame(minHeight: 44)
+                    .overlay(alignment: .bottom) { Rectangle().fill(Ink.line).frame(height: 1) }
                 }
                 .padding(.bottom, 16)
                 .listRowInsets(EdgeInsets()).listRowSeparator(.hidden).listRowBackground(Color.clear)
@@ -31,11 +31,11 @@ struct BibleView: View {
                     Button { model = ReaderModel(.today(store, path)) } label: { resume }
                         .buttonStyle(.plain).listRowInsets(EdgeInsets()).listRowSeparator(.hidden).listRowBackground(Color.clear)
                         .padding(.bottom, 12)
-                    Picker("", selection: $old) { Text("구약").tag(true); Text("신약").tag(false) }
-                        .pickerStyle(.segmented).labelsHidden().listRowSeparator(.hidden).listRowBackground(Color.clear).listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+                    TextTabs(items: [(true, "구약"), (false, "신약")], selection: $old)
+                        .listRowSeparator(.hidden).listRowBackground(Color.clear).listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
                     ForEach(BibleDB.shared.books.filter { old ? $0.id < 40 : $0.id >= 40 }) { b in
                         NavigationLink { ChapterGrid(book: b) { model = ReaderModel(.chapter(b, $0)) } } label: {
-                            LabeledContent { Text("\(b.chapterCount)장") } label: { Text(b.name).foregroundStyle(Ink.ink) }.frame(minHeight: 40)
+                            LabeledContent { Text("\(b.chapterCount)장").font(.footnote).foregroundStyle(Ink.sub) } label: { Text(b.name).font(.subheadline).foregroundStyle(Ink.ink) }.frame(minHeight: 40)
                         }
                         .listRowBackground(Color.clear).listRowInsets(EdgeInsets())
                     }
@@ -48,7 +48,7 @@ struct BibleView: View {
                             }
                         } label: {
                             VStack(alignment: .leading, spacing: 4) {
-                                Text(h.verse.text).font(SarakFont.serif(17)).foregroundStyle(Ink.ink)
+                                Text(h.verse.text).font(SarakFont.serif(16)).lineSpacing(4).foregroundStyle(Ink.ink)
                                 Text("\(h.book) \(h.verse.chapter):\(h.verse.number)").font(.footnote).foregroundStyle(Ink.sub)
                             }.padding(.vertical, 6)
                         }
@@ -56,7 +56,7 @@ struct BibleView: View {
                     }
                 }
             }
-            .listStyle(.plain).scrollDismissesKeyboard(.immediately).contentMargins(.horizontal, 24, for: .scrollContent)
+            .listStyle(.plain).scrollDismissesKeyboard(.immediately).contentMargins(.horizontal, 32, for: .scrollContent)
             .frame(maxWidth: 760).frame(maxWidth: .infinity)
             .background(Ink.canvas).toolbar(.hidden, for: .navigationBar)
             .onChange(of: query) { _, q in hits = q.count < 2 ? [] : BibleDB.shared.search(q) }
@@ -69,8 +69,9 @@ struct BibleView: View {
         let r = Reading.today(store, path)
         let first = r.segments.first.flatMap { s in BibleDB.shared.chapter(bookId: s.bookId, chapter: s.chapter).first { $0.number >= s.from } }
         return VStack(alignment: .leading, spacing: 8) {
-            Text("이어 읽기 · \(r.title)").font(.footnote).foregroundStyle(Ink.sub)
-            Text(first?.text ?? "").font(SarakFont.serif(21)).foregroundStyle(Ink.ink).fixedSize(horizontal: false, vertical: true)
+            Text("이어 읽기").font(.footnote).foregroundStyle(Ink.sub)
+            Text(first?.text ?? "").font(SarakFont.serif(18)).lineSpacing(5).foregroundStyle(Ink.ink).fixedSize(horizontal: false, vertical: true)
+            Text(r.title).font(.footnote).foregroundStyle(Ink.sub)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(22).padding(.bottom, 36)
@@ -88,12 +89,12 @@ struct ChapterGrid: View {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 56), spacing: 8)], spacing: 8) {
                 ForEach(1...max(book.chapterCount, 1), id: \.self) { c in
                     Button("\(c)") { onPick(c) }
-                        .font(.body.monospacedDigit()).foregroundStyle(Ink.ink).frame(maxWidth: .infinity, minHeight: 56)
+                        .font(.subheadline.monospacedDigit()).foregroundStyle(Ink.ink).frame(maxWidth: .infinity, minHeight: 56)
                         .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Ink.line))
                         .accessibilityLabel("\(c)장")
                 }
             }
-            .padding(24).frame(maxWidth: 760)
+            .padding(32).frame(maxWidth: 760)
         }
         .frame(maxWidth: .infinity)
         .background(Ink.canvas).navigationTitle(book.name).navigationBarTitleDisplayMode(.inline)

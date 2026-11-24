@@ -11,11 +11,11 @@ struct WordAlertsView: View {
         Binding { s.skipDate == WordAlerts.dayKey(Date()) } set: { s.skipDate = $0 ? WordAlerts.dayKey(Date()) : nil }
     }
     var body: some View {
-        Form {
+        Form { Group {
             if denied {
                 Section {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("아이폰 설정에서 알림이 꺼져 있어요").font(.headline)
+                        Text("아이폰 설정에서 알림이 꺼져 있어요").font(SarakFont.serif(18))
                         Text("켜 두면 정한 시간에 말씀이 찾아가요.").font(.footnote).foregroundStyle(Ink.sub)
                         Button("아이폰 설정 열기") { openURL(URL(string: UIApplication.openSettingsURLString)!) }.buttonStyle(SarakButtonStyle()).padding(.top, 8)
                     }.padding(.vertical, 8)
@@ -38,7 +38,7 @@ struct WordAlertsView: View {
                                 Calendar.current.date(bySettingHour: slot.h, minute: slot.m, second: 0, of: Date()) ?? Date()
                             } set: { d in
                                 let c = Calendar.current.dateComponents([.hour, .minute], from: d); slot.h = c.hour ?? 0; slot.m = c.minute ?? 0
-                            }, displayedComponents: .hourAndMinute).labelsHidden().scaleEffect(0.86, anchor: .leading)
+                            }, displayedComponents: .hourAndMinute).labelsHidden().scaleEffect(0.86, anchor: .leading).padding(.leading, -10)
                         }
                         Spacer()
                         Toggle(slot.hour.alertTitle, isOn: $slot.on).labelsHidden()
@@ -50,7 +50,8 @@ struct WordAlertsView: View {
                 Toggle("잠금화면에 말씀 보이기", isOn: $s.showVerse)
                 Button("기본값으로 되돌리기") { s.slots = WordAlerts.Slot.defaults; s.showVerse = true }.foregroundStyle(Ink.ink)
             }
-        }
+        }.listRowBackground(Color.clear) }
+        .font(.subheadline).contentMargins(.horizontal, 16, for: .scrollContent)
         .tint(Ink.primary).scrollContentBackground(.hidden).background(Ink.canvas)
         .navigationTitle("말씀 알림").navigationBarTitleDisplayMode(.inline)
         .onChange(of: s) { _, v in

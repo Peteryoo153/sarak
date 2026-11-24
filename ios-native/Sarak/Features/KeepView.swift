@@ -39,17 +39,7 @@ struct KeepView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 ScreenTitle("말씀첩")
-                HStack(spacing: 24) {
-                    ForEach(Tab.allCases, id: \.self) { t in
-                        Button { tab = t } label: {
-                            Text(t.rawValue).font(tab == t ? .subheadline.weight(.semibold) : .subheadline).foregroundStyle(tab == t ? Ink.ink : Ink.sub)
-                                .frame(minHeight: 44).overlay(alignment: .bottom) { if tab == t { Rectangle().fill(Ink.ink).frame(height: 2) } }
-                        }
-                        .accessibilityAddTraits(tab == t ? .isSelected : [])
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .overlay(alignment: .bottom) { Rectangle().fill(Ink.line).frame(height: 1).zIndex(-1) }
+                TextTabs(items: Tab.allCases.map { ($0, $0.rawValue) }, selection: $tab)
                 .padding(.bottom, 8)
                 switch tab {
                 case .kept: kept
@@ -58,7 +48,7 @@ struct KeepView: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 24).padding(.bottom, 24)
+            .padding(.horizontal, 32).padding(.bottom, 24)
         }
     }
 
@@ -111,7 +101,7 @@ struct KeepView: View {
             HStack(alignment: .top, spacing: 14) {
                 Ribbon().fill(hour.ribbon).frame(width: 12, height: 22).overlay(Ribbon().stroke(Ink.ink.opacity(0.12), lineWidth: 0.5)).padding(.top, 4).accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(text).font(SarakFont.serif(19)).foregroundStyle(Ink.ink).fixedSize(horizontal: false, vertical: true).multilineTextAlignment(.leading)
+                    Text(text).font(SarakFont.serif(17)).lineSpacing(4).foregroundStyle(Ink.ink).fixedSize(horizontal: false, vertical: true).multilineTextAlignment(.leading)
                     Text(ref).font(.footnote).foregroundStyle(Ink.sub)
                 }
                 Spacer(minLength: 0)
@@ -123,14 +113,14 @@ struct KeepView: View {
     }
     private func empty(_ t: String, _ s: String) -> some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(t).font(SarakFont.serif(22)).foregroundStyle(Ink.ink)
-            Text(s).font(.subheadline).foregroundStyle(Ink.sub)
-        }.frame(maxWidth: .infinity, alignment: .leading).padding(.top, 48)
+            Text(t).font(SarakFont.serif(18)).foregroundStyle(Ink.ink)
+            Text(s).font(.footnote).lineSpacing(4).foregroundStyle(Ink.sub)
+        }.frame(maxWidth: .infinity, alignment: .leading).padding(.top, 72)
     }
     @ViewBuilder private var detail: some View {
         if let b = picked ?? store.bookmarks.first {
             VStack(alignment: .leading, spacing: 28) {
-                VerseText(text: b.text, source: "\(b.bookName) \(b.chapter):\(b.verse)", size: 32)
+                VerseText(text: b.text, source: "\(b.bookName) \(b.chapter):\(b.verse)", size: 26)
                 Button("나누기") { share = ShareVerses(verses: [verse(b)], bookName: b.bookName) }.buttonStyle(SarakButtonStyle(quiet: true)).frame(maxWidth: 240)
             }.padding(.top, 24)
         }
@@ -158,13 +148,13 @@ struct NoteSheet: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
                     Text("\(note.date.koreanFullDate)에 남긴 글").font(.footnote).foregroundStyle(Ink.sub)
-                    TextField("한 줄", text: $text, axis: .vertical).font(SarakFont.serif(20)).lineSpacing(6).foregroundStyle(Ink.ink)
+                    TextField("한 줄", text: $text, axis: .vertical).font(SarakFont.serif(18)).lineSpacing(6).foregroundStyle(Ink.ink)
                         .frame(maxWidth: .infinity, minHeight: 96, alignment: .topLeading)
                     Rectangle().fill(Ink.line).frame(height: 1)
                     Text("글을 눌러 고칠 수 있어요. 지워도 읽은 기록은 남아요.\(inGroup ? " 그룹에 이미 보인 글은 바뀌지 않아요." : "")").font(.footnote).foregroundStyle(Ink.sub)
-                    Button("이 글 지우기") { confirm = true }.font(.body).foregroundStyle(Ink.danger).frame(minHeight: 44)
+                    Button("이 글 지우기") { confirm = true }.font(.footnote).foregroundStyle(Ink.danger).frame(minHeight: 44)
                 }
-                .padding(24)
+                .padding(32)
             }
             .background(Ink.canvas)
             .navigationTitle(note.reference).navigationBarTitleDisplayMode(.inline)
@@ -203,7 +193,7 @@ struct ReadCalendar: View {
         let lead = (cal.component(.weekday, from: month) + 5) % 7
         VStack(alignment: .leading, spacing: 14) {
             HStack {
-                Text(verbatim: "\(c.year!)년 \(c.month!)월").font(SarakFont.serif(20))
+                Text(verbatim: "\(c.year!)년 \(c.month!)월").font(SarakFont.serif(17))
                 Spacer()
                 Button { shift(-1) } label: { Image(systemName: "chevron.left").frame(width: 44, height: 44) }.accessibilityLabel("이전 달")
                 Button { shift(1) } label: { Image(systemName: "chevron.right").frame(width: 44, height: 44) }.accessibilityLabel("다음 달")
@@ -213,7 +203,7 @@ struct ReadCalendar: View {
                 ForEach(0..<lead, id: \.self) { _ in Color.clear.frame(height: 46) }
                 ForEach(days, id: \.self) { d in
                     let read = dates.contains(d), today = cal.isDateInToday(d)
-                    Text("\(cal.component(.day, from: d))").font(.callout.monospacedDigit()).foregroundStyle(Ink.ink)
+                    Text("\(cal.component(.day, from: d))").font(.footnote.monospacedDigit()).foregroundStyle(Ink.ink)
                         .frame(maxWidth: .infinity, minHeight: 46)
                         .background(read ? SarakHour.morning.page : .clear, in: RoundedRectangle(cornerRadius: 6))
                         .overlay(alignment: .bottom) { if read { Rectangle().fill(Ink.control).frame(height: 2).padding(.horizontal, 5) } }

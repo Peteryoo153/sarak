@@ -44,23 +44,43 @@ enum SarakFont {
     static func serif(_ size: CGFloat, bold: Bool = false) -> Font {
         .custom(bold ? "GowunBatang-Bold" : "GowunBatang-Regular", size: size)
     }
-    static let display = Font.system(size: 34, weight: .semibold)
-    static let title1 = Font.system(size: 26, weight: .semibold)
-    static let title2 = Font.system(size: 20, weight: .semibold)
-    static let headline = Font.system(size: 17, weight: .semibold)
-    static let body = Font.system(size: 16)
-    static let callout = Font.system(size: 15, weight: .medium)
-    static let caption = Font.system(size: 13, weight: .medium)
+    static let display = serif(24)
+    static let title1 = serif(24)
+    static let title2 = serif(18)
+    static let headline = Font.subheadline.weight(.medium)
+    static let body = Font.subheadline
+    static let callout = Font.subheadline
+    static let caption = Font.footnote
     static let micro = Font.system(size: 11, weight: .semibold)
 }
 
-/// 탭 첫 화면의 제목. 내용과 같은 왼쪽 여백(24)에 놓습니다.
+/// 글자로만 된 탭. 고른 것은 아래 선으로 표시합니다.
+struct TextTabs<T: Hashable>: View {
+    let items: [(T, String)]
+    @Binding var selection: T
+    var body: some View {
+        HStack(spacing: 24) {
+            ForEach(items, id: \.0) { v, name in
+                Button { selection = v } label: {
+                    Text(name).font(.footnote.weight(selection == v ? .semibold : .regular)).foregroundStyle(selection == v ? Ink.ink : Ink.sub)
+                        .frame(minHeight: 44).overlay(alignment: .bottom) { if selection == v { Rectangle().fill(Ink.ink).frame(height: 1) } }
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain).accessibilityAddTraits(selection == v ? .isSelected : [])
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(alignment: .bottom) { Rectangle().fill(Ink.line).frame(height: 1) }
+    }
+}
+
+/// 탭 첫 화면의 제목. 내용과 같은 왼쪽 여백(32)에 놓습니다.
 struct ScreenTitle: View {
     let text: String
     init(_ text: String) { self.text = text }
     var body: some View {
-        Text(text).font(.custom("GowunBatang-Regular", size: 30, relativeTo: .largeTitle)).foregroundStyle(Ink.ink)
-            .frame(maxWidth: .infinity, alignment: .leading).padding(.top, 20).padding(.bottom, 12)
+        Text(text).font(.custom("GowunBatang-Regular", size: 24, relativeTo: .title)).foregroundStyle(Ink.ink)
+            .frame(maxWidth: .infinity, alignment: .leading).padding(.top, 28).padding(.bottom, 16)
             .accessibilityAddTraits(.isHeader)
     }
 }
@@ -68,9 +88,9 @@ struct ScreenTitle: View {
 /// 위쪽 막대의 가운데 제목도 같은 글꼴로 맞춥니다.
 enum SarakBar {
     static func apply() {
-        let font = UIFont(name: "GowunBatang-Bold", size: 18) ?? .systemFont(ofSize: 17, weight: .medium)
+        let font = UIFont(name: "GowunBatang-Regular", size: 17) ?? .systemFont(ofSize: 16)
         UINavigationBar.appearance().titleTextAttributes = [.font: font, .foregroundColor: UIColor(Ink.ink)]
-        let large = UIFont(name: "GowunBatang-Regular", size: 30) ?? .systemFont(ofSize: 30)
+        let large = UIFont(name: "GowunBatang-Regular", size: 24) ?? .systemFont(ofSize: 24)
         UINavigationBar.appearance().largeTitleTextAttributes = [.font: large, .foregroundColor: UIColor(Ink.ink)]
     }
 }
@@ -111,10 +131,10 @@ struct PrimaryButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.body.weight(.medium))
-            .frame(maxWidth: .infinity, minHeight: 54)
+            .font(.subheadline.weight(.medium))
+            .frame(maxWidth: .infinity, minHeight: 50)
             .foregroundStyle(foreground)
-            .background(fill.opacity(isEnabled ? 1 : 0.4), in: RoundedRectangle(cornerRadius: 27, style: .continuous))
+            .background(fill.opacity(isEnabled ? 1 : 0.4), in: RoundedRectangle(cornerRadius: 25, style: .continuous))
             .opacity(configuration.isPressed ? 0.85 : 1)
             .scaleEffect(configuration.isPressed ? 0.98 : 1)
             .animation(.easeOut(duration: 0.15), value: configuration.isPressed)
@@ -124,11 +144,11 @@ struct PrimaryButtonStyle: ButtonStyle {
 struct SecondaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.body.weight(.medium))
-            .frame(maxWidth: .infinity, minHeight: 54)
+            .font(.subheadline.weight(.medium))
+            .frame(maxWidth: .infinity, minHeight: 50)
             .foregroundStyle(SarakColor.ink)
-            .background(SarakColor.raised, in: RoundedRectangle(cornerRadius: 27, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 27, style: .continuous).strokeBorder(Ink.control))
+            .background(SarakColor.raised, in: RoundedRectangle(cornerRadius: 25, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 25, style: .continuous).strokeBorder(Ink.control))
             .opacity(configuration.isPressed ? 0.7 : 1)
     }
 }
@@ -152,13 +172,9 @@ struct CardModifier: ViewModifier {
     @Environment(\.colorScheme) private var scheme
     func body(content: Content) -> some View {
         content
-            .padding(padding)
+            .padding(.vertical, padding)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(SarakColor.raised, in: RoundedRectangle(cornerRadius: Radius.lg, style: .continuous))
-            .overlay {
-                RoundedRectangle(cornerRadius: Radius.lg, style: .continuous).stroke(SarakColor.line)
-            }
-            
+            .overlay(alignment: .bottom) { Rectangle().fill(Ink.line).frame(height: 1) }
     }
 }
 
